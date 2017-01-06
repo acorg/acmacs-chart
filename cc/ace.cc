@@ -12,7 +12,7 @@ Chart* import_chart(std::string buffer)
 {
     if (buffer == "-")
         buffer = acmacs_base::read_stdin();
-    else
+    else if (buffer[0] != '{')
         buffer = acmacs_base::read_file(buffer);
     Chart* chart = nullptr;
     if (buffer[0] == '{') { // && buffer.find("\"  version\": \"acmacs-ace-v1\"") != std::string::npos) {
