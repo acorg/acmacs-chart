@@ -160,14 +160,14 @@ class Ace
     inline Ace(Chart& aChar) : mChart(aChar) {}
 
     inline void indentation(const char* str, size_t length) { std::cerr << "Indentation: " << std::string(str, length) << std::endl; mIndentation.assign(str, length); }
-      // inline std::string indentation() const { return mIndentation; }
+    inline std::string indentation() const { return mIndentation; }
     inline void version(const char* str, size_t length)
         {
             mVersion.assign(str, length);
-            if (mVersion != "acmacs-ace-v1x")
+            if (mVersion != "acmacs-ace-v1")
                 throw std::runtime_error("Unsupported data version: \"" + mVersion + "\"");
         }
-      // inline std::string version() const { return mVersion; }
+    inline std::string version() const { return mVersion; }
 
  private:
     std::string mIndentation;
@@ -187,9 +187,9 @@ class JsonReaderAce : public JsonReaderObject<Ace>
         {
             const std::string k{str, length};
             if (k == "_")
-                return json_reader_string(std::bind(&Ace::indentation, &target(), std::placeholders::_1, std::placeholders::_2));
+                return json_reader_string(std::bind(static_cast<void(Ace::*)(const char*, size_t)>(&Ace::indentation), &target(), std::placeholders::_1, std::placeholders::_2));
             else if (k == "  version")
-                return json_reader_string(std::bind(&Ace::version, &target(), std::placeholders::_1, std::placeholders::_2));
+                return json_reader_string(std::bind(static_cast<void(Ace::*)(const char*, size_t)>(&Ace::version), &target(), std::placeholders::_1, std::placeholders::_2));
             return nullptr;
         }
 };
