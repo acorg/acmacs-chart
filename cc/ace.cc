@@ -132,6 +132,8 @@ template <typename Target> class JsonReaderObject : public JsonReaderBase
 
 // ----------------------------------------------------------------------
 
+// template <typename Parent, typename Field> using JsonReaderAccessorArg = decltype(std::bind(std::declval<Field& (Parent::*&)()>(), std::declval<Parent*>()));
+
 namespace _internal
 {
     template <typename F> class JsonReaderString : public JsonReaderBase
@@ -157,7 +159,12 @@ template <typename T> inline JsonReaderBase* json_reader(void(T::*setter)(const 
     return _internal::json_reader_string(std::bind(setter, &target, std::placeholders::_1, std::placeholders::_2));
 }
 
-// ----------------------------------------------------------------------
+// for JsonReaderObject<> derivatives, e.g. return json_reader<JsonReaderChart>(&Ace::chart, target());
+template <template<typename> class Reader, typename Parent, typename Field> inline JsonReaderBase* json_reader(Field& (Parent::*accessor)(), Parent& parent)
+{
+    using Bind = decltype(std::bind(std::declval<Field& (Parent::*&)()>(), std::declval<Parent*>()));
+    return new Reader<Bind>(std::bind(accessor, &parent));
+}
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -202,12 +209,6 @@ template <typename Accessor> class JsonReaderChart : public JsonReaderObject<Acc
 
 }; // class JsonReaderChart
 
-template <typename Parent, typename Field> inline JsonReaderBase* json_reader(Field& (Parent::*accessor)(), Parent& parent)
-{
-    using Bind = decltype(std::bind(accessor, &parent));
-    return new JsonReaderChart<Bind>(std::bind(accessor, &parent));
-}
-
 // ----------------------------------------------------------------------
 
 class JsonReaderAce : public JsonReaderObject<Ace&>
@@ -224,7 +225,7 @@ class JsonReaderAce : public JsonReaderObject<Ace&>
             else if (k == "  version")
                 return json_reader(&Ace::version, target());
             else if (k == "c")
-                return json_reader(&Ace::chart, target());
+                return json_reader<JsonReaderChart>(&Ace::chart, target());
             return nullptr;
         }
 }; // class JsonReaderAce
