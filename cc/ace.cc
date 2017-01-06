@@ -38,10 +38,64 @@ class JsonReaderBase
 
 // ----------------------------------------------------------------------
 
+class JsonEventHandler : public rapidjson::BaseReaderHandler<rapidjson::UTF8<>, JsonEventHandler>
+{
+ private:
+    template <typename... Args> inline bool handler(JsonReaderBase* (JsonReaderBase::*aHandler)(Args... args), Args... args)
+        {
+            try {
+                auto new_handler = ((*mHandler.top()).*aHandler)(args...);
+                if (new_handler)
+                    mHandler.emplace(new_handler);
+            }
+            catch (JsonReaderBase::Pop&) {
+                if (mHandler.empty())
+                    return false;
+                mHandler.pop();
+            }
+            catch (JsonReaderBase::Failure& err) {
+                if (*err.what())
+                    std::cerr << "ERROR: " << err.what() << std::endl;
+                return false;
+            }
+            // catch (std::exception& err) {
+            //     std::cerr << "ERROR: " << err.what() << std::endl;
+            //     return false;
+            // }
+            return true;
+        }
+
+ public:
+    template <typename Target> inline JsonEventHandler(Target& aTaget)
+        {
+            mHandler.emplace(json_reader(aTaget));
+        }
+
+    inline bool StartObject() { return handler(&JsonReaderBase::StartObject); }
+    inline bool EndObject(rapidjson::SizeType /*memberCount*/) { return handler(&JsonReaderBase::EndObject); }
+    inline bool StartArray() { return handler(&JsonReaderBase::StartArray); }
+    inline bool EndArray(rapidjson::SizeType /*elementCount*/) { return handler(&JsonReaderBase::EndArray); }
+    inline bool Key(const char* str, rapidjson::SizeType length, bool /*copy*/) { return handler(&JsonReaderBase::Key, str, length); }
+    inline bool String(const char* str, rapidjson::SizeType length, bool /*copy*/) { return handler(&JsonReaderBase::String, str, length); }
+    inline bool Int(int i) { return handler(&JsonReaderBase::Int, i); }
+    inline bool Uint(unsigned u) { return handler(&JsonReaderBase::Uint, u); }
+    inline bool Double(double d) { return handler(&JsonReaderBase::Double, d); }
+    inline bool Bool(bool b) { return handler(&JsonReaderBase::Bool, b); }
+    inline bool Null() { return handler(&JsonReaderBase::Null); }
+    inline bool Int64(int64_t i) { return handler(&JsonReaderBase::Int64, i); }
+    inline bool Uint64(uint64_t u) { return handler(&JsonReaderBase::Uint64, u); }
+
+ private:
+    std::stack<std::unique_ptr<JsonReaderBase>> mHandler;
+
+}; // class JsonEventHandler<>
+
+// ----------------------------------------------------------------------
+
 template <typename Target> class JsonReaderObject : public JsonReaderBase
 {
  public:
-    inline JsonReaderObject(Target& aTarget) : mTarget(aTarget), mStarted(false) {}
+    inline JsonReaderObject(Target aTarget) : mTarget(aTarget), mStarted(false) {}
 
     inline virtual JsonReaderBase* Key(const char* str, rapidjson::SizeType length)
         {
@@ -72,84 +126,38 @@ template <typename Target> class JsonReaderObject : public JsonReaderBase
     inline Target& target() { return mTarget; }
 
  private:
-    Target& mTarget;
+    Target mTarget;
     bool mStarted;
 };
 
 // ----------------------------------------------------------------------
 
-template <typename F> class JsonReaderString : public JsonReaderBase
+namespace _internal
 {
- public:
-    inline JsonReaderString(F aStorage) : mStorage(aStorage) {}
+    template <typename F> class JsonReaderString : public JsonReaderBase
+    {
+     public:
+        inline JsonReaderString(F aStorage) : mStorage(aStorage) {}
 
-    inline virtual JsonReaderBase* String(const char* str, rapidjson::SizeType length)
-        {
-            mStorage(str, length);
-            throw Pop();
-        }
+        inline virtual JsonReaderBase* String(const char* str, rapidjson::SizeType length)
+            {
+                mStorage(str, length);
+                throw Pop();
+            }
 
- private:
-    F mStorage;
-};
+     private:
+        F mStorage;
+    };
 
-template <typename F> inline JsonReaderString<F>* json_reader_string(F aF) { return new JsonReaderString<F>(aF); }
+    template <typename F> inline JsonReaderString<F>* json_reader_string(F aF) { return new JsonReaderString<F>(aF); }
+}
+
+template <typename T> inline JsonReaderBase* json_reader(void(T::*setter)(const char*, size_t), T& target)
+{
+    return _internal::json_reader_string(std::bind(setter, &target, std::placeholders::_1, std::placeholders::_2));
+}
 
 // ----------------------------------------------------------------------
-
-class JsonEventHandler : public rapidjson::BaseReaderHandler<rapidjson::UTF8<>, JsonEventHandler>
-{
- private:
-    template <typename... Args> inline bool handler(JsonReaderBase* (JsonReaderBase::*aHandler)(Args... args), Args... args)
-        {
-            try {
-                auto new_handler = ((*mHandler.top()).*aHandler)(args...);
-                if (new_handler)
-                    mHandler.emplace(new_handler);
-            }
-            catch (JsonReaderBase::Pop&) {
-                if (mHandler.empty())
-                    return false;
-                mHandler.pop();
-            }
-            catch (JsonReaderBase::Failure& err) {
-                if (*err.what())
-                    std::cerr << "ERROR: " << err.what() << std::endl;
-                return false;
-            }
-            // catch (std::exception& err) {
-            //     std::cerr << "ERROR: " << err.what() << std::endl;
-            //     return false;
-            // }
-            return true;
-        }
-
- public:
-    template <typename Target> inline JsonEventHandler(Target& aTaget)
-    // : mTarget(aTaget)
-        {
-            mHandler.emplace(json_reader(aTaget));
-        }
-
-    inline bool StartObject() { return handler(&JsonReaderBase::StartObject); }
-    inline bool EndObject(rapidjson::SizeType /*memberCount*/) { return handler(&JsonReaderBase::EndObject); }
-    inline bool StartArray() { return handler(&JsonReaderBase::StartArray); }
-    inline bool EndArray(rapidjson::SizeType /*elementCount*/) { return handler(&JsonReaderBase::EndArray); }
-    inline bool Key(const char* str, rapidjson::SizeType length, bool /*copy*/) { return handler(&JsonReaderBase::Key, str, length); }
-    inline bool String(const char* str, rapidjson::SizeType length, bool /*copy*/) { return handler(&JsonReaderBase::String, str, length); }
-    inline bool Int(int i) { return handler(&JsonReaderBase::Int, i); }
-    inline bool Uint(unsigned u) { return handler(&JsonReaderBase::Uint, u); }
-    inline bool Double(double d) { return handler(&JsonReaderBase::Double, d); }
-    inline bool Bool(bool b) { return handler(&JsonReaderBase::Bool, b); }
-    inline bool Null() { return handler(&JsonReaderBase::Null); }
-    inline bool Int64(int64_t i) { return handler(&JsonReaderBase::Int64, i); }
-    inline bool Uint64(uint64_t u) { return handler(&JsonReaderBase::Uint64, u); }
-
- private:
-      // Target& mTarget;
-    std::stack<std::unique_ptr<JsonReaderBase>> mHandler;
-
-}; // class JsonEventHandler<>
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -169,30 +177,57 @@ class Ace
         }
     inline std::string version() const { return mVersion; }
 
+    inline Chart& chart() { return mChart; }
+
  private:
     std::string mIndentation;
     std::string mVersion;
     Chart& mChart;
 };
 
-template <typename F> struct FieldDesc { const char* key; F target; };
+// ----------------------------------------------------------------------
 
-class JsonReaderAce : public JsonReaderObject<Ace>
+template <typename Accessor> class JsonReaderChart : public JsonReaderObject<Accessor>
 {
  public:
-    using JsonReaderObject<Ace>::JsonReaderObject;
+    using JsonReaderObject<Accessor>::JsonReaderObject;
+
+ protected:
+    virtual inline JsonReaderBase* match_key(const char* str, rapidjson::SizeType length)
+        {
+            const std::string k{str, length};
+            std::cerr << "JsonReaderChart " << k << std::endl;
+            return nullptr;
+        }
+
+}; // class JsonReaderChart
+
+template <typename Parent, typename Field> inline JsonReaderBase* json_reader(Field& (Parent::*accessor)(), Parent& parent)
+{
+    using Bind = decltype(std::bind(accessor, &parent));
+    return new JsonReaderChart<Bind>(std::bind(accessor, &parent));
+}
+
+// ----------------------------------------------------------------------
+
+class JsonReaderAce : public JsonReaderObject<Ace&>
+{
+ public:
+    using JsonReaderObject<Ace&>::JsonReaderObject;
 
  protected:
     virtual inline JsonReaderBase* match_key(const char* str, rapidjson::SizeType length)
         {
             const std::string k{str, length};
             if (k == "_")
-                return json_reader_string(std::bind(static_cast<void(Ace::*)(const char*, size_t)>(&Ace::indentation), &target(), std::placeholders::_1, std::placeholders::_2));
+                return json_reader(&Ace::indentation, target());
             else if (k == "  version")
-                return json_reader_string(std::bind(static_cast<void(Ace::*)(const char*, size_t)>(&Ace::version), &target(), std::placeholders::_1, std::placeholders::_2));
+                return json_reader(&Ace::version, target());
+            else if (k == "c")
+                return json_reader(&Ace::chart, target());
             return nullptr;
         }
-};
+}; // class JsonReaderAce
 
 inline JsonReaderBase* json_reader(Ace& target)
 {
