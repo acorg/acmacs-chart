@@ -278,6 +278,7 @@ class Chart
     inline Chart& operator=(const Chart&) = default;
     ~Chart();
 
+    inline void xxx(const char* str, size_t length) { std::cerr << "Chart::xxx: " << std::string(str, length) << std::endl; }
     // inline std::string virus_type() const { return mInfo.virus_type(); }
 
     inline size_t number_of_antigens() const { return mAntigens.size(); }
@@ -301,6 +302,9 @@ class Chart
 
     inline const auto& column_bases() const { return mColumnBases; }
     inline auto& column_bases() { return mColumnBases; }
+
+    inline std::vector<Projection>& projections() { return mProjections; }
+    inline const std::vector<Projection>& projections() const { return mProjections; }
 
     // void find_homologous_antigen_for_sera();
     // inline void find_homologous_antigen_for_sera_const() const { const_cast<Chart*>(this)->find_homologous_antigen_for_sera(); }

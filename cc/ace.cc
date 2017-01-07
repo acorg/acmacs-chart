@@ -105,11 +105,14 @@ template <typename Target> class JsonReaderObject : public JsonReaderBase
 
     inline virtual JsonReaderBase* Key(const char* str, rapidjson::SizeType length)
         {
+              // std::cerr << "JsonReaderObject::Key " << std::string(str, length) << std::endl;
             JsonReaderBase* r = match_key(str, length);
             if (!r) {
                   // support for keys starting or ending with ? and "_"
                 r = JsonReaderBase::Key(str, length);
             }
+            // else
+            //     std::cerr << "JsonReaderObject " << std::string(str, length) << " -> PUSH " << typeid(*r).name() << std::endl;
             return r;
         }
 
@@ -137,8 +140,6 @@ template <typename Target> class JsonReaderObject : public JsonReaderBase
 };
 
 // ----------------------------------------------------------------------
-
-// template <typename Parent, typename Field> using JsonReaderAccessorArg = decltype(std::bind(std::declval<Field& (Parent::*&)()>(), std::declval<Parent*>()));
 
 namespace _internal
 {
@@ -193,15 +194,12 @@ template <typename Parent, typename Func> class JsonReaderMakerSetter : public J
     Func mF;
 };
 
-template <template<typename> class Reader, typename Parent, typename Func> class JsonReaderMakerAccessor : public JsonReaderMakerBase<Parent>
+template <typename Parent, typename ...Args> inline JsonReaderMakerBase<Parent>* json_reader_maker(void (Parent::*setter)(Args...))
 {
- public:
-    inline JsonReaderMakerAccessor(Func aF) : mF(aF) {}
-    virtual inline JsonReaderBase* operator()(Parent& parent) { return json_reader<Reader>(mF, parent); }
+    return new JsonReaderMakerSetter<Parent, decltype(setter)>(setter);
+}
 
- private:
-    Func mF;
-};
+// -------
 
 template <typename Parent> class JsonReaderMakerWrapper
 {
@@ -215,16 +213,6 @@ template <typename Parent> class JsonReaderMakerWrapper
 
 template <typename Parent> using JsonReaderData = std::map<std::string,JsonReaderMakerWrapper<Parent>>;
 
-template <typename Parent, typename ...Args> inline JsonReaderMakerBase<Parent>* json_reader_maker(void (Parent::*setter)(Args...))
-{
-    return new JsonReaderMakerSetter<Parent, decltype(setter)>(setter);
-}
-
-template <template<typename> class Reader, typename Parent, typename Field> inline JsonReaderMakerBase<Parent>* json_reader_maker(Field& (Parent::*accessor)())
-{
-    return new JsonReaderMakerAccessor<Reader, Parent, decltype(accessor)>(accessor);
-}
-
 template <typename Target> class JsonReaderForDataRef : public JsonReaderObject<Target&>
 {
  public:
@@ -234,7 +222,7 @@ template <typename Target> class JsonReaderForDataRef : public JsonReaderObject<
     virtual inline JsonReaderBase* match_key(const char* str, rapidjson::SizeType length)
         {
             const std::string k{str, length};
-            std::cerr << typeid(*this).name() << " " << k << std::endl;
+            // std::cerr << typeid(*this).name() << " " << k << std::endl;
             auto e = mData.find(k);
             if (e != mData.end())
                 return e->second(this->target());
@@ -244,11 +232,55 @@ template <typename Target> class JsonReaderForDataRef : public JsonReaderObject<
  private:
     JsonReaderData<Target>& mData;
 
-}; // class JsonReaderAce
+}; // class JsonReaderForDataRef<Target>
 
 template <typename Target> inline JsonReaderForDataRef<Target>* json_reader_for_data(Target& aTarget, JsonReaderData<Target>& aData)
 {
     return new JsonReaderForDataRef<Target>(aTarget, aData);
+}
+
+template <typename Target, typename Accessor> class JsonReaderForDataAccessor : public JsonReaderObject<Accessor>
+{
+ public:
+    inline JsonReaderForDataAccessor(Accessor aAccessor, JsonReaderData<Target>& aData) : JsonReaderObject<Accessor>(aAccessor), mData(aData) {}
+
+ protected:
+    virtual inline JsonReaderBase* match_key(const char* str, rapidjson::SizeType length)
+        {
+            const std::string k{str, length};
+            // std::cerr << typeid(*this).name() << " " << k << std::endl;
+            auto e = mData.find(k);
+            if (e != mData.end()) {
+                return e->second(this->target()());
+            }
+            return nullptr;
+        }
+
+ private:
+    JsonReaderData<Target>& mData;
+
+}; // class JsonReaderForDataAccessor<Target, Accessor>
+
+template <typename Parent, typename Field> inline auto* json_reader_for_data_accessor(Parent& aParent, Field& (Parent::*accessor)(), JsonReaderData<Field>& aData)
+{
+    using Bind = decltype(std::bind(accessor, &aParent));
+    return new JsonReaderForDataAccessor<Field, Bind>(std::bind(accessor, &aParent), aData);
+}
+
+template <typename Parent, typename Field, typename Func> class JsonReaderMakerAccessor : public JsonReaderMakerBase<Parent>
+{
+ public:
+    inline JsonReaderMakerAccessor(Func aF, JsonReaderData<Field>& aData) : mF(aF), mData(aData) {}
+    virtual inline JsonReaderBase* operator()(Parent& parent) { return json_reader_for_data_accessor(parent, mF, mData); }
+
+ private:
+    Func mF;
+    JsonReaderData<Field>& mData;
+};
+
+template <typename Parent, typename Field> inline JsonReaderMakerBase<Parent>* json_reader_maker(Field& (Parent::*accessor)(), JsonReaderData<Field>& data)
+{
+    return new JsonReaderMakerAccessor<Parent, Field, decltype(accessor)>(accessor, data);
 }
 
 // ----------------------------------------------------------------------
@@ -279,52 +311,29 @@ class Ace
 
 // ----------------------------------------------------------------------
 
-template <typename Accessor> class JsonReaderChart : public JsonReaderObject<Accessor>
-{
- public:
-    using JsonReaderObject<Accessor>::JsonReaderObject;
+#pragma GCC diagnostic push
+#ifdef __clang__
+#pragma GCC diagnostic ignored "-Wexit-time-destructors"
+#pragma GCC diagnostic ignored "-Wglobal-constructors"
+#endif
 
- protected:
-    virtual inline JsonReaderBase* match_key(const char* str, rapidjson::SizeType length)
-        {
-            const std::string k{str, length};
-            std::cerr << "JsonReaderChart " << k << std::endl;
-            return nullptr;
-        }
+static JsonReaderData<Chart> chart_reader_maker_data = {
+    {"_", json_reader_maker(&Chart::xxx)},
+      // {"P", json_reader_maker(&::projections)},
+};
 
-}; // class JsonReaderChart
+static JsonReaderData<Ace> ace_reader_maker_data = {
+    {"_", json_reader_maker(&Ace::indentation)},
+    {"  version", json_reader_maker(&Ace::version)},
+    {"c", json_reader_maker(&Ace::chart, chart_reader_maker_data)},
+};
+
+#pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------
 
-// class JsonReaderAce : public JsonReaderObject<Ace&>
-// {
-//  public:
-//     using JsonReaderObject<Ace&>::JsonReaderObject;
-
-//  protected:
-//     virtual inline JsonReaderBase* match_key(const char* str, rapidjson::SizeType length)
-//         {
-//             const std::string k{str, length};
-//             if (k == "_")
-//                 return json_reader(&Ace::indentation, target());
-//             else if (k == "  version")
-//                 return json_reader(&Ace::version, target());
-//             else if (k == "c")
-//                 return json_reader<JsonReaderChart>(&Ace::chart, target());
-//             return nullptr;
-//         }
-// }; // class JsonReaderAce
-
-static JsonReaderData<Ace> ace_reader_maker_data = {
-//static std::map<std::string,JsonReaderMakerBase<Ace>*> ace_reader_maker_data = {
-    {"_", json_reader_maker(&Ace::indentation)},
-    {"  version", json_reader_maker(&Ace::version)},
-    {"c", json_reader_maker<JsonReaderChart>(&Ace::chart)},
-};
-
 inline JsonReaderBase* json_reader(Ace& target)
 {
-    // return new JsonReaderAce(target);
     return json_reader_for_data(target, ace_reader_maker_data);
 }
 
