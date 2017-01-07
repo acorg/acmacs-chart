@@ -1,4 +1,6 @@
+#include <typeinfo>
 #include <functional>
+#include <map>
 
 #include "rapidjson/reader.h"
 #include "rapidjson/error/en.h"
@@ -169,6 +171,85 @@ template <template<typename> class Reader, typename Parent, typename Field> inli
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 
+template <typename Parent> class JsonReaderMakerBase
+{
+ public:
+    inline JsonReaderMakerBase() = default;
+    virtual ~JsonReaderMakerBase() {}
+    virtual JsonReaderBase* operator()(Parent& parent) = 0;
+};
+
+template <typename Parent, typename Func> class JsonReaderMakerSetter : public JsonReaderMakerBase<Parent>
+{
+ public:
+    inline JsonReaderMakerSetter(Func aF) : mF(aF) {}
+    virtual inline JsonReaderBase* operator()(Parent& parent) { return json_reader(mF, parent); }
+
+ private:
+    Func mF;
+};
+
+template <template<typename> class Reader, typename Parent, typename Func> class JsonReaderMakerAccessor : public JsonReaderMakerBase<Parent>
+{
+ public:
+    inline JsonReaderMakerAccessor(Func aF) : mF(aF) {}
+    virtual inline JsonReaderBase* operator()(Parent& parent) { return json_reader<Reader>(mF, parent); }
+
+ private:
+    Func mF;
+};
+
+template <typename Parent> class JsonReaderMakerWrapper
+{
+ public:
+    inline JsonReaderMakerWrapper(JsonReaderMakerBase<Parent>* aMaker) : mMaker(aMaker) {}
+    inline JsonReaderBase* operator()(Parent& parent) { return (*mMaker)(parent); }
+
+ private:
+    std::shared_ptr<JsonReaderMakerBase<Parent>> mMaker; // cannot have unique_ptr here because std::map requires copying
+};
+
+template <typename Parent> using JsonReaderData = std::map<std::string,JsonReaderMakerWrapper<Parent>>;
+
+template <typename Parent, typename ...Args> inline JsonReaderMakerBase<Parent>* json_reader_maker(void (Parent::*setter)(Args...))
+{
+    return new JsonReaderMakerSetter<Parent, decltype(setter)>(setter);
+}
+
+template <template<typename> class Reader, typename Parent, typename Field> inline JsonReaderMakerBase<Parent>* json_reader_maker(Field& (Parent::*accessor)())
+{
+    return new JsonReaderMakerAccessor<Reader, Parent, decltype(accessor)>(accessor);
+}
+
+template <typename Target> class JsonReaderForDataRef : public JsonReaderObject<Target&>
+{
+ public:
+    inline JsonReaderForDataRef(Target& aTarget, JsonReaderData<Target>& aData) : JsonReaderObject<Target&>(aTarget), mData(aData) {}
+
+ protected:
+    virtual inline JsonReaderBase* match_key(const char* str, rapidjson::SizeType length)
+        {
+            const std::string k{str, length};
+            std::cerr << typeid(*this).name() << " " << k << std::endl;
+            auto e = mData.find(k);
+            if (e != mData.end())
+                return e->second(this->target());
+            return nullptr;
+        }
+
+ private:
+    JsonReaderData<Target>& mData;
+
+}; // class JsonReaderAce
+
+template <typename Target> inline JsonReaderForDataRef<Target>* json_reader_for_data(Target& aTarget, JsonReaderData<Target>& aData)
+{
+    return new JsonReaderForDataRef<Target>(aTarget, aData);
+}
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+
 class Ace
 {
  public:
@@ -211,28 +292,36 @@ template <typename Accessor> class JsonReaderChart : public JsonReaderObject<Acc
 
 // ----------------------------------------------------------------------
 
-class JsonReaderAce : public JsonReaderObject<Ace&>
-{
- public:
-    using JsonReaderObject<Ace&>::JsonReaderObject;
+// class JsonReaderAce : public JsonReaderObject<Ace&>
+// {
+//  public:
+//     using JsonReaderObject<Ace&>::JsonReaderObject;
 
- protected:
-    virtual inline JsonReaderBase* match_key(const char* str, rapidjson::SizeType length)
-        {
-            const std::string k{str, length};
-            if (k == "_")
-                return json_reader(&Ace::indentation, target());
-            else if (k == "  version")
-                return json_reader(&Ace::version, target());
-            else if (k == "c")
-                return json_reader<JsonReaderChart>(&Ace::chart, target());
-            return nullptr;
-        }
-}; // class JsonReaderAce
+//  protected:
+//     virtual inline JsonReaderBase* match_key(const char* str, rapidjson::SizeType length)
+//         {
+//             const std::string k{str, length};
+//             if (k == "_")
+//                 return json_reader(&Ace::indentation, target());
+//             else if (k == "  version")
+//                 return json_reader(&Ace::version, target());
+//             else if (k == "c")
+//                 return json_reader<JsonReaderChart>(&Ace::chart, target());
+//             return nullptr;
+//         }
+// }; // class JsonReaderAce
+
+static JsonReaderData<Ace> ace_reader_maker_data = {
+//static std::map<std::string,JsonReaderMakerBase<Ace>*> ace_reader_maker_data = {
+    {"_", json_reader_maker(&Ace::indentation)},
+    {"  version", json_reader_maker(&Ace::version)},
+    {"c", json_reader_maker<JsonReaderChart>(&Ace::chart)},
+};
 
 inline JsonReaderBase* json_reader(Ace& target)
 {
-    return new JsonReaderAce(target);
+    // return new JsonReaderAce(target);
+    return json_reader_for_data(target, ace_reader_maker_data);
 }
 
 // ----------------------------------------------------------------------
