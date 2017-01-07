@@ -170,27 +170,42 @@ template <typename Target> class JsonReaderForDataRef : public JsonReaderObject<
 
 // ----------------------------------------------------------------------
 
-template <typename Target, typename Accessor> class JsonReaderForDataAccessor : public JsonReaderObject<Accessor>
-{
- public:
-    inline JsonReaderForDataAccessor(Accessor aAccessor, JsonReaderData<Target>& aData) : JsonReaderObject<Accessor>(aAccessor), mData(aData) {}
+// template <typename Target, typename Accessor> class JsonReaderForDataAccessor : public JsonReaderObject<Accessor>
+// {
+//  public:
+//     inline JsonReaderForDataAccessor(Accessor aAccessor, JsonReaderData<Target>& aData) : JsonReaderObject<Accessor>(aAccessor), mData(aData) {}
 
- protected:
-    virtual inline JsonReaderBase* match_key(const char* str, rapidjson::SizeType length)
-        {
-            const std::string k{str, length};
-            // std::cerr << typeid(*this).name() << " " << k << std::endl;
-            auto e = mData.find(k);
-            if (e != mData.end()) {
-                return e->second(this->target()());
-            }
-            return nullptr;
-        }
+//  protected:
+//     virtual inline JsonReaderBase* match_key(const char* str, rapidjson::SizeType length)
+//         {
+//             const std::string k{str, length};
+//             // std::cerr << typeid(*this).name() << " " << k << std::endl;
+//             auto e = mData.find(k);
+//             if (e != mData.end()) {
+//                 return e->second(this->target()());
+//             }
+//             return nullptr;
+//         }
 
- private:
-    JsonReaderData<Target>& mData;
+//  private:
+//     JsonReaderData<Target>& mData;
 
-}; // class JsonReaderForDataAccessor<Target, Accessor>
+// }; // class JsonReaderForDataAccessor<Target, Accessor>
+
+// template <typename Parent, typename Field, typename Func> class JsonReaderMakerAccessor : public JsonReaderMakerBase<Parent>
+// {
+//  public:
+//     inline JsonReaderMakerAccessor(Func aF, JsonReaderData<Field>& aData) : mF(aF), mData(aData) {}
+//     virtual inline JsonReaderBase* operator()(Parent& parent)
+//         {
+//             using Bind = decltype(std::bind(mF, &parent));
+//             return new JsonReaderForDataAccessor<Field, Bind>(std::bind(mF, &parent), mData);
+//         }
+
+//  private:
+//     Func mF;
+//     JsonReaderData<Field>& mData;
+// };
 
 template <typename Parent, typename Field, typename Func> class JsonReaderMakerAccessor : public JsonReaderMakerBase<Parent>
 {
@@ -198,8 +213,7 @@ template <typename Parent, typename Field, typename Func> class JsonReaderMakerA
     inline JsonReaderMakerAccessor(Func aF, JsonReaderData<Field>& aData) : mF(aF), mData(aData) {}
     virtual inline JsonReaderBase* operator()(Parent& parent)
         {
-            using Bind = decltype(std::bind(mF, &parent));
-            return new JsonReaderForDataAccessor<Field, Bind>(std::bind(mF, &parent), mData);
+            return new JsonReaderForDataRef<Field>(std::bind(mF, &parent)(), mData);
         }
 
  private:
