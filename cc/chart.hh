@@ -124,7 +124,7 @@ class Antigen : public AntigenSerum
 
 }; // class Antigen
 
-// // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 
 class Serum : public AntigenSerum
 {
@@ -160,7 +160,39 @@ class Serum : public AntigenSerum
 
 }; // class Serum
 
-// // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+
+class Projection
+{
+ public:
+      // inline Serum(Chart& aChart) : AntigenSerum(aChart), mHomologous(-1) {}
+    inline Projection() : mStress(-1), mDodgyTiterIsRegular(false), mStressDiffToStop(1e-10) {}
+
+    inline void comment(std::string aComment) { mComment = aComment; }
+    inline std::string comment() const { return mComment; }
+
+    inline std::vector<size_t>& disconnected() { return mDisconnected; }
+    inline const std::vector<size_t>& disconnected() const { return mDisconnected; }
+
+ private:
+    std::string mComment;                           // "c"
+    std::vector<std::vector<double>> mLayout;       // "l": [[]] layout, list of lists of doubles, if point is disconnected: emtpy list or ?[NaN, NaN]
+      // size_t mNumberOfIterations;                // "i"
+    double mStress;                                 // "s"
+    std::string mMinimumColumnBasis;                // "m": "1280", "none" (default)
+    std::vector<double> mColumnBases;               // "C"
+    std::vector<double> mTransformation;            // "t": [1.0, 0.0, 0.0, 1.0]
+    std::vector<double> mGradientMultipliers;       // "g": [] double for each point
+    std::vector<double> mTiterMultipliers;          // "f": [],  antigens_sera_titers_multipliers, double for each point
+    bool mDodgyTiterIsRegular;                      // "d": false
+    double mStressDiffToStop;                       // "e": 1e-10 - precise, 1e-5 - rough
+    std::vector<size_t> mUnmovable;                 // "U": [] list of indices of unmovable points (antigen/serum attribute for stress evaluation)
+    std::vector<size_t> mDisconnected;              // "D": [] list of indices of disconnected points (antigen/serum attribute for stress evaluation)
+    std::vector<size_t> mUnmovableInLastDimension;  // "u": [] list of indices of points unmovable in the last dimension (antigen/serum attribute for stress evaluation)
+
+}; // class Serum
+
+// ----------------------------------------------------------------------
 
 class ChartInfo
 {
@@ -281,6 +313,7 @@ class Chart
     std::vector<Serum> mSera;
     ChartTiters mTiters;
     std::vector <double> mColumnBases;
+    std::vector<Projection> mProjections;
 
 }; // class Chart
 
