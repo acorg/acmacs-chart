@@ -115,37 +115,27 @@ template <typename Parent> class JsonReaderMakerBase
  public:
     inline JsonReaderMakerBase() = default;
     virtual ~JsonReaderMakerBase() {}
-    virtual JsonReaderBase* operator()(Parent& parent) = 0;
+    virtual JsonReaderBase* reader(Parent& parent) = 0;
 };
 
 template <typename Parent, typename Func> class JsonReaderMakerSetter : public JsonReaderMakerBase<Parent>
 {
  public:
     inline JsonReaderMakerSetter(Func aF) : mF(aF) {}
-    virtual inline JsonReaderBase* operator()(Parent& parent) { return json_reader(mF, parent); }
+    virtual inline JsonReaderBase* reader(Parent& parent) { return json_reader(mF, parent); }
 
  private:
     Func mF;
 };
 
-template <typename Parent, typename ...Args> inline JsonReaderMakerBase<Parent>* json_reader_maker(void (Parent::*setter)(Args...))
+template <typename Parent, typename ...Args> inline std::shared_ptr<JsonReaderMakerBase<Parent>> json_reader_maker(void (Parent::*setter)(Args...))
 {
-    return new JsonReaderMakerSetter<Parent, decltype(setter)>(setter);
+    return std::make_shared<JsonReaderMakerSetter<Parent, decltype(setter)>>(setter);
 }
 
 // ----------------------------------------------------------------------
 
-template <typename Parent> class JsonReaderMakerWrapper
-{
- public:
-    inline JsonReaderMakerWrapper(JsonReaderMakerBase<Parent>* aMaker) : mMaker(aMaker) {}
-    inline JsonReaderBase* operator()(Parent& parent) { return (*mMaker)(parent); }
-
- private:
-    std::shared_ptr<JsonReaderMakerBase<Parent>> mMaker; // cannot have unique_ptr here because std::map requires copying
-};
-
-template <typename Parent> using JsonReaderData = std::map<std::string,JsonReaderMakerWrapper<Parent>>;
+template <typename Parent> using JsonReaderData = std::map<std::string,std::shared_ptr<JsonReaderMakerBase<Parent>>>; // cannot have unique_ptr here because std::map requires copying
 
 template <typename Target> class JsonReaderForDataRef : public JsonReaderObject<Target&>
 {
@@ -159,7 +149,8 @@ template <typename Target> class JsonReaderForDataRef : public JsonReaderObject<
             // std::cerr << typeid(*this).name() << " " << k << std::endl;
             auto e = mData.find(k);
             if (e != mData.end())
-                return e->second(this->target());
+                  // return e->second(this->target());
+                return e->second->reader(this->target());
             return nullptr;
         }
 
@@ -211,7 +202,7 @@ template <typename Parent, typename Field, typename Func> class JsonReaderMakerA
 {
  public:
     inline JsonReaderMakerAccessor(Func aF, JsonReaderData<Field>& aData) : mF(aF), mData(aData) {}
-    virtual inline JsonReaderBase* operator()(Parent& parent)
+    virtual inline JsonReaderBase* reader(Parent& parent)
         {
             return new JsonReaderForDataRef<Field>(std::bind(mF, &parent)(), mData);
         }
@@ -221,9 +212,9 @@ template <typename Parent, typename Field, typename Func> class JsonReaderMakerA
     JsonReaderData<Field>& mData;
 };
 
-template <typename Parent, typename Field> inline JsonReaderMakerBase<Parent>* json_reader_maker(Field& (Parent::*accessor)(), JsonReaderData<Field>& data)
+template <typename Parent, typename Field> inline std::shared_ptr<JsonReaderMakerBase<Parent>> json_reader_maker(Field& (Parent::*accessor)(), JsonReaderData<Field>& data)
 {
-    return new JsonReaderMakerAccessor<Parent, Field, decltype(accessor)>(accessor, data);
+    return std::make_shared<JsonReaderMakerAccessor<Parent, Field, decltype(accessor)>>(accessor, data);
 }
 
 // ----------------------------------------------------------------------
