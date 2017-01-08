@@ -47,7 +47,7 @@ class Ace
 
 static jsi::data<Projection> projection_data = {
     {"c", jsi::field(&Projection::comment)},
-      //{"D", jsi::field(&Projection::disconnected)},
+    {"D", jsi::field(&Projection::disconnected)},
 };
 
 static jsi::data<Chart> chart_data = {

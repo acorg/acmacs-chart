@@ -192,6 +192,36 @@ namespace json_importer
         }; // class ArrayOfObjects<Element>
 
           // ----------------------------------------------------------------------
+          // reader: ArrayOfValues
+          // ----------------------------------------------------------------------
+
+        template <typename Element> class ArrayOfValues : public Base
+        {
+         public:
+            inline ArrayOfValues(std::vector<Element>& aArray) : mArray(aArray), mStarted(false) {}
+
+            inline virtual Base* StartArray()
+                {
+                    if (mStarted)
+                        throw Failure(typeid(*this).name() + std::string(": unexpected StartArray event"));
+                    mStarted = true;
+                    mArray.clear(); // erase all old elements
+                    return nullptr;
+                }
+
+            inline virtual Base* EndArray()
+                {
+                    std::cerr << "EndArray of " << typeid(Element).name() << " elements:" << mArray.size() << std::endl;
+                    throw Pop();
+                }
+
+         private:
+            std::vector<Element>& mArray;
+            bool mStarted;
+
+        }; // class ArrayOfValues<Element>
+
+          // ----------------------------------------------------------------------
           // reader: template helpers
           // ----------------------------------------------------------------------
 
@@ -252,6 +282,20 @@ namespace json_importer
              private:
                 Func mF;
                 data<Element>& mData;
+            };
+
+            template <typename Parent, typename Element, typename Func>
+                class ArrayOfValuesAccessor : public Base<Parent>
+            {
+             public:
+                inline ArrayOfValuesAccessor(Func aF) : mF(aF) {}
+                virtual inline readers::Base* reader(Parent& parent)
+                    {
+                        return new ArrayOfValues<Element>(std::bind(mF, &parent)());
+                    }
+
+             private:
+                Func mF;
             };
 
         } // namespace makers
@@ -344,6 +388,12 @@ namespace json_importer
     template <typename Parent, typename Field> inline std::shared_ptr<readers::makers::Base<Parent>> field(std::vector<Field>& (Parent::*accessor)(), data<Field>& aData)
     {
         return std::make_shared<readers::makers::ArrayOfObjectsAccessor<Parent, Field, decltype(accessor)>>(accessor, aData);
+    }
+
+      // Field is an Array of values
+    template <typename Parent, typename Field> inline std::shared_ptr<readers::makers::Base<Parent>> field(std::vector<Field>& (Parent::*accessor)())
+    {
+        return std::make_shared<readers::makers::ArrayOfValuesAccessor<Parent, Field, decltype(accessor)>>(accessor);
     }
 
     template <typename Target> inline void import(std::string aSource, Target& aTarget, data<Target>& aData)
