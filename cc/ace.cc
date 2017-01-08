@@ -73,6 +73,22 @@ static jsi::data<Serum> serum_data = {
     {"s", jsi::field(&Serum::serum_species)},
 };
 
+static jsi::data<ChartInfo> chart_info_data = {
+    {"v", jsi::field(&ChartInfo::virus)},
+    {"V", jsi::field(&ChartInfo::virus_type)},
+    {"A", jsi::field(&ChartInfo::assay)},
+    {"D", jsi::field(&ChartInfo::date)},
+    {"N", jsi::field(&ChartInfo::name)},
+    {"l", jsi::field(&ChartInfo::lab)},
+    {"r", jsi::field(&ChartInfo::rbc)},
+    {"s", jsi::field(&ChartInfo::subset)},
+    {"T", jsi::field(&ChartInfo::type)},
+    {"S", jsi::field(&ChartInfo::sources, chart_info_data)},
+};
+
+static jsi::data<ChartTiters> titers_data = {
+};
+
 static jsi::data<Projection> projection_data = {
     {"C", jsi::field(&Projection::column_bases)},
     {"D", jsi::field(&Projection::disconnected)},
@@ -89,14 +105,17 @@ static jsi::data<Projection> projection_data = {
     {"d", jsi::field(&Projection::dodgy_titer_is_regular)},
 };
 
+static jsi::data<ChartPlotSpec> plot_spec_data = {
+};
+
 static jsi::data<Chart> chart_data = {
     {"P", jsi::field(&Chart::projections, projection_data)},
     {"a", jsi::field(&Chart::antigens, antigen_data)},
     {"s", jsi::field(&Chart::sera, serum_data)},
-    // {"t", jsi::field(&Chart::titers, titers_data)},
+    {"t", jsi::field(&Chart::titers, titers_data)},
     {"C", jsi::field(&Chart::column_bases)},
-    // {"i", jsi::field(&Chart::chart_info, chart_info_data)},
-    // {"p", jsi::field(&Chart::plot_spec, plot_spec_data)},
+    {"i", jsi::field(&Chart::chart_info, chart_info_data)},
+    {"p", jsi::field(&Chart::plot_spec, plot_spec_data)},
 };
 
 static jsi::data<Ace> ace_data = {

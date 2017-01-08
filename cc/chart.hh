@@ -261,21 +261,36 @@ class ChartInfo
     inline void name(const char* str, size_t length) { mName.assign(str, length); }
     inline void subset(const char* str, size_t length) { mSubset.assign(str, length); }
 //     inline TableType& type() { return mType; }
+    inline void type(const char* str, size_t length) // reading from json
+        {
+            if (length == 1)
+                throw std::runtime_error("ChartInfo: unrecognized table type: " + std::string(str, length));
+            switch (*str) {
+              case 'A':
+                  mType = Antigenic;
+                  break;
+              case 'G':
+                  mType = Genetic;
+                  break;
+              default:
+                  throw std::runtime_error("ChartInfo: unrecognized table type: " + std::string(str, length));
+            }
+        }
 
-//     inline auto& sources() { return mSources; }
-//     inline const auto& sources() const { return mSources; }
+    inline auto& sources() { return mSources; }
+    inline const auto& sources() const { return mSources; }
 
  private:
-    std::string mVirus;     // "v"
-    std::string mVirusType;     // "V"
-    std::string mAssay;         // "A"
-    std::string mDate;          // "D"
-    std::string mLab;           // "l"
-    std::string mRbc;           // "r"
-    std::string mName;           // "N"
-    std::string mSubset;           // "s"
-    TableType mType;             // "T"
-//     std::vector<ChartInfo> mSources; // "S"
+    std::string mVirus;              // "v"
+    std::string mVirusType;          // "V"
+    std::string mAssay;              // "A"
+    std::string mDate;               // "D"
+    std::string mLab;                // "l"
+    std::string mRbc;                // "r"
+    std::string mName;               // "N"
+    std::string mSubset;             // "s"
+    TableType mType;                 // "T"
+    std::vector<ChartInfo> mSources; // "S"
 
 }; // class ChartInfo
 
