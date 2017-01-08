@@ -168,7 +168,7 @@ class Projection
       // inline Serum(Chart& aChart) : AntigenSerum(aChart), mHomologous(-1) {}
     inline Projection() : mStress(-1), mDodgyTiterIsRegular(false), mStressDiffToStop(1e-10) {}
 
-    inline void comment(std::string aComment) { mComment = aComment; }
+    inline void comment(const char* str, size_t length) { mComment.assign(str, length); }
     inline std::string comment() const { return mComment; }
 
     inline std::vector<size_t>& disconnected() { return mDisconnected; }
@@ -278,7 +278,6 @@ class Chart
     inline Chart& operator=(const Chart&) = default;
     ~Chart();
 
-    inline void xxx(const char* str, size_t length) { std::cerr << "Chart::xxx: " << std::string(str, length) << std::endl; }
     // inline std::string virus_type() const { return mInfo.virus_type(); }
 
     inline size_t number_of_antigens() const { return mAntigens.size(); }

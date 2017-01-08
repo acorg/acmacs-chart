@@ -45,15 +45,19 @@ class Ace
 #pragma GCC diagnostic ignored "-Wglobal-constructors"
 #endif
 
-static jsi::data<Chart> chart_reader_maker_data = {
-    {"_", jsi::field(&Chart::xxx)},
-      // {"P", jsi::field(&::projections)},
+static jsi::data<Projection> projection_data = {
+    {"c", jsi::field(&Projection::comment)},
+      //{"D", jsi::field(&Projection::disconnected)},
 };
 
-static jsi::data<Ace> ace_reader_maker_data = {
+static jsi::data<Chart> chart_data = {
+    {"P", jsi::field(&Chart::projections, projection_data)},
+};
+
+static jsi::data<Ace> ace_data = {
     {"_", jsi::field(&Ace::indentation)},
     {"  version", jsi::field(&Ace::version)},
-    {"c", jsi::field(&Ace::chart, chart_reader_maker_data)},
+    {"c", jsi::field(&Ace::chart, chart_data)},
 };
 
 #pragma GCC diagnostic pop
@@ -70,7 +74,7 @@ Chart* import_chart(std::string buffer)
     if (buffer[0] == '{') {
         chart = new Chart{};
         Ace ace(*chart);
-        jsi::import(buffer, ace, ace_reader_maker_data);
+        jsi::import(buffer, ace, ace_data);
     }
     else
         throw std::runtime_error("cannot import chart: unrecognized source format");
