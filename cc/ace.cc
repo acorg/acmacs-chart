@@ -105,7 +105,20 @@ static jsi::data<Projection> projection_data = {
     {"d", jsi::field(&Projection::dodgy_titer_is_regular)},
 };
 
+static jsi::data<ChartPlotSpecStyle> plot_spec_style_data = {
+};
+
 static jsi::data<ChartPlotSpec> plot_spec_data = {
+    {"d", jsi::field(&ChartPlotSpec::drawing_order)},
+    // {"E", jsi::field(&ChartPlotSpec::error_lines_positive)},
+    // {"e", jsi::field(&ChartPlotSpec::error_lines_negative)},
+    // {"g", jsi::field(&ChartPlotSpec::grid)},
+    {"p", jsi::field(&ChartPlotSpec::style_for_point)},
+    {"P", jsi::field(&ChartPlotSpec::styles, plot_spec_style_data)},
+    // {"l", jsi::field(&ChartPlotSpec::style_for_procrustes_line)},
+    // {"L", jsi::field(&ChartPlotSpec::procrustes_line_styles, procrustes_line_styles_data)},
+    {"s", jsi::field(&ChartPlotSpec::shown_on_all)},
+      // {"t", jsi::field(&ChartPlotSpec::title_style, title_style_data)},
 };
 
 static jsi::data<Chart> chart_data = {

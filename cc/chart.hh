@@ -326,10 +326,36 @@ class ChartTiters
 
 // ----------------------------------------------------------------------
 
+class ChartPlotSpecStyle
+{
+ public:
+    inline ChartPlotSpecStyle() {}
+};
+
+// ----------------------------------------------------------------------
+
 class ChartPlotSpec
 {
  public:
     inline ChartPlotSpec() {}
+
+    std::vector<size_t>& drawing_order() { return mDrawingOrder; }
+    const std::vector<size_t>& drawing_order() const { return mDrawingOrder; }
+
+    std::vector<size_t>& style_for_point() { return mStyleForPoint; }
+    const std::vector<size_t>& style_for_point() const { return mStyleForPoint; }
+
+    std::vector<ChartPlotSpecStyle>& styles() { return mStyles; }
+    const std::vector<ChartPlotSpecStyle>& styles() const { return mStyles; }
+
+    std::vector<size_t>& shown_on_all() { return mShownOnAll; }
+    const std::vector<size_t>& shown_on_all() const { return mShownOnAll; }
+
+ private:
+    std::vector<size_t> mDrawingOrder;       // "d"
+    std::vector<size_t> mStyleForPoint;      // "p"
+    std::vector<ChartPlotSpecStyle> mStyles; // "P"
+    std::vector<size_t> mShownOnAll;         // "s"
 
 }; // class ChartPlotSpec
 
