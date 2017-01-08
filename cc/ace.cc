@@ -8,6 +8,7 @@
 #include "acmacs-base/xz.hh"
 
 #include "json-importer.hh"
+namespace jsi = json_importer;
 
 // ----------------------------------------------------------------------
 // ~/ac/acmacs/docs/ace-format.json
@@ -44,15 +45,15 @@ class Ace
 #pragma GCC diagnostic ignored "-Wglobal-constructors"
 #endif
 
-static JsonReaderData<Chart> chart_reader_maker_data = {
-    {"_", json_reader_maker(&Chart::xxx)},
-      // {"P", json_reader_maker(&::projections)},
+static jsi::data<Chart> chart_reader_maker_data = {
+    {"_", jsi::field(&Chart::xxx)},
+      // {"P", jsi::field(&::projections)},
 };
 
-static JsonReaderData<Ace> ace_reader_maker_data = {
-    {"_", json_reader_maker(&Ace::indentation)},
-    {"  version", json_reader_maker(&Ace::version)},
-    {"c", json_reader_maker(&Ace::chart, chart_reader_maker_data)},
+static jsi::data<Ace> ace_reader_maker_data = {
+    {"_", jsi::field(&Ace::indentation)},
+    {"  version", jsi::field(&Ace::version)},
+    {"c", jsi::field(&Ace::chart, chart_reader_maker_data)},
 };
 
 #pragma GCC diagnostic pop
@@ -66,15 +67,10 @@ Chart* import_chart(std::string buffer)
     else if (buffer[0] != '{')
         buffer = acmacs_base::read_file(buffer);
     Chart* chart = nullptr;
-    if (buffer[0] == '{') { // && buffer.find("\"  version\": \"acmacs-ace-v1\"") != std::string::npos) {
+    if (buffer[0] == '{') {
         chart = new Chart{};
         Ace ace(*chart);
-        JsonEventHandler handler{ace, ace_reader_maker_data};
-        rapidjson::Reader reader;
-        rapidjson::StringStream ss(buffer.c_str());
-        reader.Parse(ss, handler);
-        if (reader.HasParseError())
-            throw std::runtime_error("cannot import chart: data parsing failed at " + std::to_string(reader.GetErrorOffset()) + ": " +  GetParseError_En(reader.GetParseErrorCode()));
+        jsi::import(buffer, ace, ace_reader_maker_data);
     }
     else
         throw std::runtime_error("cannot import chart: unrecognized source format");
