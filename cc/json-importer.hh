@@ -9,7 +9,7 @@ namespace json_importer
 {
     class EventHandler;
 
-    namespace readers {
+    namespace storers {
 
         class Base
         {
@@ -35,6 +35,76 @@ namespace json_importer
             inline virtual Base* Int64(int64_t i) { throw Failure(typeid(*this).name() + std::string("::Int64 ") + std::to_string(i)); }
             inline virtual Base* Uint64(uint64_t u) { throw Failure(typeid(*this).name() + std::string("::Uint64 ") + std::to_string(u)); }
         };
+
+        template <typename F> class Storer : public Base
+        {
+         public:
+            inline Storer(F aStorage) : mStorage(aStorage) {}
+         protected:
+            inline virtual void pop() {}
+            template <typename ...Args> inline Base* store(Args... args) { mStorage(args...); pop(); return nullptr; }
+         private:
+            F mStorage;
+        };
+
+        template <typename F> class StringLength : public Storer<F>
+        {
+         public:
+            using Storer<F>::Storer;
+            inline virtual Base* String(const char* str, rapidjson::SizeType length) { return this->store(str, length); }
+        };
+
+        template <typename F> class Double_ : public Storer<F>
+        {
+         public:
+            using Storer<F>::Storer;
+            inline virtual Base* Double(double d) { return this->store(d); }
+        };
+
+        template <typename F> class Unsigned_ : public Storer<F>
+        {
+         public:
+            using Storer<F>::Storer;
+            inline virtual Base* Uint(unsigned u) { return this->store(u); }
+        };
+
+        template <typename F> class Int_ : public Storer<F>
+        {
+         public:
+            using Storer<F>::Storer;
+            inline virtual Base* Int(int i) { return this->store(i); }
+            inline virtual Base* Uint(unsigned u) { return Int(static_cast<int>(u)); }
+        };
+
+          // ----------------------------------------------------------------------
+          // Type detector helper functions
+          // They are never called but used by field(std::vector<Field>& (Parent::*accessor)()) functions below to infer of the storer type
+          // ----------------------------------------------------------------------
+
+        template <typename F> inline Unsigned_<F> type_detector(size_t) { throw std::exception{}; }
+        template <typename F> inline Unsigned_<F> type_detector(unsigned) { throw std::exception{}; }
+        template <typename F> inline Int_<F> type_detector(int) { throw std::exception{}; }
+        template <typename F> inline Double_<F> type_detector(double) { throw std::exception{}; }
+
+          // ----------------------------------------------------------------------
+
+          // to be used as template parameter F for the above
+        template <typename Target> class ArrayElement
+        {
+         public:
+            inline ArrayElement(std::vector<Target>& aTarget) : mTarget(aTarget) {}
+            inline void operator()(Target aValue) { mTarget.emplace_back(aValue); }
+         private:
+            std::vector<Target>& mTarget;
+        };
+
+    } // namespace storers
+
+      // ----------------------------------------------------------------------
+
+    namespace readers {
+
+        using Base = storers::Base;
 
           // ----------------------------------------------------------------------
           // reader: Object
@@ -84,93 +154,98 @@ namespace json_importer
         };
 
           // ----------------------------------------------------------------------
+          // reader: value storer
+          // ----------------------------------------------------------------------
+
+        template <typename ValueStorer> class Value : public ValueStorer
+        {
+         public:
+            using ValueStorer::ValueStorer;
+         protected:
+            inline virtual void pop() { throw storers::Base::Pop(); }
+        };
+
+          // ----------------------------------------------------------------------
           // reader: StringLength
           // ----------------------------------------------------------------------
 
-        template <typename F> class StringLength : public Base
-        {
-         public:
-            inline StringLength(F aStorage) : mStorage(aStorage) {}
+        // template <typename F> class StringLength : public storers::StringLength<F>
+        // {
+        //  public:
+        //     using storers::StringLength<F>::StringLength;
+        //  protected:
+        //     inline virtual void pop() { throw Base::Pop(); }
+        // };
 
-            inline virtual Base* String(const char* str, rapidjson::SizeType length)
-                {
-                    mStorage(str, length);
-                    throw Pop();
-                }
-
-         private:
-            F mStorage;
-        };
-
-        template <typename F> inline StringLength<F>* string_length(F aF) { return new StringLength<F>(aF); }
+        // template <typename F> inline StringLength<F>* string_length(F aF) { return new StringLength<F>(aF); }
 
           // ----------------------------------------------------------------------
           // reader: double
           // ----------------------------------------------------------------------
 
-        template <typename F> class Double_ : public Base
-        {
-         public:
-            inline Double_(F aStorage) : mStorage(aStorage) {}
+        // template <typename F> class Double_ : public Base
+        // {
+        //  public:
+        //     inline Double_(F aStorage) : mStorage(aStorage) {}
 
-            inline virtual Base* Double(double d)
-                {
-                    mStorage(d);
-                    throw Pop();
-                }
+        //     inline virtual Base* Double(double d)
+        //         {
+        //             mStorage(d);
+        //             throw Pop();
+        //         }
 
-         private:
-            F mStorage;
-        };
+        //  private:
+        //     F mStorage;
+        // };
 
-        template <typename F> inline Double_<F>* double_(F aF) { return new Double_<F>(aF); }
+        // template <typename F> inline Double_<F>* double_(F aF) { return new Double_<F>(aF); }
 
           // ----------------------------------------------------------------------
           // reader: unsigned
           // ----------------------------------------------------------------------
 
-        template <typename F> class Unsigned_ : public Base
-        {
-         public:
-            inline Unsigned_(F aStorage) : mStorage(aStorage) {}
+        // template <typename F> class Unsigned_ : public Base
+        // {
+        //  public:
+        //     inline Unsigned_(F aStorage) : mStorage(aStorage) {}
 
-            inline virtual Base* Uint(size_t u)
-                {
-                    mStorage(u);
-                    throw Pop();
-                }
+        //     inline virtual Base* Uint(size_t u)
+        //         {
+        //             mStorage(u);
+        //             throw Pop();
+        //         }
 
-         private:
-            F mStorage;
-        };
+        //  private:
+        //     F mStorage;
+        // };
 
-        template <typename F> inline Unsigned_<F>* unsigned_(F aF) { return new Unsigned_<F>(aF); }
+        // template <typename F> inline Unsigned_<F>* unsigned_(F aF) { return new Unsigned_<F>(aF); }
 
-          // ----------------------------------------------------------------------
-          // reader: int
-          // ----------------------------------------------------------------------
+        //   // ----------------------------------------------------------------------
+        //   // reader: int
+        //   // ----------------------------------------------------------------------
 
-        template <typename F> class Int_ : public Base
-        {
-         public:
-            inline Int_(F aStorage) : mStorage(aStorage) {}
+        // template <typename F> class Int_ : public Base
+        // {
+        //  public:
+        //     inline Int_(F aStorage) : mStorage(aStorage) {}
 
-            inline virtual Base* Int(int i)
-                {
-                    mStorage(i);
-                    throw Pop();
-                }
+        //     inline virtual Base* Int(int i)
+        //         {
+        //             mStorage(i);
+        //             throw Pop();
+        //         }
 
-            inline virtual Base* Uint(size_t u)
-                {
-                    return Int(static_cast<int>(u));
-                }
+        //     inline virtual Base* Uint(size_t u)
+        //         {
+        //             return Int(static_cast<int>(u));
+        //         }
 
-         private:
-            F mStorage;
-        };
+        //  private:
+        //     F mStorage;
+        // };
 
-        template <typename F> inline Int_<F>* int_(F aF) { return new Int_<F>(aF); }
+        // template <typename F> inline Int_<F>* int_(F aF) { return new Int_<F>(aF); }
 
           // ----------------------------------------------------------------------
           // reader maker base
@@ -263,15 +338,15 @@ namespace json_importer
           // reader: ArrayOfValues
           // ----------------------------------------------------------------------
 
-        template <typename Element> class ArrayOfValues : public Base
+        template <typename Element, typename Storer> class ArrayOfValues : public Storer
         {
          public:
-            inline ArrayOfValues(std::vector<Element>& aArray) : mArray(aArray), mStarted(false) {}
+            inline ArrayOfValues(std::vector<Element>& aArray) : Storer(aArray), mArray(aArray), mStarted(false) {}
 
             inline virtual Base* StartArray()
                 {
                     if (mStarted)
-                        throw Failure(typeid(*this).name() + std::string(": unexpected StartArray event"));
+                        throw Base::Failure(typeid(*this).name() + std::string(": unexpected StartArray event"));
                     mStarted = true;
                     mArray.clear(); // erase all old elements
                     std::cerr << "ArrayOfValues " << typeid(Element).name() << std::endl;
@@ -281,7 +356,7 @@ namespace json_importer
             inline virtual Base* EndArray()
                 {
                     std::cerr << "EndArray of " << typeid(Element).name() << " elements:" << mArray.size() << std::endl;
-                    throw Pop();
+                    throw Base::Pop();
                 }
 
          private:
@@ -296,7 +371,10 @@ namespace json_importer
 
         template <typename T> inline Base* reader(void(T::*setter)(const char*, size_t), T& target)
         {
-            return string_length(std::bind(setter, &target, std::placeholders::_1, std::placeholders::_2));
+              //return string_length(std::bind(setter, &target, std::placeholders::_1, std::placeholders::_2));
+
+            using Bind = decltype(std::bind(setter, &target, std::placeholders::_1, std::placeholders::_2));
+            return new Value<storers::StringLength<Bind>>(std::bind(setter, &target, std::placeholders::_1, std::placeholders::_2));
         }
 
           //   // for readers::Object<> derivatives, e.g. return readers::reader<JsonReaderChart>(&Ace::chart, target());
@@ -353,14 +431,14 @@ namespace json_importer
                 data<Element>& mData;
             };
 
-            template <typename Parent, typename Element, typename Func>
+            template <typename Parent, typename Element, typename Func, typename Storer>
                 class ArrayOfValuesAccessor : public Base<Parent>
             {
              public:
                 inline ArrayOfValuesAccessor(Func aF) : mF(aF) {}
                 virtual inline readers::Base* reader(Parent& parent)
                     {
-                        return new ArrayOfValues<Element>(std::bind(mF, &parent)());
+                        return new ArrayOfValues<Element, Storer>(std::bind(mF, &parent)());
                     }
 
              private:
@@ -453,16 +531,17 @@ namespace json_importer
         return std::make_shared<readers::makers::Accessor<Parent, Field, decltype(accessor)>>(accessor, aData);
     }
 
-      // Field is an Array of Objects
+      // Array of Objects
     template <typename Parent, typename Field> inline std::shared_ptr<readers::makers::Base<Parent>> field(std::vector<Field>& (Parent::*accessor)(), data<Field>& aData)
     {
         return std::make_shared<readers::makers::ArrayOfObjectsAccessor<Parent, Field, decltype(accessor)>>(accessor, aData);
     }
 
-      // Field is an Array of values
+      // Array of values
     template <typename Parent, typename Field> inline std::shared_ptr<readers::makers::Base<Parent>> field(std::vector<Field>& (Parent::*accessor)())
     {
-        return std::make_shared<readers::makers::ArrayOfValuesAccessor<Parent, Field, decltype(accessor)>>(accessor);
+        using Storer = decltype(storers::type_detector<storers::ArrayElement<Field>>(std::declval<Field>()));
+        return std::make_shared<readers::makers::ArrayOfValuesAccessor<Parent, Field, decltype(accessor), Storer>>(accessor);
     }
 
     template <typename Target> inline void import(std::string aSource, Target& aTarget, data<Target>& aData)
