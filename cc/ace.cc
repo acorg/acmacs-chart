@@ -51,6 +51,14 @@ class Ace
 
 using ASS = void (Antigen::*)(const char*, size_t);
 
+inline decltype(jsi::field(&Antigen::date)) field_annotations()
+{
+    using Accessor = Annotations& (Antigen::*)();
+    Accessor accessor = &Antigen::annotations;
+    using Storer = decltype(jsi::storers::type_detector<jsi::storers::ArrayElement<std::string>>(std::string()));
+    return std::make_shared<jsi::readers::makers::ArrayOfValuesAccessor<Antigen, std::string, decltype(accessor), Storer>>(accessor);
+}
+
 static jsi::data<Antigen> antigen_data = {
     {"N", jsi::field(static_cast<ASS>(&Antigen::name))},
     {"D", jsi::field(&Antigen::date)},
@@ -59,8 +67,9 @@ static jsi::data<Antigen> antigen_data = {
     {"R", jsi::field(static_cast<ASS>(&Antigen::reassortant))},
     {"l", jsi::field(&Antigen::lab_id)},
     {"S", jsi::field(static_cast<ASS>(&Antigen::semantic))},
-    // // {"a", jsi::field(static_cast<ASS>(&Antigen::annotations))},
-    // // {"c", jsi::field(&Antigen::clades)},
+      // {"a", jsi::field(static_cast<Annotations& (Antigen::*)()>(&Antigen::annotations))},
+    {"a", field_annotations()},
+    {"c", jsi::field(&Antigen::clades)},
 };
 
 using SSS = void (Serum::*)(const char*, size_t);
@@ -73,7 +82,7 @@ static jsi::data<Serum> serum_data = {
     {"I", jsi::field(&Serum::serum_id)},
     {"S", jsi::field(static_cast<SSS>(&Serum::semantic))},
     {"h", jsi::field(&Serum::homologous)},
-    // // {"a", jsi::field(static_cast<SSS>(&Serum::annotations))},
+      // {"a", jsi::field(static_cast<SSS>(&Serum::annotations))},
     {"s", jsi::field(&Serum::serum_species)},
 };
 

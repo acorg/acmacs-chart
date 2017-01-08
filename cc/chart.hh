@@ -9,30 +9,30 @@
 
 // ----------------------------------------------------------------------
 
-// class Annotations : public std::vector<std::string>
-// {
-//  public:
-//     inline Annotations() = default;
+class Annotations : public std::vector<std::string>
+{
+ public:
+    inline Annotations() = default;
 
-//     inline bool has(std::string anno) const { return std::find(begin(), end(), anno) != end(); }
-//     inline bool distinct() const { return has("DISTINCT"); }
+    inline bool has(std::string anno) const { return std::find(begin(), end(), anno) != end(); }
+    inline bool distinct() const { return has("DISTINCT"); }
 
-//     inline void sort() { std::sort(begin(), end()); }
-//     inline void sort() const { const_cast<Annotations*>(this)->sort(); }
+    inline void sort() { std::sort(begin(), end()); }
+    inline void sort() const { const_cast<Annotations*>(this)->sort(); }
 
-//       // note annotations has to be sorted (regardless of const) to compare
-//     inline bool operator == (const Annotations& aNother) const
-//         {
-//             bool equal = size() == aNother.size();
-//             if (equal) {
-//                 sort();
-//                 aNother.sort();
-//                 equal = std::mismatch(begin(), end(), aNother.begin()).first == end();
-//             }
-//             return equal;
-//         }
+      // note annotations has to be sorted (regardless of const) to compare
+    inline bool operator == (const Annotations& aNother) const
+        {
+            bool equal = size() == aNother.size();
+            if (equal) {
+                sort();
+                aNother.sort();
+                equal = std::mismatch(begin(), end(), aNother.begin()).first == end();
+            }
+            return equal;
+        }
 
-// };
+}; // class Annotations
 
 // // ----------------------------------------------------------------------
 
@@ -61,8 +61,8 @@ class AntigenSerum
 //     virtual bool is_egg() const;
 //     inline bool is_reassortant() const { return !mReassortant.empty(); }
 //     inline bool distinct() const { return mAnnotations.distinct(); }
-//     inline const Annotations& annotations() const { return mAnnotations; }
-//     inline Annotations& annotations() { return mAnnotations; }
+    inline const Annotations& annotations() const { return mAnnotations; }
+    inline Annotations& annotations() { return mAnnotations; }
 //     inline bool has_semantic(char c) const { return mSemanticAttributes.find(c) != std::string::npos; }
     inline const std::string semantic() const { return mSemanticAttributes; }
     inline void semantic(const char* str, size_t length) { mSemanticAttributes.assign(str, length); }
@@ -90,7 +90,7 @@ class AntigenSerum
     std::string mLineage; // "L"
     std::string mPassage; // "P"
     std::string mReassortant; // "R"
-    // Annotations mAnnotations; // "a"
+    Annotations mAnnotations; // "a"
     std::string mSemanticAttributes;       // string of single letter semantic boolean attributes: R - reference, V - current vaccine, v - previous vaccine, S - vaccine surrogate
 
 }; // class AntigenSerum
