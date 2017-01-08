@@ -96,6 +96,7 @@ namespace json_importer
         template <typename F> inline Int_<F> type_detector(int) { throw std::exception{}; }
         template <typename F> inline Double_<F> type_detector(double) { throw std::exception{}; }
         template <typename F> inline Bool_<F> type_detector(bool) { throw std::exception{}; }
+        template <typename F> inline StringLength<F> type_detector(std::string) { throw std::exception{}; }
 
           // ----------------------------------------------------------------------
           // to be used as template parameter F for the above to store Array values
@@ -106,6 +107,7 @@ namespace json_importer
          public:
             inline ArrayElement(std::vector<Target>& aTarget) : mTarget(aTarget) {}
             inline void operator()(Target aValue) { mTarget.emplace_back(aValue); }
+            inline void operator()(const char* str, size_t length) { mTarget.emplace_back(str, length); }
          private:
             std::vector<Target>& mTarget;
         };

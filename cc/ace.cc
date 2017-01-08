@@ -57,9 +57,9 @@ static jsi::data<Antigen> antigen_data = {
     {"L", jsi::field(static_cast<ASS>(&Antigen::lineage))},
     {"P", jsi::field(static_cast<ASS>(&Antigen::passage))},
     {"R", jsi::field(static_cast<ASS>(&Antigen::reassortant))},
-    // // {"l", jsi::field(&Antigen::lab_id)},
+    {"l", jsi::field(&Antigen::lab_id)},
     {"S", jsi::field(static_cast<ASS>(&Antigen::semantic))},
-    // // {"a", jsi::field(&Antigen::annotations)},
+    // // {"a", jsi::field(static_cast<ASS>(&Antigen::annotations))},
     // // {"c", jsi::field(&Antigen::clades)},
 };
 
@@ -73,7 +73,7 @@ static jsi::data<Serum> serum_data = {
     {"I", jsi::field(&Serum::serum_id)},
     {"S", jsi::field(static_cast<SSS>(&Serum::semantic))},
     {"h", jsi::field(&Serum::homologous)},
-    // // {"a", jsi::field(&Serum::annotations)},
+    // // {"a", jsi::field(static_cast<SSS>(&Serum::annotations))},
     {"s", jsi::field(&Serum::serum_species)},
 };
 
