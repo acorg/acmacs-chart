@@ -43,6 +43,7 @@ namespace json_importer
          protected:
             inline virtual void pop() {}
             template <typename ...Args> inline Base* store(Args... args) { mStorage(args...); pop(); return nullptr; }
+            inline F& storage() { return mStorage; }
          private:
             F mStorage;
         };
@@ -103,11 +104,10 @@ namespace json_importer
         {
          public:
             inline ArrayOfArrayElement(std::vector<std::vector<Target>>& aTarget) : mTarget(aTarget) {}
-            inline void operator()(Target aValue) {
-                std::cerr << "ArrayOfArrayElement " << typeid(Target).name() << " () " << aValue << std::endl;
-                throw std::runtime_error{"ArrayOfArrayElement"};
-                  // mTarget.emplace_back(aValue);
-            }
+            inline void operator()(Target aValue) { mTarget.back().emplace_back(aValue); }
+            inline size_t size() const { return mTarget.size(); }
+            inline void clear() { mTarget.clear(); }
+            inline void new_nested() { mTarget.emplace_back(); }
          private:
             std::vector<std::vector<Target>>& mTarget;
         };
@@ -329,7 +329,7 @@ namespace json_importer
 
             inline virtual Base* EndArray()
                 {
-                    std::cerr << "EndArray of " << typeid(Element).name() << " elements:" << mArray.size() << std::endl;
+                      // std::cerr << "EndArray of " << typeid(Element).name() << " elements:" << mArray.size() << std::endl;
                     throw Pop();
                 }
 
@@ -363,13 +363,13 @@ namespace json_importer
                         throw Base::Failure(typeid(*this).name() + std::string(": unexpected StartArray event"));
                     mStarted = true;
                     mArray.clear(); // erase all old elements
-                    std::cerr << "ArrayOfValues " << typeid(Element).name() << std::endl;
+                      // std::cerr << "ArrayOfValues " << typeid(Element).name() << std::endl;
                     return nullptr;
                 }
 
             inline virtual Base* EndArray()
                 {
-                    std::cerr << "EndArray of " << typeid(Element).name() << " elements:" << mArray.size() << std::endl;
+                      // std::cerr << "EndArray of " << typeid(Element).name() << " elements:" << mArray.size() << std::endl;
                     throw Base::Pop();
                 }
 
@@ -386,22 +386,22 @@ namespace json_importer
         template <typename Element, typename Storer> class ArrayOfArrayOfValues : public Storer
         {
          public:
-            inline ArrayOfArrayOfValues(std::vector<std::vector<Element>>& aArray) : Storer(aArray), mArray(aArray), mNesting(0) {}
+            inline ArrayOfArrayOfValues(std::vector<std::vector<Element>>& aArray) : Storer(aArray), /* mArray(aArray), */ mNesting(0) {}
 
             inline virtual Base* StartArray()
                 {
                     switch (mNesting) {
                       case 0:
-                          mNesting = 1;
-                          mArray.clear(); // erase all old elements
-                          std::cerr << "ArrayOfArrayOfValues " << typeid(Element).name() << std::endl;
+                          this->storage().clear(); // erase all old elements
+                          // std::cerr << "ArrayOfArrayOfValues " << typeid(Element).name() << std::endl;
                           break;
                       case 1:
-                          throw Base::Failure(typeid(*this).name() + std::string(": StartArray not implemented"));
+                          this->storage().new_nested();
                           break;
                       default:
                           throw Base::Failure(typeid(*this).name() + std::string(": unexpected StartArray event"));
                     }
+                    ++mNesting;
                     return nullptr;
                 }
 
@@ -409,19 +409,19 @@ namespace json_importer
                 {
                     switch (mNesting) {
                       case 1:
-                          std::cerr << "EndArray of " << typeid(Element).name() << " elements:" << mArray.size() << std::endl;
+                            // std::cerr << "EndArray of " << typeid(Element).name() << " elements:" << this->storage().size() << std::endl;
                           throw Base::Pop();
                       case 2:
-                          mNesting = 1;
                           break;
                       default:
                           throw Base::Failure(typeid(*this).name() + std::string(": internal, EndArray event with nesting ") + std::to_string(mNesting));
                     }
+                    --mNesting;
                     return nullptr;
                 }
 
          private:
-            std::vector<std::vector<Element>>& mArray;
+              // std::vector<std::vector<Element>>& mArray;
             size_t mNesting;
 
         }; // class ArrayOfValues<Element>

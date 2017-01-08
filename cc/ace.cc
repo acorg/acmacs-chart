@@ -19,7 +19,11 @@ class Ace
  public:
     inline Ace(Chart& aChar) : mChart(aChar) {}
 
-    inline void indentation(const char* str, size_t length) { std::cerr << "Indentation: " << std::string(str, length) << std::endl; mIndentation.assign(str, length); }
+    inline void indentation(const char* str, size_t length)
+        {
+            mIndentation.assign(str, length);
+              // std::cerr << "Indentation: " << mIndentation << std::endl;
+        }
     inline std::string indentation() const { return mIndentation; }
     inline void version(const char* str, size_t length)
         {
