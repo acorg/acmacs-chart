@@ -617,6 +617,15 @@ namespace json_importer
         return std::make_shared<readers::makers::Setter<Parent, decltype(setter)>>(setter);
     }
 
+      // Field is a simple object set via setter: void ParentBase::setter(const Value& value)
+      // Parent is derived from ParentBase, setter declared in ParentBase (and accessible in Parent)
+      // must be specified as field<Parent>(&Parent::accessor)
+    template <typename Parent, typename ParentBase, typename ...Args> inline std::shared_ptr<readers::makers::Base<Parent>> field(void (ParentBase::*setter)(Args...))
+    {
+        using Setter = void (Parent::*)(Args...);
+        return std::make_shared<readers::makers::Setter<Parent, Setter>>(setter);
+    }
+
       // Field is an Object accessible via: Field& Parent::accessor()
     template <typename Parent, typename Field> inline std::shared_ptr<readers::makers::Base<Parent>> field(Field& (Parent::*accessor)(), data<Field>& aData)
     {
@@ -634,6 +643,17 @@ namespace json_importer
     {
         using Storer = decltype(storers::type_detector<storers::ArrayElement<Field>>(std::declval<Field>()));
         return std::make_shared<readers::makers::ArrayOfValuesAccessor<Parent, Field, decltype(accessor), Storer>>(accessor);
+    }
+
+      // Array of values (with inheritance)
+      // Access for Field of Parent, where
+      //   Field is derived from std::vector<Element>
+      //   Parent is derived from ParentBase, accessor declared in ParentBase (and accessible in Parent)
+      // must be specified as field<Element, Parent>(&Parent::accessor)
+    template <typename Element, typename Parent, typename ParentBase, typename Field> inline std::shared_ptr<readers::makers::Base<Parent>> field(Field& (ParentBase::*accessor)())
+    {
+        using Storer = decltype(storers::type_detector<storers::ArrayElement<Element>>(std::declval<Element>()));
+        return std::make_shared<readers::makers::ArrayOfValuesAccessor<Parent, Element, decltype(accessor), Storer>>(accessor);
     }
 
       // Array of array of values

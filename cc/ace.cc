@@ -49,39 +49,27 @@ class Ace
 #pragma GCC diagnostic ignored "-Wglobal-constructors"
 #endif
 
-using ASS = void (Antigen::*)(const char*, size_t);
-
-template <typename Parent> inline std::shared_ptr<jsi::readers::makers::Base<Parent>> field_annotations()
-{
-    using Accessor = Annotations& (Parent::*)();
-    Accessor accessor = &Parent::annotations;
-    using Storer = decltype(jsi::storers::type_detector<jsi::storers::ArrayElement<std::string>>(std::string()));
-    return std::make_shared<jsi::readers::makers::ArrayOfValuesAccessor<Parent, std::string, decltype(accessor), Storer>>(accessor);
-}
-
 static jsi::data<Antigen> antigen_data = {
-    {"N", jsi::field(static_cast<ASS>(&Antigen::name))},
+    {"N", jsi::field<Antigen>(&Antigen::name)},
     {"D", jsi::field(&Antigen::date)},
-    {"L", jsi::field(static_cast<ASS>(&Antigen::lineage))},
-    {"P", jsi::field(static_cast<ASS>(&Antigen::passage))},
-    {"R", jsi::field(static_cast<ASS>(&Antigen::reassortant))},
+    {"L", jsi::field<Antigen>(&Antigen::lineage)},
+    {"P", jsi::field<Antigen>(&Antigen::passage)},
+    {"R", jsi::field<Antigen>(&Antigen::reassortant)},
     {"l", jsi::field(&Antigen::lab_id)},
-    {"S", jsi::field(static_cast<ASS>(&Antigen::semantic))},
-    {"a", field_annotations<Antigen>()},
+    {"S", jsi::field<Antigen>(&Antigen::semantic)},
+    {"a", jsi::field<std::string, Antigen>(&Antigen::annotations)},
     {"c", jsi::field(&Antigen::clades)},
 };
 
-using SSS = void (Serum::*)(const char*, size_t);
-
 static jsi::data<Serum> serum_data = {
-    {"N", jsi::field(static_cast<SSS>(&Serum::name))},
-    {"L", jsi::field(static_cast<SSS>(&Serum::lineage))},
-    {"P", jsi::field(static_cast<SSS>(&Serum::passage))},
-    {"R", jsi::field(static_cast<SSS>(&Serum::reassortant))},
+    {"N", jsi::field<Serum>(&Serum::name)},
+    {"L", jsi::field<Serum>(&Serum::lineage)},
+    {"P", jsi::field<Serum>(&Serum::passage)},
+    {"R", jsi::field<Serum>(&Serum::reassortant)},
     {"I", jsi::field(&Serum::serum_id)},
-    {"S", jsi::field(static_cast<SSS>(&Serum::semantic))},
+    {"S", jsi::field<Serum>(&Serum::semantic)},
     {"h", jsi::field(&Serum::homologous)},
-    {"a", field_annotations<Serum>()},
+    {"a", jsi::field<std::string, Serum>(&Serum::annotations)},
     {"s", jsi::field(&Serum::serum_species)},
 };
 
