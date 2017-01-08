@@ -77,6 +77,15 @@ namespace json_importer
             inline virtual Base* Uint(unsigned u) { return Int(static_cast<int>(u)); }
         };
 
+        template <typename F> class Bool_ : public Storer<F>
+        {
+         public:
+            using Storer<F>::Storer;
+            inline virtual Base* Bool(bool b) { return this->store(b); }
+              // inline virtual Base* Int(int i) { return Bool(i != 0); }
+            inline virtual Base* Uint(unsigned u) { return Bool(u != 0); }
+        };
+
           // ----------------------------------------------------------------------
           // Type detector functions
           // They are never called but used by field(std::vector<Field>& (Parent::*accessor)()) and reader(void(T::*setter)(V), T& target) functions below to infer of the storer's type
@@ -86,6 +95,7 @@ namespace json_importer
         template <typename F> inline Unsigned_<F> type_detector(unsigned) { throw std::exception{}; }
         template <typename F> inline Int_<F> type_detector(int) { throw std::exception{}; }
         template <typename F> inline Double_<F> type_detector(double) { throw std::exception{}; }
+        template <typename F> inline Bool_<F> type_detector(bool) { throw std::exception{}; }
 
           // ----------------------------------------------------------------------
           // to be used as template parameter F for the above to store Array values

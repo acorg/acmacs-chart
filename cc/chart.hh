@@ -192,11 +192,20 @@ class Projection
     inline std::vector<double>& titer_multipliers() { return mTiterMultipliers; }
     inline const std::vector<double>& titer_multipliers() const { return mTiterMultipliers; }
 
+    inline void dodgy_titer_is_regular(bool aDodgyTiterIsRegular) { mDodgyTiterIsRegular = aDodgyTiterIsRegular; }
+    inline double dodgy_titer_is_regular() const { return mDodgyTiterIsRegular; }
+
     inline void stress_diff_to_stop(double aStressDiffToStop) { mStressDiffToStop = aStressDiffToStop; }
     inline double stress_diff_to_stop() const { return mStressDiffToStop; }
 
+    inline std::vector<size_t>& unmovable() { return mUnmovable; }
+    inline const std::vector<size_t>& unmovable() const { return mUnmovable; }
+
     inline std::vector<size_t>& disconnected() { return mDisconnected; }
     inline const std::vector<size_t>& disconnected() const { return mDisconnected; }
+
+    inline std::vector<size_t>& unmovable_in_last_dimension() { return mUnmovableInLastDimension; }
+    inline const std::vector<size_t>& unmovable_in_last_dimension() const { return mUnmovableInLastDimension; }
 
  private:
     std::string mComment;                           // "c"
