@@ -171,6 +171,9 @@ class Projection
     inline void comment(const char* str, size_t length) { mComment.assign(str, length); }
     inline std::string comment() const { return mComment; }
 
+    inline void stress_diff_to_stop(double aStressDiffToStop) { mStressDiffToStop = aStressDiffToStop; }
+    inline double stress_diff_to_stop() const { return mStressDiffToStop; }
+
     inline std::vector<size_t>& disconnected() { return mDisconnected; }
     inline const std::vector<size_t>& disconnected() const { return mDisconnected; }
 

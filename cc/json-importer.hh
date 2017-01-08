@@ -78,7 +78,7 @@ namespace json_importer
 
           // ----------------------------------------------------------------------
           // Type detector helper functions
-          // They are never called but used by field(std::vector<Field>& (Parent::*accessor)()) functions below to infer of the storer type
+          // They are never called but used by field(std::vector<Field>& (Parent::*accessor)()) and reader(void(T::*setter)(V), T& target) functions below to infer of the storer's type
           // ----------------------------------------------------------------------
 
         template <typename F> inline Unsigned_<F> type_detector(size_t) { throw std::exception{}; }
@@ -371,10 +371,15 @@ namespace json_importer
 
         template <typename T> inline Base* reader(void(T::*setter)(const char*, size_t), T& target)
         {
-              //return string_length(std::bind(setter, &target, std::placeholders::_1, std::placeholders::_2));
-
             using Bind = decltype(std::bind(setter, &target, std::placeholders::_1, std::placeholders::_2));
             return new Value<storers::StringLength<Bind>>(std::bind(setter, &target, std::placeholders::_1, std::placeholders::_2));
+        }
+
+        template <typename T, typename V> inline Base* reader(void(T::*setter)(V), T& target)
+        {
+            using Bind = decltype(std::bind(setter, &target, std::placeholders::_1));
+            using Storer = decltype(storers::type_detector<Bind>(std::declval<V>()));
+            return new Value<Storer>(std::bind(setter, &target, std::placeholders::_1));
         }
 
           //   // for readers::Object<> derivatives, e.g. return readers::reader<JsonReaderChart>(&Ace::chart, target());

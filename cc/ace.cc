@@ -47,6 +47,7 @@ class Ace
 
 static jsi::data<Projection> projection_data = {
     {"c", jsi::field(&Projection::comment)},
+    {"e", jsi::field(&Projection::stress_diff_to_stop)},
     {"D", jsi::field(&Projection::disconnected)},
 };
 
