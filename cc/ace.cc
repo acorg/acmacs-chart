@@ -49,6 +49,34 @@ class Ace
 #pragma GCC diagnostic ignored "-Wglobal-constructors"
 #endif
 
+using ASS = void (Antigen::*)(const char*, size_t);
+
+static jsi::data<Antigen> antigen_data = {
+    {"N", jsi::field(static_cast<ASS>(&Antigen::name))},
+    {"D", jsi::field(&Antigen::date)},
+    {"L", jsi::field(static_cast<ASS>(&Antigen::lineage))},
+    {"P", jsi::field(static_cast<ASS>(&Antigen::passage))},
+    {"R", jsi::field(static_cast<ASS>(&Antigen::reassortant))},
+    // // {"l", jsi::field(&Antigen::lab_id)},
+    {"S", jsi::field(static_cast<ASS>(&Antigen::semantic))},
+    // // {"a", jsi::field(&Antigen::annotations)},
+    // // {"c", jsi::field(&Antigen::clades)},
+};
+
+using SSS = void (Serum::*)(const char*, size_t);
+
+static jsi::data<Serum> serum_data = {
+    {"N", jsi::field(static_cast<SSS>(&Serum::name))},
+    {"L", jsi::field(static_cast<SSS>(&Serum::lineage))},
+    {"P", jsi::field(static_cast<SSS>(&Serum::passage))},
+    {"R", jsi::field(static_cast<SSS>(&Serum::reassortant))},
+    {"I", jsi::field(&Serum::serum_id)},
+    {"S", jsi::field(static_cast<SSS>(&Serum::semantic))},
+    {"h", jsi::field(&Serum::homologous)},
+    // // {"a", jsi::field(&Serum::annotations)},
+    {"s", jsi::field(&Serum::serum_species)},
+};
+
 static jsi::data<Projection> projection_data = {
     {"C", jsi::field(&Projection::column_bases)},
     {"D", jsi::field(&Projection::disconnected)},
@@ -67,8 +95,8 @@ static jsi::data<Projection> projection_data = {
 
 static jsi::data<Chart> chart_data = {
     {"P", jsi::field(&Chart::projections, projection_data)},
-    // {"a", jsi::field(&Chart::antigens, antigen_data)},
-    // {"s", jsi::field(&Chart::sera, serum_data)},
+    {"a", jsi::field(&Chart::antigens, antigen_data)},
+    {"s", jsi::field(&Chart::sera, serum_data)},
     // {"t", jsi::field(&Chart::titers, titers_data)},
     {"C", jsi::field(&Chart::column_bases)},
     // {"i", jsi::field(&Chart::chart_info, chart_info_data)},
