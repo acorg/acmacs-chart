@@ -77,7 +77,7 @@ namespace json_importer
         };
 
           // ----------------------------------------------------------------------
-          // Type detector helper functions
+          // Type detector functions
           // They are never called but used by field(std::vector<Field>& (Parent::*accessor)()) and reader(void(T::*setter)(V), T& target) functions below to infer of the storer's type
           // ----------------------------------------------------------------------
 
@@ -87,8 +87,9 @@ namespace json_importer
         template <typename F> inline Double_<F> type_detector(double) { throw std::exception{}; }
 
           // ----------------------------------------------------------------------
+          // to be used as template parameter F for the above to store Array values
+          // ----------------------------------------------------------------------
 
-          // to be used as template parameter F for the above
         template <typename Target> class ArrayElement
         {
          public:
@@ -96,6 +97,19 @@ namespace json_importer
             inline void operator()(Target aValue) { mTarget.emplace_back(aValue); }
          private:
             std::vector<Target>& mTarget;
+        };
+
+        template <typename Target> class ArrayOfArrayElement
+        {
+         public:
+            inline ArrayOfArrayElement(std::vector<std::vector<Target>>& aTarget) : mTarget(aTarget) {}
+            inline void operator()(Target aValue) {
+                std::cerr << "ArrayOfArrayElement " << typeid(Target).name() << " () " << aValue << std::endl;
+                throw std::runtime_error{"ArrayOfArrayElement"};
+                  // mTarget.emplace_back(aValue);
+            }
+         private:
+            std::vector<std::vector<Target>>& mTarget;
         };
 
     } // namespace storers
@@ -366,6 +380,53 @@ namespace json_importer
         }; // class ArrayOfValues<Element>
 
           // ----------------------------------------------------------------------
+          // reader: ArrayOfArrayOfValues
+          // ----------------------------------------------------------------------
+
+        template <typename Element, typename Storer> class ArrayOfArrayOfValues : public Storer
+        {
+         public:
+            inline ArrayOfArrayOfValues(std::vector<std::vector<Element>>& aArray) : Storer(aArray), mArray(aArray), mNesting(0) {}
+
+            inline virtual Base* StartArray()
+                {
+                    switch (mNesting) {
+                      case 0:
+                          mNesting = 1;
+                          mArray.clear(); // erase all old elements
+                          std::cerr << "ArrayOfArrayOfValues " << typeid(Element).name() << std::endl;
+                          break;
+                      case 1:
+                          throw Base::Failure(typeid(*this).name() + std::string(": StartArray not implemented"));
+                          break;
+                      default:
+                          throw Base::Failure(typeid(*this).name() + std::string(": unexpected StartArray event"));
+                    }
+                    return nullptr;
+                }
+
+            inline virtual Base* EndArray()
+                {
+                    switch (mNesting) {
+                      case 1:
+                          std::cerr << "EndArray of " << typeid(Element).name() << " elements:" << mArray.size() << std::endl;
+                          throw Base::Pop();
+                      case 2:
+                          mNesting = 1;
+                          break;
+                      default:
+                          throw Base::Failure(typeid(*this).name() + std::string(": internal, EndArray event with nesting ") + std::to_string(mNesting));
+                    }
+                    return nullptr;
+                }
+
+         private:
+            std::vector<std::vector<Element>>& mArray;
+            size_t mNesting;
+
+        }; // class ArrayOfValues<Element>
+
+          // ----------------------------------------------------------------------
           // reader: template helpers
           // ----------------------------------------------------------------------
 
@@ -444,6 +505,20 @@ namespace json_importer
                 virtual inline readers::Base* reader(Parent& parent)
                     {
                         return new ArrayOfValues<Element, Storer>(std::bind(mF, &parent)());
+                    }
+
+             private:
+                Func mF;
+            };
+
+            template <typename Parent, typename Element, typename Func, typename Storer>
+                class ArrayOfArrayOfValuesAccessor : public Base<Parent>
+            {
+             public:
+                inline ArrayOfArrayOfValuesAccessor(Func aF) : mF(aF) {}
+                virtual inline readers::Base* reader(Parent& parent)
+                    {
+                        return new ArrayOfArrayOfValues<Element, Storer>(std::bind(mF, &parent)());
                     }
 
              private:
@@ -547,6 +622,13 @@ namespace json_importer
     {
         using Storer = decltype(storers::type_detector<storers::ArrayElement<Field>>(std::declval<Field>()));
         return std::make_shared<readers::makers::ArrayOfValuesAccessor<Parent, Field, decltype(accessor), Storer>>(accessor);
+    }
+
+      // Array of array of values
+    template <typename Parent, typename Field> inline std::shared_ptr<readers::makers::Base<Parent>> field(std::vector<std::vector<Field>>& (Parent::*accessor)())
+    {
+        using Storer = decltype(storers::type_detector<storers::ArrayOfArrayElement<Field>>(std::declval<Field>()));
+        return std::make_shared<readers::makers::ArrayOfArrayOfValuesAccessor<Parent, Field, decltype(accessor), Storer>>(accessor);
     }
 
     template <typename Target> inline void import(std::string aSource, Target& aTarget, data<Target>& aData)

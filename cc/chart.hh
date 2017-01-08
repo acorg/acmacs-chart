@@ -171,6 +171,27 @@ class Projection
     inline void comment(const char* str, size_t length) { mComment.assign(str, length); }
     inline std::string comment() const { return mComment; }
 
+    inline std::vector<std::vector<double>>& layout() { return mLayout; }
+    inline const std::vector<std::vector<double>>& layout() const { return mLayout; }
+    
+    inline void stress(double aStress) { mStress = aStress; }
+    inline double stress() const { return mStress; }
+
+    inline void minimum_column_basis(const char* str, size_t length) { mMinimumColumnBasis.assign(str, length); }
+    inline std::string minimum_column_basis() const { return mMinimumColumnBasis; }
+
+    inline std::vector<double>& column_bases() { return mColumnBases; }
+    inline const std::vector<double>& column_bases() const { return mColumnBases; }
+
+    inline std::vector<double>& transformation() { return mTransformation; }
+    inline const std::vector<double>& transformation() const { return mTransformation; }
+
+    inline std::vector<double>& gradient_multipliers() { return mGradientMultipliers; }
+    inline const std::vector<double>& gradient_multipliers() const { return mGradientMultipliers; }
+
+    inline std::vector<double>& titer_multipliers() { return mTiterMultipliers; }
+    inline const std::vector<double>& titer_multipliers() const { return mTiterMultipliers; }
+
     inline void stress_diff_to_stop(double aStressDiffToStop) { mStressDiffToStop = aStressDiffToStop; }
     inline double stress_diff_to_stop() const { return mStressDiffToStop; }
 

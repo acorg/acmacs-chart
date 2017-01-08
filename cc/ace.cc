@@ -46,9 +46,16 @@ class Ace
 #endif
 
 static jsi::data<Projection> projection_data = {
+    {"C", jsi::field(&Projection::column_bases)},
+    {"D", jsi::field(&Projection::disconnected)},
     {"c", jsi::field(&Projection::comment)},
     {"e", jsi::field(&Projection::stress_diff_to_stop)},
-    {"D", jsi::field(&Projection::disconnected)},
+    {"f", jsi::field(&Projection::titer_multipliers)},
+    {"g", jsi::field(&Projection::gradient_multipliers)},
+    {"l", jsi::field(&Projection::layout)},
+    {"m", jsi::field(&Projection::minimum_column_basis)},
+    {"s", jsi::field(&Projection::stress)},
+    {"t", jsi::field(&Projection::transformation)},
 };
 
 static jsi::data<Chart> chart_data = {
