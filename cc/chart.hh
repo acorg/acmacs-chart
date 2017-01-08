@@ -303,6 +303,15 @@ class ChartTiters
 
 // ----------------------------------------------------------------------
 
+class ChartPlotSpec
+{
+ public:
+    inline ChartPlotSpec() {}
+    
+}; // class ChartPlotSpec
+
+// ----------------------------------------------------------------------
+
 class Chart
 {
  public:
@@ -338,18 +347,22 @@ class Chart
     inline std::vector<Projection>& projections() { return mProjections; }
     inline const std::vector<Projection>& projections() const { return mProjections; }
 
+    inline const ChartPlotSpec& plot_spec() const { return mPlotSpec; }
+    inline ChartPlotSpec& plot_spec() { return mPlotSpec; }
+
     // void find_homologous_antigen_for_sera();
     // inline void find_homologous_antigen_for_sera_const() const { const_cast<Chart*>(this)->find_homologous_antigen_for_sera(); }
 
     // inline bool operator < (const Chart& aNother) const { return table_id() < aNother.table_id(); }
 
  private:
-    ChartInfo mInfo;
-    std::vector<Antigen> mAntigens;
-    std::vector<Serum> mSera;
-    ChartTiters mTiters;
-    std::vector <double> mColumnBases;
-    std::vector<Projection> mProjections;
+    ChartInfo mInfo;                       // "i"
+    std::vector<Antigen> mAntigens;        // "a"
+    std::vector<Serum> mSera;              // "s"
+    ChartTiters mTiters;                   // "t"
+    std::vector <double> mColumnBases;     // "C"
+    std::vector<Projection> mProjections;  // "P"
+    ChartPlotSpec mPlotSpec;               // "p"
 
 }; // class Chart
 

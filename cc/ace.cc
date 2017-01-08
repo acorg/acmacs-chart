@@ -67,6 +67,12 @@ static jsi::data<Projection> projection_data = {
 
 static jsi::data<Chart> chart_data = {
     {"P", jsi::field(&Chart::projections, projection_data)},
+    // {"a", jsi::field(&Chart::antigens, antigen_data)},
+    // {"s", jsi::field(&Chart::sera, serum_data)},
+    // {"t", jsi::field(&Chart::titers, titers_data)},
+    {"C", jsi::field(&Chart::column_bases)},
+    // {"i", jsi::field(&Chart::chart_info, chart_info_data)},
+    // {"p", jsi::field(&Chart::plot_spec, plot_spec_data)},
 };
 
 static jsi::data<Ace> ace_data = {
