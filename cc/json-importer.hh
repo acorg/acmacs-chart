@@ -105,6 +105,74 @@ namespace json_importer
         template <typename F> inline StringLength<F>* string_length(F aF) { return new StringLength<F>(aF); }
 
           // ----------------------------------------------------------------------
+          // reader: double
+          // ----------------------------------------------------------------------
+
+        template <typename F> class Double_ : public Base
+        {
+         public:
+            inline Double_(F aStorage) : mStorage(aStorage) {}
+
+            inline virtual Base* Double(double d)
+                {
+                    mStorage(d);
+                    throw Pop();
+                }
+
+         private:
+            F mStorage;
+        };
+
+        template <typename F> inline Double_<F>* double_(F aF) { return new Double_<F>(aF); }
+
+          // ----------------------------------------------------------------------
+          // reader: unsigned
+          // ----------------------------------------------------------------------
+
+        template <typename F> class Unsigned_ : public Base
+        {
+         public:
+            inline Unsigned_(F aStorage) : mStorage(aStorage) {}
+
+            inline virtual Base* Uint(size_t u)
+                {
+                    mStorage(u);
+                    throw Pop();
+                }
+
+         private:
+            F mStorage;
+        };
+
+        template <typename F> inline Unsigned_<F>* unsigned_(F aF) { return new Unsigned_<F>(aF); }
+
+          // ----------------------------------------------------------------------
+          // reader: int
+          // ----------------------------------------------------------------------
+
+        template <typename F> class Int_ : public Base
+        {
+         public:
+            inline Int_(F aStorage) : mStorage(aStorage) {}
+
+            inline virtual Base* Int(int i)
+                {
+                    mStorage(i);
+                    throw Pop();
+                }
+
+            inline virtual Base* Uint(size_t u)
+                {
+                    return Int(static_cast<int>(u));
+                }
+
+         private:
+            F mStorage;
+        };
+
+        template <typename F> inline Int_<F>* int_(F aF) { return new Int_<F>(aF); }
+
+          // ----------------------------------------------------------------------
           // reader maker base
           // ----------------------------------------------------------------------
 
@@ -206,6 +274,7 @@ namespace json_importer
                         throw Failure(typeid(*this).name() + std::string(": unexpected StartArray event"));
                     mStarted = true;
                     mArray.clear(); // erase all old elements
+                    std::cerr << "ArrayOfValues " << typeid(Element).name() << std::endl;
                     return nullptr;
                 }
 
