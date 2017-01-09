@@ -106,8 +106,9 @@ namespace json_importer
         {
          public:
             inline ArrayElement(std::vector<Target>& aTarget) : mTarget(aTarget) {}
-            inline void operator()(Target aValue) { mTarget.emplace_back(aValue); }
-            inline void operator()(const char* str, size_t length) { mTarget.emplace_back(str, length); }
+            // inline void operator()(Target aValue) { mTarget.emplace_back(aValue); }
+            // inline void operator()(const char* str, size_t length) { mTarget.emplace_back(str, length); }
+            template <typename ...Args> inline void operator()(Args ...args) { mTarget.emplace_back(args...); }
          private:
             std::vector<Target>& mTarget;
         };
@@ -146,7 +147,6 @@ namespace json_importer
                 {
                     if (!mStarted)
                         throw Failure(typeid(*this).name() + std::string(": unexpected Key event"));
-                      // std::cerr << "JsonReaderObject::Key " << std::string(str, length) << std::endl;
                     Base* r = match_key(str, length);
                     if (!r) {
                           // support for keys starting or ending with ? and "_"
@@ -294,13 +294,11 @@ namespace json_importer
                         throw Base::Failure(typeid(*this).name() + std::string(": unexpected StartArray event"));
                     mStarted = true;
                     mArray.clear(); // erase all old elements
-                      // std::cerr << "ArrayOfValues " << typeid(Element).name() << std::endl;
                     return nullptr;
                 }
 
             inline virtual Base* EndArray()
                 {
-                      // std::cerr << "EndArray of " << typeid(Element).name() << " elements:" << mArray.size() << std::endl;
                     throw Base::Pop();
                 }
 
@@ -324,7 +322,6 @@ namespace json_importer
                     switch (mNesting) {
                       case 0:
                           this->storage().clear(); // erase all old elements
-                          // std::cerr << "ArrayOfArrayOfValues " << typeid(Element).name() << std::endl;
                           break;
                       case 1:
                           this->storage().new_nested();
@@ -340,7 +337,6 @@ namespace json_importer
                 {
                     switch (mNesting) {
                       case 1:
-                            // std::cerr << "EndArray of " << typeid(Element).name() << " elements:" << this->storage().size() << std::endl;
                           throw Base::Pop();
                       case 2:
                           break;
@@ -542,6 +538,9 @@ namespace json_importer
 // ======================================================================
 
     template <typename Parent> using data = readers::data<Parent>;
+
+      // Base class for custom Storers
+    using StorerBase = storers::Base;
 
       // Field is a simple object set via setter: void Parent::setter(const Value& value)
     template <typename Parent, typename ...Args> inline std::shared_ptr<readers::makers::Base<Parent>> field(void (Parent::*setter)(Args...))

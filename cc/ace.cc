@@ -145,10 +145,10 @@ static jsi::data<ChartPlotSpec> plot_spec_data = {
 // std::vector< std::vector< std::pair<std::string, std::string>>>>
 // table        row                    column       titer
 
-class TiterDictStorer : public jsi::storers::Base
+class TiterDictStorer : public jsi::StorerBase
 {
  public:
-    using Base = jsi::storers::Base;
+    using Base = jsi::StorerBase;
 
     inline TiterDictStorer(ChartTiters::Dict& aTarget, bool aStarted = false) : mTarget(aTarget), mStarted(aStarted) {}
 
@@ -202,10 +202,10 @@ class TiterDictStorer : public jsi::storers::Base
 // std::vector< std::vector< std::vector< std::pair<std::string, std::string>>>>
 // layers       layer        row                    column       titer
 
-class TiterLayersStorer : public jsi::storers::Base
+class TiterLayersStorer : public jsi::StorerBase
 {
  public:
-    using Base = jsi::storers::Base;
+    using Base = jsi::StorerBase;
 
     inline TiterLayersStorer(ChartTiters::Layers& aTarget) : mTarget(aTarget), mStarted(false) {}
 
