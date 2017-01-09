@@ -316,7 +316,7 @@ namespace json_importer
         template <typename Element, typename Storer> class ArrayOfArrayOfValues : public Storer
         {
          public:
-            inline ArrayOfArrayOfValues(std::vector<std::vector<Element>>& aArray) : Storer(aArray), /* mArray(aArray), */ mNesting(0) {}
+            inline ArrayOfArrayOfValues(std::vector<std::vector<Element>>& aArray) : Storer(aArray), mNesting(0) {}
 
             inline virtual Base* StartArray()
                 {
@@ -351,7 +351,6 @@ namespace json_importer
                 }
 
          private:
-              // std::vector<std::vector<Element>>& mArray;
             size_t mNesting;
 
         }; // class ArrayOfValues<Element>

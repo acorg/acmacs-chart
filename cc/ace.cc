@@ -142,20 +142,103 @@ static jsi::data<ChartPlotSpec> plot_spec_data = {
 
 // ----------------------------------------------------------------------
 
-class LayersStorer : public jsi::storers::Base
+// std::vector< std::vector< std::pair<std::string, std::string>>>>
+// table        row                    column       titer
+
+class TiterDictStorer : public jsi::storers::Base
 {
  public:
-    inline LayersStorer(ChartTiters::Layers& aTarget) : mTarget(aTarget) {}
+    using Base = jsi::storers::Base;
+
+    inline TiterDictStorer(ChartTiters::Dict& aTarget, bool aStarted = false) : mTarget(aTarget), mStarted(aStarted) {}
+
+    inline virtual Base* StartArray()
+        {
+            if (mStarted)
+                throw Base::Failure(typeid(*this).name() + std::string(": unexpected StartArray event"));
+            mTarget.clear(); // erase all old elements
+            mStarted = true;
+            return nullptr;
+        }
+
+    inline virtual Base* EndArray()
+        {
+            throw Base::Pop();
+        }
+
+    inline virtual Base* StartObject()
+        {
+            if (!mStarted)
+                throw Base::Failure(typeid(*this).name() + std::string(": unexpected StartObject event"));
+            mTarget.emplace_back(); // add row
+            return nullptr;
+        }
+
+    inline virtual Base* EndObject()
+        {
+            return nullptr;
+        }
+
+    inline virtual Base* Key(const char* str, rapidjson::SizeType length)
+        {
+            mTarget.back().emplace_back(std::string{str, length}, std::string{}); // add column and empty titer
+            return nullptr;
+        }
+
+    inline virtual Base* String(const char* str, rapidjson::SizeType length)
+        {
+            if (!mTarget.back().back().second.empty())
+                throw Base::Failure(typeid(*this).name() + std::string(": unexpected String event: titer is there: ") + mTarget.back().back().second);
+            mTarget.back().back().second.assign(str, length);
+            return nullptr;
+        }
+
+ private:
+    ChartTiters::Dict& mTarget;
+    bool mStarted;
+
+}; // class TiterDictStorer
+
+// std::vector< std::vector< std::vector< std::pair<std::string, std::string>>>>
+// layers       layer        row                    column       titer
+
+class TiterLayersStorer : public jsi::storers::Base
+{
+ public:
+    using Base = jsi::storers::Base;
+
+    inline TiterLayersStorer(ChartTiters::Layers& aTarget) : mTarget(aTarget), mStarted(false) {}
+
+    inline virtual Base* StartArray()
+        {
+            Base* result = nullptr;
+            if (!mStarted) {
+                mTarget.clear(); // erase all old elements
+                mStarted = true;
+            }
+            else {
+                mTarget.emplace_back(); // add layer
+                result = new TiterDictStorer(mTarget.back(), true);
+            }
+            return result;
+        }
+
+    inline virtual Base* EndArray()
+        {
+            throw Base::Pop();
+        }
 
  private:
     ChartTiters::Layers& mTarget;
-};
+    bool mStarted;
+
+}; // class TiterLayersStorer
 
 
 static jsi::data<ChartTiters> titers_data = {
-    {"L", jsi::field<LayersStorer, ChartTiters, ChartTiters::Layers>(&ChartTiters::layers)},
-    // {"l", jsi::field(&ChartTiters::list)},
-    // {"d", jsi::field(&ChartTiters::dict)},
+    {"L", jsi::field<TiterLayersStorer, ChartTiters, ChartTiters::Layers>(&ChartTiters::layers)},
+      // {"l", jsi::field(&ChartTiters::list)},
+    {"d", jsi::field<TiterDictStorer, ChartTiters, ChartTiters::Dict>(&ChartTiters::dict)},
 };
 
 // ----------------------------------------------------------------------
