@@ -7,7 +7,7 @@
 #include "acmacs-base/read-file.hh"
 #include "acmacs-base/xz.hh"
 
-#include "json-importer.hh"
+#include "acmacs-base/json-importer.hh"
 namespace jsi = json_importer;
 
 // ----------------------------------------------------------------------
