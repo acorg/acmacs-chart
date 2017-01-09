@@ -9,6 +9,7 @@ class Chart;
 // ----------------------------------------------------------------------
 
 Chart* import_chart(std::string data);
+void export_chart(std::string aFilename, const Chart& aChart);
 
 // ----------------------------------------------------------------------
 /// Local Variables:

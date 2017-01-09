@@ -40,6 +40,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             ;
 
     m.def("import_chart", &import_chart, py::arg("data"), py::doc("Imports chart from a buffer or file in the ace format."));
+    m.def("export_chart", &export_chart, py::arg("filename"), py::arg("chart"), py::doc("Exports chart into a file in the ace format."));
 
     return m.ptr();
 }

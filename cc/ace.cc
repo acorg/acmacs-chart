@@ -3,11 +3,16 @@
 #include "acmacs-base/read-file.hh"
 #include "acmacs-base/xz.hh"
 
+#include "acmacs-base/json-writer.hh"
 #include "acmacs-base/json-importer.hh"
 namespace jsi = json_importer;
 
 // ----------------------------------------------------------------------
 // ~/ac/acmacs/docs/ace-format.json
+// ----------------------------------------------------------------------
+
+static const char* ACE_DUMP_VERSION = "acmacs-ace-v1";
+
 // ----------------------------------------------------------------------
 
 class Ace
@@ -24,7 +29,7 @@ class Ace
     inline void version(const char* str, size_t length)
         {
             mVersion.assign(str, length);
-            if (mVersion != "acmacs-ace-v1")
+            if (mVersion != ACE_DUMP_VERSION)
                 throw std::runtime_error("Unsupported data version: \"" + mVersion + "\"");
         }
     inline std::string version() const { return mVersion; }
@@ -240,13 +245,13 @@ static jsi::data<ChartTiters> titers_data = {
 // ----------------------------------------------------------------------
 
 static jsi::data<Chart> chart_data = {
+    {"C", jsi::field(&Chart::column_bases)},
     {"P", jsi::field(&Chart::projections, projection_data)},
     {"a", jsi::field(&Chart::antigens, antigen_data)},
-    {"s", jsi::field(&Chart::sera, serum_data)},
-    {"t", jsi::field(&Chart::titers, titers_data)},
-    {"C", jsi::field(&Chart::column_bases)},
     {"i", jsi::field(&Chart::chart_info, chart_info_data)},
     {"p", jsi::field(&Chart::plot_spec, plot_spec_data)},
+    {"s", jsi::field(&Chart::sera, serum_data)},
+    {"t", jsi::field(&Chart::titers, titers_data)},
 };
 
 static jsi::data<Ace> ace_data = {
@@ -276,6 +281,36 @@ Chart* import_chart(std::string buffer)
     return chart;
 
 } // import_chart
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+
+template <typename RW> inline JsonWriterT<RW>& operator <<(JsonWriterT<RW>& writer, const Chart& aChart)
+{
+    return writer << StartObject
+                  << JsonObjectKey("  version") << ACE_DUMP_VERSION
+                  << JsonObjectKey("c") << StartObject
+                  << JsonObjectKey("C") << aChart.column_bases()
+                  // << JsonObjectKey("P") << aChart.projections()
+                  // << JsonObjectKey("a") << aChart.antigens()
+                  // << JsonObjectKey("i") << aChart.chart_info()
+                  // << JsonObjectKey("p") << aChart.plot_spec()
+                  // << JsonObjectKey("s") << aChart.sera()
+                  // << JsonObjectKey("t") << aChart.titers()
+                  << EndObject
+                  << EndObject;
+}
+
+// ----------------------------------------------------------------------
+
+void export_chart(std::string aFilename, const Chart& aChart)
+{
+    export_to_json(aChart, ACE_DUMP_VERSION, aFilename, 2);
+
+} // export_chart
+
+// ----------------------------------------------------------------------
+
 
 // ----------------------------------------------------------------------
 /// Local Variables:
