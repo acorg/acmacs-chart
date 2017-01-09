@@ -105,7 +105,29 @@ static jsi::data<Projection> projection_data = {
     {"d", jsi::field(&Projection::dodgy_titer_is_regular)},
 };
 
+static jsi::data<LabelStyle> label_style_data = {
+    {"+", jsi::field(&LabelStyle::shown)},
+    {"p", jsi::field(&LabelStyle::position)},
+    {"t", jsi::field(&LabelStyle::text)},
+    {"f", jsi::field(&LabelStyle::face)},
+    {"s", jsi::field(&LabelStyle::slant)},
+    {"w", jsi::field(&LabelStyle::weight)},
+    {"s", jsi::field(&LabelStyle::size)},
+    {"c", jsi::field(&LabelStyle::color)},
+    {"r", jsi::field(&LabelStyle::rotation)},
+    {"i", jsi::field(&LabelStyle::interline)},
+};
+
 static jsi::data<ChartPlotSpecStyle> plot_spec_style_data = {
+    {"+", jsi::field(&ChartPlotSpecStyle::shown)},
+    {"F", jsi::field(&ChartPlotSpecStyle::fill_color)},
+    {"O", jsi::field(&ChartPlotSpecStyle::outline_color)},
+    {"o", jsi::field(&ChartPlotSpecStyle::outline_width)},
+    {"S", jsi::field(&ChartPlotSpecStyle::shape)},
+    {"s", jsi::field(&ChartPlotSpecStyle::size)},
+    {"r", jsi::field(&ChartPlotSpecStyle::rotation)},
+    {"a", jsi::field(&ChartPlotSpecStyle::aspect)},
+    {"l", jsi::field(&ChartPlotSpecStyle::label, label_style_data)},
 };
 
 static jsi::data<ChartPlotSpec> plot_spec_data = {

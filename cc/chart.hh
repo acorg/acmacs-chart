@@ -6,6 +6,7 @@
 #include <algorithm>
 
 #include "acmacs-base/virus-name.hh"
+#include "acmacs-base/color.hh"
 
 // ----------------------------------------------------------------------
 
@@ -326,11 +327,144 @@ class ChartTiters
 
 // ----------------------------------------------------------------------
 
+class LabelStyle
+{
+ public:
+    enum class Slant {Normal, Italic, Oblique};
+    enum class Weight {Normal, Bold};
+
+    inline LabelStyle() {}
+
+    inline void shown(bool aShown) { mShown = aShown; }
+    inline bool shown() const { return mShown; }
+
+    std::vector<double>& position() { return mPosition; }
+    const std::vector<double>& position() const { return mPosition; }
+
+    inline void text(const char* str, size_t length) { mText.assign(str, length); }
+    inline std::string text() const { return mText; }
+
+    inline void face(const char* str, size_t length) { mFace.assign(str, length); }
+    inline std::string face() const { return mFace; }
+
+    inline void slant(const char* str, size_t length) { mSlant = slant_from_string(str, length); }
+    inline Slant slant() const { return mSlant; }
+
+    inline void weight(const char* str, size_t length) { mWeight = weight_from_string(str, length); }
+    inline Weight weight() const { return mWeight; }
+
+    inline void size(double aSize) { mSize = aSize; }
+    inline double size() const { return mSize; }
+
+    inline void color(const char* str, size_t length) { mColor.from_string(str, length); }
+    inline std::string color() const { return mColor; }
+
+    inline void rotation(double aRotation) { mRotation = aRotation; }
+    inline double rotation() const { return mRotation; }
+
+    inline void interline(double aInterline) { mInterline = aInterline; }
+    inline double interline() const { return mInterline; }
+
+ private:
+    bool mShown;                   // "+"
+    std::vector<double> mPosition; // "p": [0.0, 1.0] label position (2D only), list of two doubles, default is [0, 1] means under point
+    std::string mText;             // "t": "label text if forced by user",
+    std::string mFace;             // "f": "font face",
+    Slant mSlant;                  // "s": "normal OR italic OR oblique", // font slant, default normal
+    Weight mWeight;                // "w": "normal OR bold", // font weight, default normal
+    double mSize;                  // "s": 1.0,           // size, default 1.0
+    Color mColor;                  // "c": "black",   // color, default black
+    double mRotation;              // "r": 0.0,       // rotation, default 0.0
+    double mInterline;             // "i": 0.2, // addtional interval between lines as a fraction of line height, default - 0.2
+
+    inline Slant slant_from_string(const char* str, size_t length) const
+        {
+            const std::string s{str, length};
+            if (s == "normal")
+                return Slant::Normal;
+            if (s == "italic")
+                return Slant::Italic;
+            if (s == "oblique")
+                return Slant::Oblique;
+            throw std::runtime_error("Unrecognized font slant: " + s);
+        }
+
+    inline Weight weight_from_string(const char* str, size_t length) const
+        {
+            const std::string s{str, length};
+            if (s == "normal")
+                return Weight::Normal;
+            if (s == "bold")
+                return Weight::Bold;
+            throw std::runtime_error("Unrecognized font weight: " + s);
+        }
+
+}; // class LabelStyle
+
+// ----------------------------------------------------------------------
+
 class ChartPlotSpecStyle
 {
  public:
+    enum Shape {Circle, Box, Triangle};
+
     inline ChartPlotSpecStyle() {}
-};
+
+    inline void shown(bool aShown) { mShown = aShown; }
+    inline bool shown() const { return mShown; }
+
+    inline void fill_color(const char* str, size_t length) { mFillColor.from_string(str, length); }
+    inline std::string fill_color() const { return mFillColor; }
+
+    inline void outline_color(const char* str, size_t length) { mOutlineColor.from_string(str, length); }
+    inline std::string outline_color() const { return mOutlineColor; }
+
+    inline void outline_width(double aOutlineWidth) { mOutlineWidth = aOutlineWidth; }
+    inline double outline_width() const { return mOutlineWidth; }
+
+    inline void shape(const char* str, size_t length) { mShape = shape_from_string(str, length); }
+    inline Shape shape() const { return mShape; }
+
+    inline void size(double aSize) { mSize = aSize; }
+    inline double size() const { return mSize; }
+
+    inline void rotation(double aRotation) { mRotation = aRotation; }
+    inline double rotation() const { return mRotation; }
+
+    inline void aspect(double aAspect) { mAspect = aAspect; }
+    inline double aspect() const { return mAspect; }
+
+    inline LabelStyle& label() { return mLabel; }
+    inline const LabelStyle& label() const { return mLabel; }
+
+ private:
+    bool mShown;          // "+"
+    Color mFillColor;     //  "F": "fill color: #FF0000 or T[RANSPARENT] or color name (red, green, blue, etc.), default is transparent",
+    Color mOutlineColor;  // "O": "outline color: #000000 or T[RANSPARENT] or color name (red, green, blue, etc.), default is black",
+    double mOutlineWidth; // "o": 1.0,             // outline width, default 1.0
+    Shape mShape;         // "S": "shape: C[IRCLE], B[OX], T[RIANGLE], default is circle",
+    double mSize;         // "s": 1.0,             // size, default is 1.0
+    double mRotation;     // "r": 0.0,             // rotation in radians, default is 0.0
+    double mAspect;       // "a": 1.0,              // aspect ratio, default is 1.0
+    LabelStyle mLabel;    // "l"
+
+    inline Shape shape_from_string(const char* str, size_t length) const
+        {
+            switch (*str) {
+              case 'C':
+              case 'c':
+                  return Circle;
+              case 'B':
+              case 'b':
+                  return Box;
+              case 'T':
+              case 't':
+                  return Triangle;
+            }
+            throw std::runtime_error("Unrecognized point shape: " + std::string(str, length));
+        }
+
+}; // class ChartPlotSpecStyle
 
 // ----------------------------------------------------------------------
 
