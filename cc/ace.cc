@@ -237,7 +237,7 @@ class TiterLayersStorer : public jsi::storers::Base
 
 static jsi::data<ChartTiters> titers_data = {
     {"L", jsi::field<TiterLayersStorer, ChartTiters, ChartTiters::Layers>(&ChartTiters::layers)},
-      // {"l", jsi::field(&ChartTiters::list)},
+    {"l", jsi::field(&ChartTiters::list)},
     {"d", jsi::field<TiterDictStorer, ChartTiters, ChartTiters::Dict>(&ChartTiters::dict)},
 };
 

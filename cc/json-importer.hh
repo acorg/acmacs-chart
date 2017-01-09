@@ -116,7 +116,8 @@ namespace json_importer
         {
          public:
             inline ArrayOfArrayElement(std::vector<std::vector<Target>>& aTarget) : mTarget(aTarget) {}
-            inline void operator()(Target aValue) { mTarget.back().emplace_back(aValue); }
+              // inline void operator()(Target aValue) { mTarget.back().emplace_back(aValue); }
+            template <typename ...Args> inline void operator()(Args ...args) { mTarget.back().emplace_back(args...); }
             inline size_t size() const { return mTarget.size(); }
             inline void clear() { mTarget.clear(); }
             inline void new_nested() { mTarget.emplace_back(); }
