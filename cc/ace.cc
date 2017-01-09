@@ -1,7 +1,3 @@
-#include <typeinfo>
-#include <functional>
-#include <map>
-
 #include "ace.hh"
 #include "chart.hh"
 #include "acmacs-base/read-file.hh"
