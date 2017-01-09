@@ -300,8 +300,9 @@ class ChartInfo
 class ChartTiters
 {
  public:
-    typedef std::vector<std::vector<std::string>> List;
-    typedef std::vector<std::vector<std::pair<std::string, std::string>>> Dict;
+    using List = std::vector<std::vector<std::string>>;
+    using Dict = std::vector<std::vector<std::pair<std::string, std::string>>>;
+    using Layers = std::vector<Dict>;
 
     inline ChartTiters() {}
 
@@ -314,14 +315,14 @@ class ChartTiters
 //             return mList;
 //         }
 
-//     inline List& list() { return mList; }
-//     inline Dict& dict() { return mDict; }
-//     inline auto& layers() { return mLayers; }
+    inline List& list() { return mList; }
+    inline Dict& dict() { return mDict; }
+    inline Layers& layers() { return mLayers; }
 
-//  private:
-//     List mList;
-//     Dict mDict;
-//     std::vector<Dict> mLayers;
+ private:
+    List mList;                 // "l"
+    Dict mDict;                 // "d"
+    Layers mLayers;             // "L"
 
 }; // class ChartTiters
 

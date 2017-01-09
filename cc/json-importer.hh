@@ -192,88 +192,6 @@ namespace json_importer
         };
 
           // ----------------------------------------------------------------------
-          // reader: StringLength
-          // ----------------------------------------------------------------------
-
-        // template <typename F> class StringLength : public storers::StringLength<F>
-        // {
-        //  public:
-        //     using storers::StringLength<F>::StringLength;
-        //  protected:
-        //     inline virtual void pop() { throw Base::Pop(); }
-        // };
-
-        // template <typename F> inline StringLength<F>* string_length(F aF) { return new StringLength<F>(aF); }
-
-          // ----------------------------------------------------------------------
-          // reader: double
-          // ----------------------------------------------------------------------
-
-        // template <typename F> class Double_ : public Base
-        // {
-        //  public:
-        //     inline Double_(F aStorage) : mStorage(aStorage) {}
-
-        //     inline virtual Base* Double(double d)
-        //         {
-        //             mStorage(d);
-        //             throw Pop();
-        //         }
-
-        //  private:
-        //     F mStorage;
-        // };
-
-        // template <typename F> inline Double_<F>* double_(F aF) { return new Double_<F>(aF); }
-
-          // ----------------------------------------------------------------------
-          // reader: unsigned
-          // ----------------------------------------------------------------------
-
-        // template <typename F> class Unsigned_ : public Base
-        // {
-        //  public:
-        //     inline Unsigned_(F aStorage) : mStorage(aStorage) {}
-
-        //     inline virtual Base* Uint(size_t u)
-        //         {
-        //             mStorage(u);
-        //             throw Pop();
-        //         }
-
-        //  private:
-        //     F mStorage;
-        // };
-
-        // template <typename F> inline Unsigned_<F>* unsigned_(F aF) { return new Unsigned_<F>(aF); }
-
-        //   // ----------------------------------------------------------------------
-        //   // reader: int
-        //   // ----------------------------------------------------------------------
-
-        // template <typename F> class Int_ : public Base
-        // {
-        //  public:
-        //     inline Int_(F aStorage) : mStorage(aStorage) {}
-
-        //     inline virtual Base* Int(int i)
-        //         {
-        //             mStorage(i);
-        //             throw Pop();
-        //         }
-
-        //     inline virtual Base* Uint(size_t u)
-        //         {
-        //             return Int(static_cast<int>(u));
-        //         }
-
-        //  private:
-        //     F mStorage;
-        // };
-
-        // template <typename F> inline Int_<F>* int_(F aF) { return new Int_<F>(aF); }
-
-          // ----------------------------------------------------------------------
           // reader maker base
           // ----------------------------------------------------------------------
 
@@ -537,6 +455,20 @@ namespace json_importer
                 Func mF;
             };
 
+            template <typename Storer, typename Parent, typename Field>
+                class GenericAccessor : public Base<Parent>
+            {
+             public:
+                using Accessor  = Field& (Parent::*)();
+                inline GenericAccessor(Accessor aAccessor) : mAccessor(aAccessor) {}
+                virtual inline readers::Base* reader(Parent& parent)
+                    {
+                        return new Storer(std::bind(mAccessor, &parent)());
+                    }
+             private:
+                Accessor mAccessor;
+            };
+
         } // namespace makers
 
           // ----------------------------------------------------------------------
@@ -662,6 +594,15 @@ namespace json_importer
         using Storer = decltype(storers::type_detector<storers::ArrayOfArrayElement<Field>>(std::declval<Field>()));
         return std::make_shared<readers::makers::ArrayOfArrayOfValuesAccessor<Parent, Field, decltype(accessor), Storer>>(accessor);
     }
+
+      // Custom Storer (derived from storers::Base)
+      // must be specified as field<Storer, Parent, Field>(&Parent::accessor)
+    template <typename Storer, typename Parent, typename Field> inline std::shared_ptr<readers::makers::Base<Parent>> field(Field& (Parent::*accessor)())
+    {
+        return std::make_shared<readers::makers::GenericAccessor<Storer, Parent, Field>>(accessor);
+    }
+
+      // ----------------------------------------------------------------------
 
     template <typename Target> inline void import(std::string aSource, Target& aTarget, data<Target>& aData)
     {

@@ -86,9 +86,6 @@ static jsi::data<ChartInfo> chart_info_data = {
     {"S", jsi::field(&ChartInfo::sources, chart_info_data)},
 };
 
-static jsi::data<ChartTiters> titers_data = {
-};
-
 static jsi::data<Projection> projection_data = {
     {"C", jsi::field(&Projection::column_bases)},
     {"D", jsi::field(&Projection::disconnected)},
@@ -142,6 +139,26 @@ static jsi::data<ChartPlotSpec> plot_spec_data = {
     {"s", jsi::field(&ChartPlotSpec::shown_on_all)},
       // {"t", jsi::field(&ChartPlotSpec::title_style, title_style_data)},
 };
+
+// ----------------------------------------------------------------------
+
+class LayersStorer : public jsi::storers::Base
+{
+ public:
+    inline LayersStorer(ChartTiters::Layers& aTarget) : mTarget(aTarget) {}
+
+ private:
+    ChartTiters::Layers& mTarget;
+};
+
+
+static jsi::data<ChartTiters> titers_data = {
+    {"L", jsi::field<LayersStorer, ChartTiters, ChartTiters::Layers>(&ChartTiters::layers)},
+    // {"l", jsi::field(&ChartTiters::list)},
+    // {"d", jsi::field(&ChartTiters::dict)},
+};
+
+// ----------------------------------------------------------------------
 
 static jsi::data<Chart> chart_data = {
     {"P", jsi::field(&Chart::projections, projection_data)},
