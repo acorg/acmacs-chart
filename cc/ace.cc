@@ -305,7 +305,7 @@ template <typename RW> inline JsonWriterT<RW>& operator <<(JsonWriterT<RW>& writ
 
 void export_chart(std::string aFilename, const Chart& aChart)
 {
-    export_to_json(aChart, ACE_DUMP_VERSION, aFilename, 2);
+    export_to_json(aChart, ACE_DUMP_VERSION, aFilename, 2, true /* insert_emacs_indent_hint */, true /* force_compression */);
 
 } // export_chart
 
