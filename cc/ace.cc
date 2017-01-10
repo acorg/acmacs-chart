@@ -346,7 +346,7 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
                   << jsw::if_not_empty("D", aProjection.disconnected())
                   << jsw::if_not_empty("U", aProjection.unmovable())
                   << jsw::if_not_empty("c", aProjection.comment())
-                  << jsw::key("d") << aProjection.dodgy_titer_is_regular()
+                  << jsw::if_not_equal("d", aProjection.dodgy_titer_is_regular(), false)
                   << jsw::key("e") << aProjection.stress_diff_to_stop()
                   << jsw::if_not_empty("f", aProjection.titer_multipliers())
                   << jsw::if_not_empty("g", aProjection.gradient_multipliers())
@@ -443,7 +443,7 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
 
 void export_chart(std::string aFilename, const Chart& aChart)
 {
-    jsw::export_to_json(aChart, ACE_DUMP_VERSION, aFilename, 2, true /* insert_emacs_indent_hint */, true /* force_compression */);
+    jsw::export_to_json(aChart, ACE_DUMP_VERSION, aFilename, 1, true /* insert_emacs_indent_hint */, true /* force_compression */);
 
 } // export_chart
 
