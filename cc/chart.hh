@@ -202,7 +202,7 @@ class Projection
     inline const std::vector<double>& titer_multipliers() const { return mTiterMultipliers; }
 
     inline void dodgy_titer_is_regular(bool aDodgyTiterIsRegular) { mDodgyTiterIsRegular = aDodgyTiterIsRegular; }
-    inline double dodgy_titer_is_regular() const { return mDodgyTiterIsRegular; }
+    inline bool dodgy_titer_is_regular() const { return mDodgyTiterIsRegular; }
 
     inline void stress_diff_to_stop(double aStressDiffToStop) { mStressDiffToStop = aStressDiffToStop; }
     inline double stress_diff_to_stop() const { return mStressDiffToStop; }
@@ -271,10 +271,9 @@ class ChartInfo
     inline void rbc(const char* str, size_t length) { mRbc.assign(str, length); }
     inline void name(const char* str, size_t length) { mName.assign(str, length); }
     inline void subset(const char* str, size_t length) { mSubset.assign(str, length); }
-//     inline TableType& type() { return mType; }
     inline void type(const char* str, size_t length) // reading from json
         {
-            if (length == 1)
+            if (length != 1)
                 throw std::runtime_error("ChartInfo: unrecognized table type: " + std::string(str, length));
             switch (*str) {
               case 'A':
@@ -407,8 +406,8 @@ class LabelStyle
     std::vector<double> mPosition; // "p": [0.0, 1.0] label position (2D only), list of two doubles, default is [0, 1] means under point
     std::string mText;             // "t": "label text if forced by user",
     std::string mFace;             // "f": "font face",
-    Slant mSlant;                  // "s": "normal OR italic OR oblique", // font slant, default normal
-    Weight mWeight;                // "w": "normal OR bold", // font weight, default normal
+    Slant mSlant;                  // "S": "normal OR italic OR oblique", // font slant, default normal
+    Weight mWeight;                // "W": "normal OR bold", // font weight, default normal
     double mSize;                  // "s": 1.0,           // size, default 1.0
     Color mColor;                  // "c": "black",   // color, default black
     double mRotation;              // "r": 0.0,       // rotation, default 0.0

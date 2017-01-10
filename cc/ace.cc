@@ -116,8 +116,8 @@ static jsi::data<LabelStyle> label_style_data = {
     {"p", jsi::field(&LabelStyle::position)},
     {"t", jsi::field(&LabelStyle::text)},
     {"f", jsi::field(&LabelStyle::face)},
-    {"s", jsi::field(&LabelStyle::slant)},
-    {"w", jsi::field(&LabelStyle::weight)},
+    {"S", jsi::field(&LabelStyle::slant)},
+    {"W", jsi::field(&LabelStyle::weight)},
     {"s", jsi::field(&LabelStyle::size)},
     {"c", jsi::field(&LabelStyle::color)},
     {"r", jsi::field(&LabelStyle::rotation)},
@@ -300,7 +300,7 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
                   << jsw::if_not_empty("D", aChartInfo.date())
                   << jsw::if_not_empty("N", aChartInfo.name())
                   << jsw::if_not_empty("S", aChartInfo.sources())
-                  << jsw::key("T") << aChartInfo.type_as_string()
+                  << jsw::if_not_equal("T", aChartInfo.type_as_string(), std::string("A"))
                   << jsw::if_not_empty("V", aChartInfo.virus_type())
                   << jsw::if_not_empty("l", aChartInfo.lab())
                   << jsw::if_not_empty("r", aChartInfo.rbc())
@@ -344,7 +344,9 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
     return writer << jsw::start_object
                   << jsw::if_not_empty("C", aProjection.column_bases())
                   << jsw::if_not_empty("D", aProjection.disconnected())
+                  << jsw::if_not_empty("U", aProjection.unmovable())
                   << jsw::if_not_empty("c", aProjection.comment())
+                  << jsw::key("d") << aProjection.dodgy_titer_is_regular()
                   << jsw::key("e") << aProjection.stress_diff_to_stop()
                   << jsw::if_not_empty("f", aProjection.titer_multipliers())
                   << jsw::if_not_empty("g", aProjection.gradient_multipliers())
@@ -352,9 +354,7 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
                   << jsw::key("m") << aProjection.minimum_column_basis()
                   << jsw::key("s") << aProjection.stress()
                   << jsw::if_not_empty("t", aProjection.transformation())
-                  << jsw::if_not_empty("U", aProjection.unmovable())
                   << jsw::if_not_empty("u", aProjection.unmovable_in_last_dimension())
-                  << jsw::key("d") << aProjection.dodgy_titer_is_regular()
                   << jsw::end_object;
 }
 
@@ -367,10 +367,10 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
                   << jsw::key("i") << aLabelStyle.interline()
                   << jsw::if_not_empty("p", aLabelStyle.position())
                   << jsw::if_not_zero("r", aLabelStyle.rotation())
-                  << jsw::key("s") << aLabelStyle.size()
-                  << jsw::if_not_equal("s", aLabelStyle.slant_as_stirng(), std::string("normal"))
+                  << jsw::if_not_one("s", aLabelStyle.size())
+                  << jsw::if_not_equal("S", aLabelStyle.slant_as_stirng(), std::string("normal"))
                   << jsw::if_not_empty("t", aLabelStyle.text())
-                  << jsw::if_not_equal("w", aLabelStyle.weight_as_stirng(), std::string("normal"))
+                  << jsw::if_not_equal("W", aLabelStyle.weight_as_stirng(), std::string("normal"))
                   << jsw::end_object;
 }
 
