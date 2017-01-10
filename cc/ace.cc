@@ -355,23 +355,23 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
 template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const LabelStyle& aLabelStyle)
 {
     return writer << jsw::start_object
-                  << jsw::key("+") << aLabelStyle.shown()
+                  << jsw::if_not_equal("+", aLabelStyle.shown(), true)
                   << jsw::key("c") << aLabelStyle.color()
                   << jsw::if_not_empty("f", aLabelStyle.face())
                   << jsw::key("i") << aLabelStyle.interline()
                   << jsw::if_not_empty("p", aLabelStyle.position())
                   << jsw::if_not_zero("r", aLabelStyle.rotation())
                   << jsw::key("s") << aLabelStyle.size()
-                  << jsw::key("s") << aLabelStyle.slant_as_stirng()
+                  << jsw::if_not_equal("s", aLabelStyle.slant_as_stirng(), std::string("normal"))
                   << jsw::if_not_empty("t", aLabelStyle.text())
-                  << jsw::key("w") << aLabelStyle.weight_as_stirng()
+                  << jsw::if_not_equal("w", aLabelStyle.weight_as_stirng(), std::string("normal"))
                   << jsw::end_object;
 }
 
 template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const ChartPlotSpecStyle& aChartPlotSpecStyle)
 {
     return writer << jsw::start_object
-                  << jsw::key("+") << aChartPlotSpecStyle.shown()
+                  << jsw::if_not_equal("+", aChartPlotSpecStyle.shown(), true)
                   << jsw::key("F") << aChartPlotSpecStyle.fill_color()
                   << jsw::key("O") << aChartPlotSpecStyle.outline_color()
                   << jsw::key("S") << aChartPlotSpecStyle.shape_as_string()
