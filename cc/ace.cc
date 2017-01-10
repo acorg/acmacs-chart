@@ -3,6 +3,14 @@
 #include "acmacs-base/read-file.hh"
 #include "acmacs-base/xz.hh"
 
+namespace json_writer
+{
+    template <typename RW> class writer;
+}
+namespace jsw = json_writer;
+
+template <typename RW> jsw::writer<RW>& operator <<(jsw::writer<RW>&, const std::vector<std::pair<std::string, std::string>>&);
+
 #include "acmacs-base/json-writer.hh"
 #include "acmacs-base/json-importer.hh"
 namespace jsi = json_importer;
@@ -285,8 +293,6 @@ Chart* import_chart(std::string buffer)
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 
-namespace jsw = json_writer;
-
 template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const ChartInfo& aChartInfo)
 {
     return writer << jsw::start_object
@@ -399,6 +405,24 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
                   << jsw::end_object;
 }
 
+template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const std::vector<std::pair<std::string, std::string>>& aChartTitersDict)
+{
+    writer << jsw::start_object;
+    for (const auto& e: aChartTitersDict)
+        writer << jsw::key(e.first) << e.second;
+    writer << jsw::end_object;
+    return writer;
+}
+
+template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const ChartTiters& aChartTiters)
+{
+    return writer << jsw::start_object
+                  << jsw::if_not_empty("L", aChartTiters.layers())
+                  << jsw::if_not_empty("l", aChartTiters.list())
+                  << jsw::if_not_empty("d", aChartTiters.dict())
+                  << jsw::end_object;
+}
+
 template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const Chart& aChart)
 {
     return writer << jsw::start_object
@@ -408,9 +432,9 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
                   << jsw::if_not_empty("P", aChart.projections())
                   << jsw::key("a") << aChart.antigens()
                   << jsw::key("i") << aChart.chart_info()
-                  << jsw::key("p") << aChart.plot_spec()
+                  << jsw::if_not_empty("p", aChart.plot_spec())
                   << jsw::key("s") << aChart.sera()
-                  // << jsw::key("t") << aChart.titers()
+                  << jsw::key("t") << aChart.titers()
                   << jsw::end_object
                   << jsw::end_object;
 }
@@ -422,9 +446,6 @@ void export_chart(std::string aFilename, const Chart& aChart)
     jsw::export_to_json(aChart, ACE_DUMP_VERSION, aFilename, 2, true /* insert_emacs_indent_hint */, true /* force_compression */);
 
 } // export_chart
-
-// ----------------------------------------------------------------------
-
 
 // ----------------------------------------------------------------------
 /// Local Variables:

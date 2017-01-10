@@ -329,6 +329,10 @@ class ChartTiters
     inline Dict& dict() { return mDict; }
     inline Layers& layers() { return mLayers; }
 
+    inline const List& list() const { return mList; }
+    inline const Dict& dict() const { return mDict; }
+    inline const Layers& layers() const { return mLayers; }
+
  private:
     List mList;                 // "l"
     Dict mDict;                 // "d"
@@ -349,8 +353,8 @@ class LabelStyle
     inline void shown(bool aShown) { mShown = aShown; }
     inline bool shown() const { return mShown; }
 
-    std::vector<double>& position() { return mPosition; }
-    const std::vector<double>& position() const { return mPosition; }
+    inline std::vector<double>& position() { return mPosition; }
+    inline const std::vector<double>& position() const { return mPosition; }
 
     inline void text(const char* str, size_t length) { mText.assign(str, length); }
     inline std::string text() const { return mText; }
@@ -518,17 +522,19 @@ class ChartPlotSpec
  public:
     inline ChartPlotSpec() {}
 
-    std::vector<size_t>& drawing_order() { return mDrawingOrder; }
-    const std::vector<size_t>& drawing_order() const { return mDrawingOrder; }
+    inline std::vector<size_t>& drawing_order() { return mDrawingOrder; }
+    inline const std::vector<size_t>& drawing_order() const { return mDrawingOrder; }
 
-    std::vector<size_t>& style_for_point() { return mStyleForPoint; }
-    const std::vector<size_t>& style_for_point() const { return mStyleForPoint; }
+    inline std::vector<size_t>& style_for_point() { return mStyleForPoint; }
+    inline const std::vector<size_t>& style_for_point() const { return mStyleForPoint; }
 
-    std::vector<ChartPlotSpecStyle>& styles() { return mStyles; }
-    const std::vector<ChartPlotSpecStyle>& styles() const { return mStyles; }
+    inline std::vector<ChartPlotSpecStyle>& styles() { return mStyles; }
+    inline const std::vector<ChartPlotSpecStyle>& styles() const { return mStyles; }
 
-    std::vector<size_t>& shown_on_all() { return mShownOnAll; }
-    const std::vector<size_t>& shown_on_all() const { return mShownOnAll; }
+    inline std::vector<size_t>& shown_on_all() { return mShownOnAll; }
+    inline const std::vector<size_t>& shown_on_all() const { return mShownOnAll; }
+
+    inline bool empty() const { return mDrawingOrder.empty() && mStyleForPoint.empty() && mStyles.empty() && mShownOnAll.empty(); }
 
  private:
     std::vector<size_t> mDrawingOrder;       // "d"
