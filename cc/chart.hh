@@ -252,6 +252,16 @@ class ChartInfo
     inline const std::string name() const { return mName; }
     inline const std::string subset() const { return mSubset; }
     inline TableType type() const { return mType; }
+    inline std::string type_as_string() const
+        {
+            switch(mType) {
+              case Antigenic:
+                  return "A";
+              case Genetic:
+                  return "G";
+            }
+            return "?";         // to keep gcc happy
+        }
 
     inline void virus(const char* str, size_t length) { mVirus.assign(str, length); }
     inline void virus_type(const char* str, size_t length) { mVirusType.assign(str, length); }
@@ -334,7 +344,7 @@ class LabelStyle
     enum class Slant {Normal, Italic, Oblique};
     enum class Weight {Normal, Bold};
 
-    inline LabelStyle() {}
+    inline LabelStyle() : mShown(true), mSlant(Slant::Normal), mWeight(Weight::Normal), mSize(1), mColor(0), mRotation(0), mInterline(0.2) {}
 
     inline void shown(bool aShown) { mShown = aShown; }
     inline bool shown() const { return mShown; }
@@ -350,9 +360,31 @@ class LabelStyle
 
     inline void slant(const char* str, size_t length) { mSlant = slant_from_string(str, length); }
     inline Slant slant() const { return mSlant; }
+    inline std::string slant_as_stirng() const
+        {
+            switch (mSlant) {
+              case Slant::Normal:
+                  return "normal";
+              case Slant::Italic:
+                  return "italic";
+              case Slant::Oblique:
+                  return "oblique";
+            }
+            return "?";
+        }
 
     inline void weight(const char* str, size_t length) { mWeight = weight_from_string(str, length); }
     inline Weight weight() const { return mWeight; }
+    inline std::string weight_as_stirng() const
+        {
+            switch (mWeight) {
+              case Weight::Normal:
+                  return "normal";
+              case Weight::Bold:
+                  return "bold";
+            }
+            return "?";
+        }
 
     inline void size(double aSize) { mSize = aSize; }
     inline double size() const { return mSize; }
@@ -409,7 +441,7 @@ class ChartPlotSpecStyle
  public:
     enum Shape {Circle, Box, Triangle};
 
-    inline ChartPlotSpecStyle() {}
+    inline ChartPlotSpecStyle() : mShown(true), mFillColor("transparent"), mOutlineColor("black"), mOutlineWidth(1), mShape(Circle), mSize(1), mRotation(0), mAspect(1) {}
 
     inline void shown(bool aShown) { mShown = aShown; }
     inline bool shown() const { return mShown; }
@@ -425,6 +457,18 @@ class ChartPlotSpecStyle
 
     inline void shape(const char* str, size_t length) { mShape = shape_from_string(str, length); }
     inline Shape shape() const { return mShape; }
+    inline std::string shape_as_string() const
+        {
+            switch(mShape) {
+              case Circle:
+                  return "C";
+              case Box:
+                  return "B";
+              case Triangle:
+                  return "T";
+            }
+            return "?";
+        }
 
     inline void size(double aSize) { mSize = aSize; }
     inline double size() const { return mSize; }

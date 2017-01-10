@@ -287,17 +287,129 @@ Chart* import_chart(std::string buffer)
 
 namespace jsw = json_writer;
 
+template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const ChartInfo& aChartInfo)
+{
+    return writer << jsw::start_object
+                  << jsw::key("A") << aChartInfo.assay()
+                  << jsw::if_not_empty("D", aChartInfo.date())
+                  << jsw::if_not_empty("N", aChartInfo.name())
+                  << jsw::if_not_empty("S", aChartInfo.sources())
+                  << jsw::key("T") << aChartInfo.type_as_string()
+                  << jsw::if_not_empty("V", aChartInfo.virus_type())
+                  << jsw::if_not_empty("l", aChartInfo.lab())
+                  << jsw::if_not_empty("r", aChartInfo.rbc())
+                  << jsw::if_not_empty("s", aChartInfo.subset())
+                  << jsw::if_not_empty("v", aChartInfo.virus())
+                  << jsw::end_object;
+}
+
+template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const Antigen& aAntigen)
+{
+    return writer << jsw::start_object
+                  << jsw::key("N") << aAntigen.name()
+                  << jsw::if_not_empty("D", aAntigen.date())
+                  << jsw::if_not_empty("L", aAntigen.lineage())
+                  << jsw::if_not_empty("P", aAntigen.passage())
+                  << jsw::if_not_empty("R", aAntigen.reassortant())
+                  << jsw::if_not_empty("l", aAntigen.lab_id())
+                  << jsw::if_not_empty("S", aAntigen.semantic())
+                  << jsw::if_not_empty("a", aAntigen.annotations())
+                  << jsw::if_not_empty("c", aAntigen.clades())
+                  << jsw::end_object;
+}
+
+template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const Serum& aSerum)
+{
+    return writer << jsw::start_object
+                  << jsw::key("N") << aSerum.name()
+                  << jsw::if_not_empty("I", aSerum.serum_id())
+                  << jsw::if_not_empty("L", aSerum.lineage())
+                  << jsw::if_not_empty("P", aSerum.passage())
+                  << jsw::if_not_empty("R", aSerum.reassortant())
+                  << jsw::if_not_empty("S", aSerum.semantic())
+                  << jsw::if_not_empty("a", aSerum.annotations())
+                  << jsw::if_non_negative("h", aSerum.homologous())
+                  << jsw::if_not_empty("s", aSerum.serum_species())
+                  << jsw::end_object;
+}
+
+template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const Projection& aProjection)
+{
+    return writer << jsw::start_object
+                  << jsw::if_not_empty("C", aProjection.column_bases())
+                  << jsw::if_not_empty("D", aProjection.disconnected())
+                  << jsw::if_not_empty("c", aProjection.comment())
+                  << jsw::key("e") << aProjection.stress_diff_to_stop()
+                  << jsw::if_not_empty("f", aProjection.titer_multipliers())
+                  << jsw::if_not_empty("g", aProjection.gradient_multipliers())
+                  << jsw::key("l") << aProjection.layout()
+                  << jsw::key("m") << aProjection.minimum_column_basis()
+                  << jsw::key("s") << aProjection.stress()
+                  << jsw::if_not_empty("t", aProjection.transformation())
+                  << jsw::if_not_empty("U", aProjection.unmovable())
+                  << jsw::if_not_empty("u", aProjection.unmovable_in_last_dimension())
+                  << jsw::key("d") << aProjection.dodgy_titer_is_regular()
+                  << jsw::end_object;
+}
+
+template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const LabelStyle& aLabelStyle)
+{
+    return writer << jsw::start_object
+                  << jsw::key("+") << aLabelStyle.shown()
+                  << jsw::key("c") << aLabelStyle.color()
+                  << jsw::if_not_empty("f", aLabelStyle.face())
+                  << jsw::key("i") << aLabelStyle.interline()
+                  << jsw::if_not_empty("p", aLabelStyle.position())
+                  << jsw::if_not_zero("r", aLabelStyle.rotation())
+                  << jsw::key("s") << aLabelStyle.size()
+                  << jsw::key("s") << aLabelStyle.slant_as_stirng()
+                  << jsw::if_not_empty("t", aLabelStyle.text())
+                  << jsw::key("w") << aLabelStyle.weight_as_stirng()
+                  << jsw::end_object;
+}
+
+template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const ChartPlotSpecStyle& aChartPlotSpecStyle)
+{
+    return writer << jsw::start_object
+                  << jsw::key("+") << aChartPlotSpecStyle.shown()
+                  << jsw::key("F") << aChartPlotSpecStyle.fill_color()
+                  << jsw::key("O") << aChartPlotSpecStyle.outline_color()
+                  << jsw::key("S") << aChartPlotSpecStyle.shape_as_string()
+                  << jsw::if_not_one("a", aChartPlotSpecStyle.aspect())
+                  << jsw::key("l") << aChartPlotSpecStyle.label()
+                  << jsw::key("o") << aChartPlotSpecStyle.outline_width()
+                  << jsw::if_not_zero("r", aChartPlotSpecStyle.rotation())
+                  << jsw::key("s") << aChartPlotSpecStyle.size()
+                  << jsw::end_object;
+}
+
+template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const ChartPlotSpec& aChartPlotSpec)
+{
+    return writer << jsw::start_object
+                  << jsw::if_not_empty("d", aChartPlotSpec.drawing_order())
+              // "E", aChartPlotSpec.error_lines_positive()
+              // "e", aChartPlotSpec.error_lines_negative()
+              // "g", aChartPlotSpec.grid()
+                  << jsw::if_not_empty("p", aChartPlotSpec.style_for_point())
+                  << jsw::if_not_empty("P", aChartPlotSpec.styles())
+              // "l", aChartPlotSpec.style_for_procrustes_line()
+              // "L", aChartPlotSpec.procrustes_line_styles, procrustes_line_styles_data()
+                  << jsw::if_not_empty("s", aChartPlotSpec.shown_on_all())
+              // "t", aChartPlotSpec.title_style, title_style_data()
+                  << jsw::end_object;
+}
+
 template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const Chart& aChart)
 {
     return writer << jsw::start_object
                   << jsw::key("  version") << ACE_DUMP_VERSION
                   << jsw::key("c") << jsw::start_object
-                  << jsw::key("C") << aChart.column_bases()
-                  // << jsw::key("P") << aChart.projections()
-                  // << jsw::key("a") << aChart.antigens()
-                  // << jsw::key("i") << aChart.chart_info()
-                  // << jsw::key("p") << aChart.plot_spec()
-                  // << jsw::key("s") << aChart.sera()
+                  << jsw::if_not_empty("C", aChart.column_bases())
+                  << jsw::if_not_empty("P", aChart.projections())
+                  << jsw::key("a") << aChart.antigens()
+                  << jsw::key("i") << aChart.chart_info()
+                  << jsw::key("p") << aChart.plot_spec()
+                  << jsw::key("s") << aChart.sera()
                   // << jsw::key("t") << aChart.titers()
                   << jsw::end_object
                   << jsw::end_object;
