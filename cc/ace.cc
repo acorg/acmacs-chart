@@ -285,27 +285,29 @@ Chart* import_chart(std::string buffer)
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 
-template <typename RW> inline JsonWriterT<RW>& operator <<(JsonWriterT<RW>& writer, const Chart& aChart)
+namespace jsw = json_writer;
+
+template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const Chart& aChart)
 {
-    return writer << StartObject
-                  << JsonObjectKey("  version") << ACE_DUMP_VERSION
-                  << JsonObjectKey("c") << StartObject
-                  << JsonObjectKey("C") << aChart.column_bases()
-                  // << JsonObjectKey("P") << aChart.projections()
-                  // << JsonObjectKey("a") << aChart.antigens()
-                  // << JsonObjectKey("i") << aChart.chart_info()
-                  // << JsonObjectKey("p") << aChart.plot_spec()
-                  // << JsonObjectKey("s") << aChart.sera()
-                  // << JsonObjectKey("t") << aChart.titers()
-                  << EndObject
-                  << EndObject;
+    return writer << jsw::start_object
+                  << jsw::key("  version") << ACE_DUMP_VERSION
+                  << jsw::key("c") << jsw::start_object
+                  << jsw::key("C") << aChart.column_bases()
+                  // << jsw::key("P") << aChart.projections()
+                  // << jsw::key("a") << aChart.antigens()
+                  // << jsw::key("i") << aChart.chart_info()
+                  // << jsw::key("p") << aChart.plot_spec()
+                  // << jsw::key("s") << aChart.sera()
+                  // << jsw::key("t") << aChart.titers()
+                  << jsw::end_object
+                  << jsw::end_object;
 }
 
 // ----------------------------------------------------------------------
 
 void export_chart(std::string aFilename, const Chart& aChart)
 {
-    export_to_json(aChart, ACE_DUMP_VERSION, aFilename, 2, true /* insert_emacs_indent_hint */, true /* force_compression */);
+    jsw::export_to_json(aChart, ACE_DUMP_VERSION, aFilename, 2, true /* insert_emacs_indent_hint */, true /* force_compression */);
 
 } // export_chart
 
