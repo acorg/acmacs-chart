@@ -53,7 +53,15 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
       // ----------------------------------------------------------------------
 
     py::class_<ChartInfo>(m, "ChartInfo")
+            .def("virus", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::virus))
             .def("virus_type", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::virus_type))
+            .def("assay", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::assay))
+            .def("date", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::date))
+            .def("lab", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::lab))
+            .def("rbc", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::rbc))
+            .def("name", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::name))
+            .def("subset", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::subset))
+            .def("type", &ChartInfo::type_as_string)
             ;
 
     py::class_<Chart>(m, "Chart")

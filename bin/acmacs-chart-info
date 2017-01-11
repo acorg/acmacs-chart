@@ -19,7 +19,7 @@ def main(args):
     with timeit("Reading chart from " + args.input[0]):
         chart = acmacs_chart.import_chart(args.input[0])
     virus_type = chart.chart_info().virus_type()
-    print("virus_type", virus_type)
+    print("virus_type", virus_type, chart.chart_info().date())
     hidb_set = acmacs_chart.HiDbSet(str(Path("~/AD/data").expanduser().resolve()))
     hidb = hidb_set.get(virus_type)
     if args.list_names:

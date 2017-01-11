@@ -250,14 +250,14 @@ class ChartInfo
     inline ChartInfo() : mType(Antigenic) {}
 //     std::string table_id(std::string lineage) const;
 
-    inline const std::string virus() const { return mVirus; }
-    inline const std::string virus_type() const { return mVirusType; }
-    inline const std::string assay() const { return mAssay; }
-    inline const std::string date() const { return mDate; }
-    inline const std::string lab() const { return mLab; }
-    inline const std::string rbc() const { return mRbc; }
-    inline const std::string name() const { return mName; }
-    inline const std::string subset() const { return mSubset; }
+    inline const std::string virus() const { return merge_text_fields(&ChartInfo::mVirus); }
+    inline const std::string virus_type() const { return merge_text_fields(&ChartInfo::mVirusType); }
+    inline const std::string assay() const { return merge_text_fields(&ChartInfo::mAssay); }
+    const std::string date() const;
+    inline const std::string lab() const { return merge_text_fields(&ChartInfo::mLab); }
+    inline const std::string rbc() const { return merge_text_fields(&ChartInfo::mRbc); }
+    inline const std::string name() const { return merge_text_fields(&ChartInfo::mName); }
+    inline const std::string subset() const { return merge_text_fields(&ChartInfo::mSubset); }
     inline TableType type() const { return mType; }
     inline std::string type_as_string() const
         {
@@ -308,6 +308,8 @@ class ChartInfo
     std::string mSubset;             // "s"
     TableType mType;                 // "T"
     std::vector<ChartInfo> mSources; // "S"
+
+    std::string merge_text_fields(std::string ChartInfo::* aMember) const;
 
 }; // class ChartInfo
 
