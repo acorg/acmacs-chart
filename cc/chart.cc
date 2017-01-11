@@ -27,14 +27,16 @@ std::string Antigen::full_name() const
 
 // ----------------------------------------------------------------------
 
-void Antigen::find_in_hidb(const hidb::HiDb& aHiDb) const
+const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_hidb(const hidb::HiDb& aHiDb) const
 {
     try {
-        auto found = aHiDb.find_antigen_exactly(full_name());
-        std::cerr << "find_in_hidb: " << full_name() << " --> " << found.most_recent_table().table_id() << " tables:" << found.number_of_tables() << std::endl;
+        const auto& found = aHiDb.find_antigen_exactly(full_name());
+          // std::cerr << "find_in_hidb: " << full_name() << " --> " << found.most_recent_table().table_id() << " tables:" << found.number_of_tables() << std::endl;
+        return found;
     }
     catch (hidb::HiDb::NotFound& err) {
         std::cerr << "ERROR: not found " << err.what() << std::endl;
+        throw;
     }
 
 } // Antigen::find_in_hidb

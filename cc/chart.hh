@@ -9,7 +9,7 @@
 #include "acmacs-base/color.hh"
 #include "acmacs-base/string.hh"
 
-namespace hidb { class HiDb; }
+namespace hidb { class HiDb; class Antigen; class Serum; template <typename AS> class AntigenSerumData; }
 
 // ----------------------------------------------------------------------
 
@@ -125,7 +125,7 @@ class Antigen : public AntigenSerum
     inline const std::vector<std::string>& clades() const { return mClades; }
     inline std::vector<std::string>& clades() { return mClades; }
 
-    void find_in_hidb(const hidb::HiDb& aHiDb) const;
+    const hidb::AntigenSerumData<hidb::Antigen>& find_in_hidb(const hidb::HiDb& aHiDb) const;
 
 //     virtual std::string variant_id() const;
 

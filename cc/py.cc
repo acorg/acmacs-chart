@@ -13,6 +13,16 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
       // HiDb
       // ----------------------------------------------------------------------
 
+    py::class_<hidb::PerTable>(m, "hidb_PerTable")
+            .def("table_id", static_cast<const std::string (hidb::PerTable::*)() const>(&hidb::PerTable::table_id))
+            ;
+
+    py::class_<hidb::AntigenData>(m, "hidb_AntigenSerumData_Antigen")
+            .def("number_of_tables", &hidb::AntigenData::number_of_tables)
+            .def("most_recent_table", &hidb::AntigenData::most_recent_table)
+            .def("date", &hidb::AntigenData::date)
+            ;
+
     py::class_<hidb::HiDb>(m, "HiDb")
             ;
 
@@ -39,7 +49,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
     py::class_<Antigen, AntigenSerum>(m, "Antigen")
             .def("date", static_cast<const std::string (Antigen::*)() const>(&Antigen::date))
             .def("lab_id", [](const Antigen &a) { py::list list; for (const auto& li: a.lab_id()) { list.append(py::str(li)); } return list; }, py::doc("returns a copy of the lab_id list, modifications to the returned list are not applied"))
-            .def("find_in_hidb", &Antigen::find_in_hidb, py::arg("hidb"))
+            .def("find_in_hidb", &Antigen::find_in_hidb, py::arg("hidb"), py::return_value_policy::reference)
             ;
 
     py::class_<Serum, AntigenSerum>(m, "Serum")
