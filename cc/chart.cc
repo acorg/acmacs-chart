@@ -36,6 +36,7 @@ const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_hidb(const hidb::H
     }
     catch (hidb::HiDb::NotFound& err) {
         std::cerr << "ERROR: not found " << err.what() << std::endl;
+        std::cerr << hidb::report(aHiDb.find_antigens(full_name()), "  ") << std::endl;
         throw;
     }
 
