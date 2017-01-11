@@ -26,6 +26,7 @@ def main(args):
         ag_no_w = len(str(chart.number_of_antigens()))
         for ag_no in range(chart.number_of_antigens()):
             ag = chart.antigen(ag_no)
+            ag.find_in_hidb(hidb)
             print(f"AG {ag_no:{ag_no_w}d} {ag.name()} {ag.reassortant()} {ag.passage()} {ag.annotations() or ''} [{ag.date()}]")
         print()
         for sr_no in range(chart.number_of_sera()):

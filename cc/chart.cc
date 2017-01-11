@@ -23,7 +23,9 @@ void Antigen::find_in_hidb(const hidb::HiDb& aHiDb) const
     p.erase(std::remove(p.begin(), p.end(), std::string()), p.end());
     std::string name_to_look = string::join(" ", p);
     auto r = aHiDb.find_antigens(name_to_look);
-    std::cerr << "find_in_hidb: " << name_to_look << " --> " << r.size() << std::endl;
+    if (r.empty())
+        std::cerr << "ERROR: not found " << name_to_look << std::endl;
+    std::cerr << "find_in_hidb: " << name_to_look << " --> " << r.size() << std::endl << hidb::report(r, "  ") << std::endl;
 
 } // Antigen::find_in_hidb
 
