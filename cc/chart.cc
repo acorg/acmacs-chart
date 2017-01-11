@@ -17,17 +17,37 @@ AntigenSerum::~AntigenSerum()
 
 // ----------------------------------------------------------------------
 
-void Antigen::find_in_hidb(const hidb::HiDb& aHiDb) const
+std::string Antigen::full_name() const
 {
     std::vector<std::string> p{name(), reassortant(), annotations().join(), passage()};
     p.erase(std::remove(p.begin(), p.end(), std::string()), p.end());
-    std::string name_to_look = string::join(" ", p);
-    auto r = aHiDb.find_antigens(name_to_look);
-    if (r.empty())
-        std::cerr << "ERROR: not found " << name_to_look << std::endl;
-    std::cerr << "find_in_hidb: " << name_to_look << " --> " << r.size() << std::endl << hidb::report(r, "  ") << std::endl;
+    return string::join(" ", p);
+
+} // Antigen::full_name
+
+// ----------------------------------------------------------------------
+
+void Antigen::find_in_hidb(const hidb::HiDb& aHiDb) const
+{
+    try {
+        auto found = aHiDb.find_antigen_exactly(full_name());
+        std::cerr << "find_in_hidb: " << full_name() << " --> " << found.most_recent_table().table_id() << " tables:" << found.number_of_tables() << std::endl;
+    }
+    catch (hidb::HiDb::NotFound& err) {
+        std::cerr << "ERROR: not found " << err.what() << std::endl;
+    }
 
 } // Antigen::find_in_hidb
+
+// ----------------------------------------------------------------------
+
+std::string Serum::full_name() const
+{
+    std::vector<std::string> p{name(), reassortant(), annotations().join(), serum_id()};
+    p.erase(std::remove(p.begin(), p.end(), std::string()), p.end());
+    return string::join(" ", p);
+
+} // Serum::full_name
 
 // ----------------------------------------------------------------------
 

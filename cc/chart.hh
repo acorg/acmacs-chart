@@ -52,7 +52,7 @@ class AntigenSerum
 
     inline AntigenSerum& operator=(const AntigenSerum&) = default;
 
-      // virtual std::string full_name() const = 0;
+    virtual std::string full_name() const = 0;
 
     inline const std::string name() const { return mName; }
     inline void name(const char* str, size_t length) { mName.assign(str, length); }
@@ -112,7 +112,7 @@ class Antigen : public AntigenSerum
       // inline Antigen(Chart& aChart) : AntigenSerum(aChart) {}
     inline Antigen(const Antigen&) = default;
     inline Antigen(Antigen&&) = default;
-      // virtual std::string full_name() const;
+    virtual std::string full_name() const;
 
     // inline void name(const char* str, size_t length) { AntigenSerum::name(str, length); }
 
@@ -149,7 +149,7 @@ class Serum : public AntigenSerum
       // inline Serum(Chart& aChart) : AntigenSerum(aChart), mHomologous(-1) {}
     inline Serum(const Serum&) = default;
     inline Serum(Serum&&) = default;
-      // virtual std::string full_name() const;
+    virtual std::string full_name() const;
 
     inline const std::string serum_id() const { return mSerumId; }
     inline void serum_id(const char* str, size_t length) { mSerumId.assign(str, length); }
