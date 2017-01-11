@@ -15,15 +15,23 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
     py::class_<AntigenSerum>(m, "AntigenSerum")
             // .def("full_name", &AntigenSerum::full_name)
             // .def("variant_id", &AntigenSerum::variant_id)
-            // .def("name", static_cast<const std::string (AntigenSerum::*)() const>(&AntigenSerum::name))
-            // .def("annotations", [](const AntigenSerum &as) { py::list list; for (const auto& anno: as.annotations()) { list.append(py::str(anno)); } return list; }, py::doc("returns a copy of the annotation list, modifications to the returned list are not applied"))
+            .def("name", static_cast<const std::string (AntigenSerum::*)() const>(&AntigenSerum::name))
+            .def("lineage", static_cast<const std::string (AntigenSerum::*)() const>(&AntigenSerum::lineage))
+            .def("passage", static_cast<const std::string (AntigenSerum::*)() const>(&AntigenSerum::passage))
+            .def("reassortant", static_cast<const std::string (AntigenSerum::*)() const>(&AntigenSerum::reassortant))
+            .def("semantic", static_cast<const std::string (AntigenSerum::*)() const>(&AntigenSerum::semantic))
+            .def("annotations", [](const AntigenSerum &as) { py::list list; for (const auto& anno: as.annotations()) { list.append(py::str(anno)); } return list; }, py::doc("returns a copy of the annotation list, modifications to the returned list are not applied"))
             ;
 
     py::class_<Antigen, AntigenSerum>(m, "Antigen")
-            // .def("lab_id", [](const Antigen &a) { py::list list; for (const auto& li: a.lab_id()) { list.append(py::str(li)); } return list; }, py::doc("returns a copy of the lab_id list, modifications to the returned list are not applied"))
+            .def("date", static_cast<const std::string (Antigen::*)() const>(&Antigen::date))
+            .def("lab_id", [](const Antigen &a) { py::list list; for (const auto& li: a.lab_id()) { list.append(py::str(li)); } return list; }, py::doc("returns a copy of the lab_id list, modifications to the returned list are not applied"))
             ;
 
     py::class_<Serum, AntigenSerum>(m, "Serum")
+            .def("serum_id", static_cast<const std::string (Serum::*)() const>(&Serum::serum_id))
+            .def("serum_species", static_cast<const std::string (Serum::*)() const>(&Serum::serum_species))
+            .def("homologous", static_cast<int (Serum::*)() const>(&Serum::homologous))
             ;
 
       // ----------------------------------------------------------------------
