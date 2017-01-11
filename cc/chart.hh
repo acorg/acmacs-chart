@@ -7,6 +7,9 @@
 
 #include "acmacs-base/virus-name.hh"
 #include "acmacs-base/color.hh"
+#include "acmacs-base/string.hh"
+
+namespace hidb { class HiDb; }
 
 // ----------------------------------------------------------------------
 
@@ -20,6 +23,8 @@ class Annotations : public std::vector<std::string>
 
     inline void sort() { std::sort(begin(), end()); }
     inline void sort() const { const_cast<Annotations*>(this)->sort(); }
+
+    inline std::string join() const { return string::join(" ", *this); }
 
       // note annotations has to be sorted (regardless of const) to compare
     inline bool operator == (const Annotations& aNother) const
@@ -119,6 +124,8 @@ class Antigen : public AntigenSerum
     inline bool has_lab_id(std::string aLabId) const { return std::find(mLabId.begin(), mLabId.end(), aLabId) != mLabId.end(); }
     inline const std::vector<std::string>& clades() const { return mClades; }
     inline std::vector<std::string>& clades() { return mClades; }
+
+    void find_in_hidb(const hidb::HiDb& aHiDb) const;
 
 //     virtual std::string variant_id() const;
 

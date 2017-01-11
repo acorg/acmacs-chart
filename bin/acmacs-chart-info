@@ -18,6 +18,10 @@ from acmacs_base.timeit import timeit
 def main(args):
     with timeit("Reading chart from " + args.input[0]):
         chart = acmacs_chart.import_chart(args.input[0])
+    virus_type = chart.chart_info().virus_type()
+    print("virus_type", virus_type)
+    hidb_set = acmacs_chart.HiDbSet(str(Path("~/AD/data").expanduser().resolve()))
+    hidb = hidb_set.get(virus_type)
     if args.list_names:
         ag_no_w = len(str(chart.number_of_antigens()))
         for ag_no in range(chart.number_of_antigens()):
