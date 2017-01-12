@@ -23,6 +23,11 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("date", &hidb::AntigenData::date)
             ;
 
+    py::class_<hidb::SerumData>(m, "hidb_AntigenSerumData_Serum")
+            .def("number_of_tables", &hidb::SerumData::number_of_tables)
+            .def("most_recent_table", &hidb::SerumData::most_recent_table)
+            ;
+
     py::class_<hidb::HiDb>(m, "HiDb")
             ;
 
@@ -56,6 +61,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("serum_id", static_cast<const std::string (Serum::*)() const>(&Serum::serum_id))
             .def("serum_species", static_cast<const std::string (Serum::*)() const>(&Serum::serum_species))
             .def("homologous", static_cast<int (Serum::*)() const>(&Serum::homologous))
+            .def("find_in_hidb", &Serum::find_in_hidb, py::arg("hidb"), py::return_value_policy::reference)
             ;
 
       // ----------------------------------------------------------------------

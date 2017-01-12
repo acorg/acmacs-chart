@@ -31,7 +31,8 @@ def main(args):
         print()
         for sr_no in range(chart.number_of_sera()):
             sr = chart.serum(sr_no)
-            print(f"SR {sr_no:{ag_no_w}d} {sr.name()} {sr.reassortant()} {sr.serum_id()} {sr.passage()} {sr.annotations() or ''}")
+            serum_data = sr.find_in_hidb(hidb)
+            print(f"SR {sr_no:{ag_no_w}d} {sr.name()} {sr.reassortant()} {sr.serum_id()} {sr.passage()} {sr.annotations() or ''} {serum_data.most_recent_table().table_id()} tables:{serum_data.number_of_tables()}")
 
 # ----------------------------------------------------------------------
 

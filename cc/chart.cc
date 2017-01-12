@@ -17,15 +17,6 @@ AntigenSerum::~AntigenSerum()
 
 // ----------------------------------------------------------------------
 
-std::string Antigen::full_name() const
-{
-    std::vector<std::string> p{name(), reassortant(), annotations().join(), passage()};
-    return string::join(" ", p.begin(), std::remove(p.begin(), p.end(), std::string()));
-
-} // Antigen::full_name
-
-// ----------------------------------------------------------------------
-
 const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_hidb(const hidb::HiDb& aHiDb) const
 {
     try {
@@ -34,6 +25,13 @@ const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_hidb(const hidb::H
         return found;
     }
     catch (hidb::HiDb::NotFound& err) {
+        if (passage() == "X?") {
+            try {
+                return aHiDb.find_antigen_exactly(full_name_without_passage());
+            }
+            catch (hidb::HiDb::NotFound&) {
+            }
+        }
         std::cerr << "ERROR: not found " << err.what() << std::endl;
         std::cerr << hidb::report(aHiDb.find_antigens(full_name()), "  ") << std::endl;
         throw;
@@ -43,12 +41,20 @@ const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_hidb(const hidb::H
 
 // ----------------------------------------------------------------------
 
-std::string Serum::full_name() const
+const hidb::AntigenSerumData<hidb::Serum>& Serum::find_in_hidb(const hidb::HiDb& aHiDb) const
 {
-    std::vector<std::string> p{name(), reassortant(), annotations().join(), serum_id()};
-    return string::join(" ", p.begin(), std::remove(p.begin(), p.end(), std::string()));
+    try {
+        const auto& found = aHiDb.find_serum_exactly(full_name());
+          // std::cerr << "find_in_hidb: " << full_name() << " --> " << found.most_recent_table().table_id() << " tables:" << found.number_of_tables() << std::endl;
+        return found;
+    }
+    catch (hidb::HiDb::NotFound& err) {
+        std::cerr << "ERROR: not found " << err.what() << std::endl;
+        std::cerr << hidb::report(aHiDb.find_sera(full_name()), "  ") << std::endl;
+        throw;
+    }
 
-} // Serum::full_name
+} // Serum::find_in_hidb
 
 // ----------------------------------------------------------------------
 

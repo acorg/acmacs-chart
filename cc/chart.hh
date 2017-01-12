@@ -53,6 +53,7 @@ class AntigenSerum
     inline AntigenSerum& operator=(const AntigenSerum&) = default;
 
     virtual std::string full_name() const = 0;
+    virtual std::string full_name_without_passage() const = 0;
 
     inline const std::string name() const { return mName; }
     inline void name(const char* str, size_t length) { mName.assign(str, length); }
@@ -90,6 +91,13 @@ class AntigenSerum
 
 //     virtual AntigenSerumMatch match_passage(const AntigenSerum& aNother) const;
 
+ protected:
+    inline std::string name_join(std::initializer_list<std::string>&& parts) const
+        {
+            std::vector<std::string> p{parts};
+            return string::join(" ", std::begin(p), std::remove(std::begin(p), std::end(p), std::string()));
+        }
+
  private:
 //       // Chart& mChart;
     std::string mName; // "N" "[VIRUS_TYPE/][HOST/]LOCATION/ISOLATION/YEAR" or "CDC_ABBR NAME" or "NAME"
@@ -112,7 +120,8 @@ class Antigen : public AntigenSerum
       // inline Antigen(Chart& aChart) : AntigenSerum(aChart) {}
     inline Antigen(const Antigen&) = default;
     inline Antigen(Antigen&&) = default;
-    virtual std::string full_name() const;
+    virtual inline std::string full_name() const { return name_join({name(), reassortant(), annotations().join(), passage()}); }
+    virtual inline std::string full_name_without_passage() const { return name_join({name(), reassortant(), annotations().join()}); }
 
     // inline void name(const char* str, size_t length) { AntigenSerum::name(str, length); }
 
@@ -128,10 +137,6 @@ class Antigen : public AntigenSerum
     const hidb::AntigenSerumData<hidb::Antigen>& find_in_hidb(const hidb::HiDb& aHiDb) const;
 
 //     virtual std::string variant_id() const;
-
-//     using AntigenSerum::match;
-//     virtual AntigenSerumMatch match(const Serum& aNother) const;
-//     virtual AntigenSerumMatch match(const Antigen& aNother) const;
 
  private:
     std::string mDate; // "D"
@@ -149,7 +154,8 @@ class Serum : public AntigenSerum
       // inline Serum(Chart& aChart) : AntigenSerum(aChart), mHomologous(-1) {}
     inline Serum(const Serum&) = default;
     inline Serum(Serum&&) = default;
-    virtual std::string full_name() const;
+    virtual inline std::string full_name() const { return name_join({name(), reassortant(), serum_id(), annotations().join()}); } // serum_id comes before annotations, see hidb chart.cc Serum::variant_id
+    virtual inline std::string full_name_without_passage() const { return full_name(); }
 
     inline const std::string serum_id() const { return mSerumId; }
     inline void serum_id(const char* str, size_t length) { mSerumId.assign(str, length); }
@@ -162,9 +168,7 @@ class Serum : public AntigenSerum
     inline void homologous(int aHomologous) { mHomologous = aHomologous; }
 //     virtual bool is_egg() const;
 
-//     using AntigenSerum::match;
-//     virtual AntigenSerumMatch match(const Serum& aNother) const;
-//     virtual AntigenSerumMatch match(const Antigen& aNother) const;
+    const hidb::AntigenSerumData<hidb::Serum>& find_in_hidb(const hidb::HiDb& aHiDb) const;
 
 //  protected:
 //     virtual AntigenSerumMatch match_passage(const AntigenSerum& aNother) const;
