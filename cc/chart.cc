@@ -20,8 +20,7 @@ AntigenSerum::~AntigenSerum()
 std::string Antigen::full_name() const
 {
     std::vector<std::string> p{name(), reassortant(), annotations().join(), passage()};
-    p.erase(std::remove(p.begin(), p.end(), std::string()), p.end());
-    return string::join(" ", p);
+    return string::join(" ", p.begin(), std::remove(p.begin(), p.end(), std::string()));
 
 } // Antigen::full_name
 
@@ -47,8 +46,7 @@ const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_hidb(const hidb::H
 std::string Serum::full_name() const
 {
     std::vector<std::string> p{name(), reassortant(), annotations().join(), serum_id()};
-    p.erase(std::remove(p.begin(), p.end(), std::string()), p.end());
-    return string::join(" ", p);
+    return string::join(" ", p.begin(), std::remove(p.begin(), p.end(), std::string()));
 
 } // Serum::full_name
 
@@ -62,8 +60,7 @@ std::string ChartInfo::merge_text_fields(std::string ChartInfo::* aMember) const
         for (const auto& src: mSources)
             data.push_back(src.*aMember);
         std::sort(data.begin(), data.end());
-        data.erase(std::unique(data.begin(), data.end()), data.end());
-        result = string::join("+", data);
+        result = string::join("+", data.begin(), std::unique(data.begin(), data.end()));
     }
     return result;
 
@@ -79,7 +76,7 @@ const std::string ChartInfo::date() const
         for (const auto& src: mSources)
             data.push_back(src.mDate);
         std::sort(data.begin(), data.end());
-        result = string::join("-", std::vector<std::string>{data.front(), data.back()});
+        result = data.front() + "-" + data.back();
     }
     return result;
 

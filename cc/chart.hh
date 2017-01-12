@@ -24,7 +24,7 @@ class Annotations : public std::vector<std::string>
     inline void sort() { std::sort(begin(), end()); }
     inline void sort() const { const_cast<Annotations*>(this)->sort(); }
 
-    inline std::string join() const { return string::join(" ", *this); }
+    inline std::string join() const { return string::join(" ", begin(), end()); }
 
       // note annotations has to be sorted (regardless of const) to compare
     inline bool operator == (const Annotations& aNother) const
