@@ -52,7 +52,13 @@ const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_suggestions(std::s
 {
     const std::regex wrongly_converted{" (SECM|VIR)(-)"};
     std::smatch m;
-    if (std::regex_search(aName, m, wrongly_converted)) {
+
+    if (aName.find(" DISTINCT") != std::string::npos) { // DISTINCT antigens are not stored in hidb
+        throw hidb::HiDb::NotFound(aName);
+    }
+    else if (std::regex_search(aName, m, wrongly_converted)) {
+        // std::cerr << "SECM Suggestions for " << aName << std::endl
+        //           << hidb::report(aSuggestions, "  ") << std::endl;
         std::string name = aName;   // to avoid aName changing
         name[static_cast<size_t>(m[2].first - aName.begin())] = '0';
         for (const auto& e: aSuggestions) {
@@ -60,13 +66,18 @@ const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_suggestions(std::s
                 return *e;
         }
     }
-
-    if (aName.find(" DISTINCT") == std::string::npos) { // DISTINCT antigens are not stored in hidb
-        std::cerr << "Suggestions for " << aName << std::endl
-                  << hidb::report(aSuggestions, "  ") << std::endl;
+    else if (aName[2] == ' ') {
+          // some cdc names were incorrectly used before, e.g. "CO CO-9-2718" was used as "CO 9-2718"
+        std::string fixed = aName.substr(0, 3) + aName.substr(0, 2) + "-" + aName.substr(3);
+        // std::cerr << "FIXED: " << fixed << std::endl; // << report(*fk, "  ") << std::endl;
+        const auto found = std::find_if(aSuggestions.begin(), aSuggestions.end(), [&fixed](const auto& e) -> bool { return e->data().full_name() == fixed; });
+        if (found != aSuggestions.end())
+            return **found;
     }
 
-    throw hidb::HiDb::NotFound(aName);
+    std::cerr << "Suggestions for " << aName << std::endl
+              << hidb::report(aSuggestions, "  ") << std::endl;
+    throw hidb::HiDb::NotFound(aName, aSuggestions);
 
 } // Antigen::find_in_suggestions
 
