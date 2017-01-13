@@ -61,8 +61,10 @@ const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_suggestions(std::s
         }
     }
 
-    std::cerr << "Suggestions for " << aName << std::endl
-              << hidb::report(aSuggestions, "  ") << std::endl;
+    if (aName.find(" DISTINCT") == std::string::npos) { // DISTINCT antigens are not stored in hidb
+        std::cerr << "Suggestions for " << aName << std::endl
+                  << hidb::report(aSuggestions, "  ") << std::endl;
+    }
 
     throw hidb::HiDb::NotFound(aName);
 

@@ -26,8 +26,18 @@ def main(args):
         ag_no_w = len(str(chart.number_of_antigens()))
         for ag_no in range(chart.number_of_antigens()):
             ag = chart.antigen(ag_no)
-            antigen_data = ag.find_in_hidb(hidb)
-            print(f"AG {ag_no:{ag_no_w}d} {ag.name()} {ag.reassortant()} {ag.passage()} {ag.annotations() or ''} [{ag.date()}] {antigen_data.most_recent_table().table_id()} tables:{antigen_data.number_of_tables()}")
+            try:
+                antigen_data = ag.find_in_hidb(hidb)
+                most_recent_table = antigen_data.most_recent_table().table_id()
+                number_of_tables = antigen_data.number_of_tables()
+            except acmacs_chart.hidb_NotFound:
+                if "DISTINCT" in ag.annotations():
+                    # DISTINCT antigens are not stored in hidb
+                    most_recent_table = "*not stored in hidb*"
+                    number_of_tables = 1
+                else:
+                    raise
+            print(f"AG {ag_no:{ag_no_w}d} {ag.name()} {ag.reassortant()} {ag.passage()} {ag.annotations() or ''} [{ag.date()}] {most_recent_table} tables:{number_of_tables}")
         print()
         for sr_no in range(chart.number_of_sera()):
             sr = chart.serum(sr_no)

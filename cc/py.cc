@@ -13,6 +13,8 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
       // HiDb
       // ----------------------------------------------------------------------
 
+    py::register_exception<hidb::HiDb::NotFound>(m, "hidb_NotFound");
+
     py::class_<hidb::PerTable>(m, "hidb_PerTable")
             .def("table_id", static_cast<const std::string (hidb::PerTable::*)() const>(&hidb::PerTable::table_id))
             ;
