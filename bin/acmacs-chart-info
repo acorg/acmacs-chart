@@ -43,6 +43,7 @@ try:
 
     parser.add_argument('input', nargs=1, help='Chart file.')
     parser.add_argument('-n', '--names', action='store_true', dest='list_names', default=False, help='List antigen and serum names in chart.')
+    parser.add_argument('--vaccine', action='store', dest='vaccine', default=None, help='Report vaccine strains in the chart.')
 
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel, format="%(levelname)s %(asctime)s: %(message)s")

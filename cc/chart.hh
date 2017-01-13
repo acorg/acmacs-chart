@@ -9,7 +9,14 @@
 #include "acmacs-base/color.hh"
 #include "acmacs-base/string.hh"
 
-namespace hidb { class HiDb; class Antigen; class Serum; template <typename AS> class AntigenSerumData; }
+namespace hidb
+{
+    class HiDb;
+    class Antigen;
+    class Serum;
+    template <typename AS> class AntigenSerumData;
+    class AntigenRefs;
+}
 
 // ----------------------------------------------------------------------
 
@@ -142,6 +149,8 @@ class Antigen : public AntigenSerum
     std::string mDate; // "D"
     std::vector<std::string> mLabId; // "l"
     std::vector<std::string> mClades; // "c"
+
+    const hidb::AntigenSerumData<hidb::Antigen>& find_in_suggestions(std::string aName, const hidb::AntigenRefs& aSuggestions) const;
 
 }; // class Antigen
 
@@ -570,7 +579,6 @@ class Chart
 
     inline size_t number_of_antigens() const { return mAntigens.size(); }
     inline size_t number_of_sera() const { return mSera.size(); }
-    // inline std::string table_id() const { return mInfo.table_id(lineage()); }
     // std::string lineage() const;
 
     inline const ChartInfo& chart_info() const { return mInfo; }

@@ -19,8 +19,9 @@ AntigenSerum::~AntigenSerum()
 
 const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_hidb(const hidb::HiDb& aHiDb) const
 {
+    const std::string name = full_name();
     try {
-        const auto& found = aHiDb.find_antigen_exactly(full_name());
+        const auto& found = aHiDb.find_antigen_exactly(name);
           // std::cerr << "find_in_hidb: " << full_name() << " --> " << found.most_recent_table().table_id() << " tables:" << found.number_of_tables() << std::endl;
         return found;
     }
@@ -32,12 +33,38 @@ const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_hidb(const hidb::H
             catch (hidb::HiDb::NotFound&) {
             }
         }
-        std::cerr << "ERROR: not found " << err.what() << std::endl;
-        std::cerr << hidb::report(aHiDb.find_antigens(full_name()), "  ") << std::endl;
+        else if (!err.suggestions().empty()) {
+            return find_in_suggestions(name, err.suggestions());
+        }
+        else {
+            std::cerr << "ERROR: not found and no suggestions for " << name << std::endl
+                      << hidb::report(aHiDb.find_antigens(name), "  ") << std::endl;
+        }
         throw;
     }
 
 } // Antigen::find_in_hidb
+
+// ----------------------------------------------------------------------
+
+const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_suggestions(std::string aName, const hidb::AntigenRefs& aSuggestions) const
+{
+    const auto secm_pos = aName.find("SECM-");
+    if (secm_pos != std::string::npos) {
+        std::string n = aName;
+        n[secm_pos + 4] = '0';
+        for (const auto& e: aSuggestions) {
+            if (e->data().full_name() == n)
+                return *e;
+        }
+    }
+
+    std::cerr << "Suggestions for " << aName << std::endl
+              << hidb::report(aSuggestions, "  ") << std::endl;
+
+    throw hidb::HiDb::NotFound(aName);
+
+} // Antigen::find_in_suggestions
 
 // ----------------------------------------------------------------------
 
