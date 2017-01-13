@@ -1,4 +1,5 @@
 #include <set>
+#include <regex>
 
 #include "chart.hh"
 #include "hidb/hidb.hh"
@@ -49,12 +50,13 @@ const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_hidb(const hidb::H
 
 const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_suggestions(std::string aName, const hidb::AntigenRefs& aSuggestions) const
 {
-    const auto secm_pos = aName.find("SECM-");
-    if (secm_pos != std::string::npos) {
-        std::string n = aName;
-        n[secm_pos + 4] = '0';
+    const std::regex wrongly_converted{" (SECM|VIR)(-)"};
+    std::smatch m;
+    if (std::regex_search(aName, m, wrongly_converted)) {
+        std::string name = aName;   // to avoid aName changing
+        name[static_cast<size_t>(m[2].first - aName.begin())] = '0';
         for (const auto& e: aSuggestions) {
-            if (e->data().full_name() == n)
+            if (e->data().full_name() == name)
                 return *e;
         }
     }
