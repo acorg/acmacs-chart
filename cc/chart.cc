@@ -38,8 +38,8 @@ const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_hidb(const hidb::H
             return find_in_suggestions(name, err.suggestions());
         }
         else {
-            std::cerr << "ERROR: not found and no suggestions for " << name << std::endl
-                      << hidb::report(aHiDb.find_antigens(name), "  ") << std::endl;
+            // std::cerr << "ERROR: not found and no suggestions for " << name << std::endl
+            //           << hidb::report(aHiDb.find_antigens(name), "  ") << std::endl;
         }
         throw;
     }
@@ -76,7 +76,7 @@ const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_suggestions(std::s
     }
 
     std::cerr << "Suggestions for " << aName << std::endl
-              << hidb::report(aSuggestions, "  ") << std::endl;
+              << hidb::report(aSuggestions, "  "); // << std::endl;
     throw hidb::HiDb::NotFound(aName, aSuggestions);
 
 } // Antigen::find_in_suggestions

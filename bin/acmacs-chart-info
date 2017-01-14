@@ -22,29 +22,37 @@ def main(args):
     print("virus_type", virus_type, chart.chart_info().date())
     hidb_set = acmacs_chart.HiDbSet(str(Path("~/AD/data").expanduser().resolve()))
     hidb = hidb_set.get(virus_type)
-    if args.list_names:
-        ag_no_w = len(str(chart.number_of_antigens()))
-        for ag_no in range(chart.number_of_antigens()):
-            ag = chart.antigen(ag_no)
-            try:
-                antigen_data = ag.find_in_hidb(hidb)
-                most_recent_table = antigen_data.most_recent_table().table_id()
-                number_of_tables = antigen_data.number_of_tables()
-            except acmacs_chart.hidb_NotFound:
-                if "DISTINCT" in ag.annotations():
-                    # DISTINCT antigens are not stored in hidb
-                    most_recent_table = "*not stored in hidb*"
-                    number_of_tables = 1
-                else:
-                    most_recent_table = "*NOT FOUND in hidb*"
-                    number_of_tables = 0
-                    # raise
-            print(f"AG {ag_no:{ag_no_w}d} {ag.name()} {ag.reassortant()} {ag.passage()} {ag.annotations() or ''} [{ag.date()}] {most_recent_table} tables:{number_of_tables}")
-        print()
-        for sr_no in range(chart.number_of_sera()):
-            sr = chart.serum(sr_no)
-            serum_data = sr.find_in_hidb(hidb)
-            print(f"SR {sr_no:{ag_no_w}d} {sr.name()} {sr.reassortant()} {sr.serum_id()} {sr.passage()} {sr.annotations() or ''} {serum_data.most_recent_table().table_id()} tables:{serum_data.number_of_tables()}")
+    if args.list_names or args.not_found_names:
+        list_names(chart, hidb, args.not_found_names)
+
+# ----------------------------------------------------------------------
+
+def list_names(chart, hidb, not_found_names):
+    ag_no_w = len(str(chart.number_of_antigens()))
+    for ag_no in range(chart.number_of_antigens()):
+        ag = chart.antigen(ag_no)
+        found = False
+        try:
+            antigen_data = ag.find_in_hidb(hidb)
+            most_recent_table = antigen_data.most_recent_table().table_id()
+            number_of_tables = antigen_data.number_of_tables()
+            found = True
+        except acmacs_chart.hidb_NotFound:
+            if "DISTINCT" in ag.annotations():
+                # DISTINCT antigens are not stored in hidb
+                most_recent_table = "*not stored in hidb*"
+                number_of_tables = 1
+            else:
+                most_recent_table = "*NOT FOUND in hidb*"
+                number_of_tables = 0
+                # raise
+        if not not_found_names or not found:
+            print(f"AG {ag_no:{ag_no_w}d} {ag.name()} {ag.reassortant()} {ag.passage()} {ag.annotations() or ''} [{ag.date()}] {ag.lab_id()} {most_recent_table} tables:{number_of_tables}")
+    print()
+    for sr_no in range(chart.number_of_sera()):
+        sr = chart.serum(sr_no)
+        serum_data = sr.find_in_hidb(hidb)
+        print(f"SR {sr_no:{ag_no_w}d} {sr.name()} {sr.reassortant()} {sr.serum_id()} {sr.passage()} {sr.annotations() or ''} {serum_data.most_recent_table().table_id()} tables:{serum_data.number_of_tables()}")
 
 # ----------------------------------------------------------------------
 
@@ -55,6 +63,7 @@ try:
 
     parser.add_argument('input', nargs=1, help='Chart file.')
     parser.add_argument('-n', '--names', action='store_true', dest='list_names', default=False, help='List antigen and serum names in chart.')
+    parser.add_argument('--not-found-names', action='store_true', dest='not_found_names', default=False, help='Report names not found in hidb.')
     parser.add_argument('--vaccine', action='store', dest='vaccine', default=None, help='Report vaccine strains in the chart.')
 
     args = parser.parse_args()
