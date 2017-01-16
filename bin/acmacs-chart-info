@@ -58,8 +58,12 @@ def list_names(chart, hidb, not_found_names):
             number_of_tables = serum_data.number_of_tables()
             found = True
         except acmacs_chart.hidb_NotFound:
-            most_recent_table = "*NOT FOUND in hidb*"
-            number_of_tables = 0
+            if "DISTINCT" in sr.annotations():
+                most_recent_table = "*not stored in hidb*"
+                number_of_tables = 1
+            else:
+                most_recent_table = "*NOT FOUND in hidb*"
+                number_of_tables = 0
         if not not_found_names or not found:
             print(f"SR {sr_no:{ag_no_w}d} {sr.name()} {sr.reassortant()} {sr.serum_id()} {sr.passage()} {sr.annotations() or ''} {most_recent_table} tables:{number_of_tables}")
 
