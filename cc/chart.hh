@@ -579,7 +579,7 @@ class Chart
 
     inline size_t number_of_antigens() const { return mAntigens.size(); }
     inline size_t number_of_sera() const { return mSera.size(); }
-    // std::string lineage() const;
+    std::string lineage() const;
 
     inline const ChartInfo& chart_info() const { return mInfo; }
     inline ChartInfo& chart_info() { return mInfo; }

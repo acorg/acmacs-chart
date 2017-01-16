@@ -132,6 +132,19 @@ const std::string ChartInfo::date() const
 
 // ----------------------------------------------------------------------
 
+std::string Chart::lineage() const
+{
+    std::set<std::string> lineages;
+    for (const auto& antigen: mAntigens) {
+        if (!antigen.lineage().empty())
+            lineages.insert(antigen.lineage());
+    }
+    return string::join("+", lineages);
+
+} // Chart::lineage
+
+// ----------------------------------------------------------------------
+
 
 // ----------------------------------------------------------------------
 /// Local Variables:
