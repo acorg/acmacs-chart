@@ -252,13 +252,23 @@ static jsi::data<ChartTiters> titers_data = {
 
 // ----------------------------------------------------------------------
 
+inline std::shared_ptr<jsi::readers::makers::Base<Chart>> field(Antigens& (Chart::*accessor)(), jsi::data<Antigen>& aData)
+{
+    return std::make_shared<jsi::readers::makers::ArrayOfObjectsAccessor<Chart, Antigen, decltype(accessor)>>(accessor, aData);
+}
+
+inline std::shared_ptr<jsi::readers::makers::Base<Chart>> field(Sera& (Chart::*accessor)(), jsi::data<Serum>& aData)
+{
+    return std::make_shared<jsi::readers::makers::ArrayOfObjectsAccessor<Chart, Serum, decltype(accessor)>>(accessor, aData);
+}
+
 static jsi::data<Chart> chart_data = {
     {"C", jsi::field(&Chart::column_bases)},
     {"P", jsi::field(&Chart::projections, projection_data)},
-    {"a", jsi::field(&Chart::antigens, antigen_data)},
+    {"a", field(&Chart::antigens, antigen_data)},
     {"i", jsi::field(&Chart::chart_info, chart_info_data)},
     {"p", jsi::field(&Chart::plot_spec, plot_spec_data)},
-    {"s", jsi::field(&Chart::sera, serum_data)},
+    {"s", field(&Chart::sera, serum_data)},
     {"t", jsi::field(&Chart::titers, titers_data)},
 };
 

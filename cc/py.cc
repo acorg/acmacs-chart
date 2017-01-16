@@ -88,6 +88,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("antigen", &Chart::antigen, py::arg("no"), py::return_value_policy::reference)
             .def("serum", &Chart::serum, py::arg("no"), py::return_value_policy::reference)
             .def("lineage", &Chart::lineage)
+            .def("vaccines", &Chart::vaccines, py::arg("name"), py::arg("hidb"))
             // .def("table_id", &Chart::table_id)
             // .def("find_homologous_antigen_for_sera", &Chart::find_homologous_antigen_for_sera)
             .def("chart_info", static_cast<const ChartInfo& (Chart::*)() const>(&Chart::chart_info), py::return_value_policy::reference)
@@ -95,6 +96,13 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
 
     m.def("import_chart", &import_chart, py::arg("data"), py::doc("Imports chart from a buffer or file in the ace format."));
     m.def("export_chart", &export_chart, py::arg("filename"), py::arg("chart"), py::doc("Exports chart into a file in the ace format."));
+
+      // ----------------------------------------------------------------------
+
+    py::class_<Vaccines>(m, "Vaccines")
+            ;
+
+      // ----------------------------------------------------------------------
 
     return m.ptr();
 }

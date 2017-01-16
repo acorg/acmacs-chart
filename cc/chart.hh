@@ -72,9 +72,9 @@ class AntigenSerum
     std::string passage_without_date() const;
     inline const std::string reassortant() const { return mReassortant; }
     inline void reassortant(const char* str, size_t length) { mReassortant.assign(str, length); }
-//     virtual bool is_egg() const;
-//     inline bool is_reassortant() const { return !mReassortant.empty(); }
-//     inline bool distinct() const { return mAnnotations.distinct(); }
+    bool is_egg() const;
+    inline bool is_reassortant() const { return !mReassortant.empty(); }
+    inline bool distinct() const { return mAnnotations.distinct(); }
     inline const Annotations& annotations() const { return mAnnotations; }
     inline Annotations& annotations() { return mAnnotations; }
 //     inline bool has_semantic(char c) const { return mSemanticAttributes.find(c) != std::string::npos; }
@@ -188,6 +188,28 @@ class Serum : public AntigenSerum
     std::string mSerumSpecies; // "s"
 
 }; // class Serum
+
+// ----------------------------------------------------------------------
+
+using AntigenRefs = std::vector<const Antigen*>;
+
+class Antigens : public std::vector<Antigen>
+{
+ public:
+    inline Antigens() {}
+
+    void find_by_name(std::string aName, AntigenRefs& aResult) const;
+
+}; // class Antigens
+
+// ----------------------------------------------------------------------
+
+class Sera : public std::vector<Serum>
+{
+ public:
+    inline Sera() {}
+
+}; // class Sera
 
 // ----------------------------------------------------------------------
 
@@ -567,6 +589,8 @@ class ChartPlotSpec
 
 // ----------------------------------------------------------------------
 
+class Vaccines;
+
 class Chart
 {
  public:
@@ -584,12 +608,12 @@ class Chart
     inline const ChartInfo& chart_info() const { return mInfo; }
     inline ChartInfo& chart_info() { return mInfo; }
 
-    inline const std::vector<Antigen>& antigens() const { return mAntigens; }
-    inline std::vector<Antigen>& antigens() { return mAntigens; }
+    inline const Antigens& antigens() const { return mAntigens; }
+    inline Antigens& antigens() { return mAntigens; }
     inline Antigen& antigen(size_t ag_no) { return mAntigens[ag_no]; }
 
-    inline const std::vector<Serum>& sera() const { return mSera; }
-    inline std::vector<Serum>& sera() { return mSera; }
+    inline const Sera& sera() const { return mSera; }
+    inline Sera& sera() { return mSera; }
     inline Serum& serum(size_t sr_no) { return mSera[sr_no]; }
 
     inline const ChartTiters& titers() const { return mTiters; }
@@ -604,6 +628,8 @@ class Chart
     inline const ChartPlotSpec& plot_spec() const { return mPlotSpec; }
     inline ChartPlotSpec& plot_spec() { return mPlotSpec; }
 
+    Vaccines* vaccines(std::string aName, const hidb::HiDb& aHiDb) const;
+
     // void find_homologous_antigen_for_sera();
     // inline void find_homologous_antigen_for_sera_const() const { const_cast<Chart*>(this)->find_homologous_antigen_for_sera(); }
 
@@ -611,14 +637,47 @@ class Chart
 
  private:
     ChartInfo mInfo;                       // "i"
-    std::vector<Antigen> mAntigens;        // "a"
-    std::vector<Serum> mSera;              // "s"
+    Antigens mAntigens;                    // "a"
+    Sera mSera;                            // "s"
     ChartTiters mTiters;                   // "t"
     std::vector <double> mColumnBases;     // "C"
     std::vector<Projection> mProjections;  // "P"
     ChartPlotSpec mPlotSpec;               // "p"
 
 }; // class Chart
+
+// ----------------------------------------------------------------------
+
+class Vaccines
+{
+ public:
+    class Entry
+    {
+     public:
+        inline Entry(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::string aMostRecentTableDate)
+            : antigen(aAntigen), data(aAntigenData), most_recent_table_date(aMostRecentTableDate) {}
+        const Antigen* antigen;
+        const hidb::AntigenSerumData<hidb::Antigen>* data;
+        std::string most_recent_table_date;
+
+        bool operator < (const Entry& a) const;
+    };
+
+    inline Vaccines() {}
+
+    void report() const;
+
+ private:
+    std::vector<Entry> mEgg;
+    std::vector<Entry> mCell;
+    std::vector<Entry> mReassortant;
+
+    friend class Chart;
+
+    void add(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::string aMostRecentTableDate);
+    void sort();
+
+}; // class Vaccines
 
 // ----------------------------------------------------------------------
 /// Local Variables:

@@ -18,6 +18,38 @@ AntigenSerum::~AntigenSerum()
 
 // ----------------------------------------------------------------------
 
+std::string AntigenSerum::passage_without_date() const
+{
+    if (mPassage.size() > 13 && mPassage[mPassage.size() - 1] == ')' && mPassage[mPassage.size() - 12] == '(' && mPassage[mPassage.size() - 13] == ' ' && mPassage[mPassage.size() - 4] == '-' && mPassage[mPassage.size() - 7] == '-')
+        return std::string(mPassage, 0, mPassage.size() - 13);
+    else
+        return mPassage;
+
+} // AntigenSerum::passage_without_date
+
+// ----------------------------------------------------------------------
+
+#pragma GCC diagnostic push
+#ifdef __clang__
+#pragma GCC diagnostic ignored "-Wexit-time-destructors"
+#endif
+
+bool AntigenSerum::is_egg() const
+{
+    static std::regex egg_passage{
+        R"#(E(\?|[0-9][0-9]?))#"  // passage
+        R"#(( (ISOLATE|CLONE) [0-9\-]+)*)#"         // NIMR isolate and/or clone, NIMR H1pdm has CLONE 38-32
+        R"#(( *\+[1-9])?)#"         // NIID has +1 at the end of passage
+        R"#(( \([12][0129][0-9][0-9]-[01][0-9]-[0-3][0-9]\))?$)#" // passage date
+       };
+    return std::regex_search(mPassage, egg_passage) || is_reassortant(); // reassortant is always egg (2016-10-21)
+
+} // AntigenSerum::is_egg
+
+#pragma GCC diagnostic pop
+
+// ----------------------------------------------------------------------
+
 const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_hidb(const hidb::HiDb& aHiDb) const
 {
     const std::string name = full_name();
@@ -100,6 +132,17 @@ const hidb::AntigenSerumData<hidb::Serum>& Serum::find_in_hidb(const hidb::HiDb&
 
 // ----------------------------------------------------------------------
 
+void Antigens::find_by_name(std::string aName, AntigenRefs& aResult) const
+{
+    for (const auto& antigen: *this) {
+        if (antigen.name().find(aName) != std::string::npos)
+            aResult.push_back(&antigen);
+    }
+
+} // Antigens::find_by_name
+
+// ----------------------------------------------------------------------
+
 std::string ChartInfo::merge_text_fields(std::string ChartInfo::* aMember) const
 {
     std::string result = this->*aMember;
@@ -142,6 +185,83 @@ std::string Chart::lineage() const
     return string::join("+", lineages);
 
 } // Chart::lineage
+
+// ----------------------------------------------------------------------
+
+Vaccines* Chart::vaccines(std::string aName, const hidb::HiDb& aHiDb) const
+{
+    Vaccines* result = new Vaccines();
+    AntigenRefs by_name;
+    antigens().find_by_name(aName, by_name);
+    for (const auto* ag: by_name) {
+        std::cerr << ag->full_name() << std::endl;
+        try {
+            const auto& data = ag->find_in_hidb(aHiDb);
+            result->add(ag, &data, aHiDb.charts()[data.most_recent_table().table_id()].chart_info().date());
+        }
+        catch (hidb::HiDb::NotFound&) {
+        }
+    }
+    result->sort();
+    result->report();
+    return result;
+
+} // Chart::vaccines
+
+// ----------------------------------------------------------------------
+
+inline bool Vaccines::Entry::operator < (const Vaccines::Entry& a) const
+{
+    const auto a_nt = a.data->number_of_tables(), t_nt = data->number_of_tables();
+    return t_nt == a_nt ? most_recent_table_date > a.most_recent_table_date : t_nt > a_nt;
+}
+
+// ----------------------------------------------------------------------
+
+void Vaccines::add(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::string aMostRecentTableDate)
+{
+    if (aAntigen->is_reassortant())
+        mReassortant.emplace_back(aAntigen, aAntigenData, aMostRecentTableDate);
+    else if (aAntigen->is_egg())
+        mEgg.emplace_back(aAntigen, aAntigenData, aMostRecentTableDate);
+    else
+        mCell.emplace_back(aAntigen, aAntigenData, aMostRecentTableDate);
+
+} // Vaccines::add
+
+// ----------------------------------------------------------------------
+
+void Vaccines::sort()
+{
+    std::sort(mCell.begin(), mCell.end());
+    std::sort(mEgg.begin(), mEgg.end());
+    std::sort(mReassortant.begin(), mReassortant.end());
+
+} // Vaccines::sort
+
+// ----------------------------------------------------------------------
+
+void Vaccines::report() const
+{
+    if (!mCell.empty()) {
+        std::cout << "CELL" << std::endl;
+        for (const auto& entry: mCell)
+            std::cout << "  " << entry.antigen->full_name() << " tables:" << entry.data->number_of_tables() << " recent:" << entry.data->most_recent_table().table_id() << std::endl;
+    }
+
+    if (!mEgg.empty()) {
+        std::cout << "EGG" << std::endl;
+        for (const auto& entry: mEgg)
+            std::cout << "  " << entry.antigen->full_name() << " tables:" << entry.data->number_of_tables() << " recent:" << entry.data->most_recent_table().table_id() << std::endl;
+    }
+
+    if (!mReassortant.empty()) {
+        std::cout << "REASSORTANT" << std::endl;
+        for (const auto& entry: mReassortant)
+            std::cout << "  " << entry.antigen->full_name() << " tables:" << entry.data->number_of_tables() << " recent:" << entry.data->most_recent_table().table_id() << std::endl;
+    }
+
+} // Vaccines::report
 
 // ----------------------------------------------------------------------
 

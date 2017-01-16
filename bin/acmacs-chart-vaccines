@@ -15,14 +15,49 @@ from acmacs_base.timeit import timeit
 
 # ----------------------------------------------------------------------
 
+sVaccines = {
+    "A(H1N1)": [
+        {"name": "CALIFORNIA/7/2009", "type": "current"},
+        ],
+    "A(H3N2)": [
+        {"name": "BRISBANE/10/2007",         "type": "previous"},
+        {"name": "PERTH/16/2009",            "type": "previous"},
+        {"name": "VICTORIA/361/2011",        "type": "previous"},
+        {"name": "TEXAS/50/2012",            "type": "previous"},
+        {"name": "SWITZERLAND/9715293/2013", "type": "previous"},
+        {"name": "HONG KONG/4801/2014",      "type": "current"},
+        {"name": "SAITAMA/103/2014",         "type": "surrogate"},
+        {"name": "HONG KONG/7295/2014",      "type": "surrogate"},
+        ],
+    "B/VICTORIA": [
+        {"name": "MALAYSIA/2506/2004",      "type": "previous"},
+        {"name": "BRISBANE/60/2008",        "type": "current"},
+        {"name": "PARIS/1762/2009",         "type": "current"},
+        {"name": "SOUTH AUSTRALIA/81/2012", "type": "surrogate"},
+        ],
+    "B/YAMAGATA": [
+        {"name": "FLORIDA/4/2006",       "type": "previous"},
+        {"name": "WISCONSIN/1/2010",     "type": "previous"},
+        {"name": "MASSACHUSETTS/2/2012", "type": "previous"},
+        {"name": "PHUKET/3073/2013",     "type": "current"},
+        ],
+    }
+
+# ----------------------------------------------------------------------
+
 def main(args):
     with timeit("Reading chart from " + args.chart[0]):
         chart = acmacs_chart.import_chart(args.chart[0])
     virus_type = chart.chart_info().virus_type()
     lineage = chart.lineage()
-    print("virus_type", virus_type, "lineage", lineage)
+    print(virus_type, lineage)
     hidb_set = acmacs_chart.HiDbSet(str(Path("~/AD/data").expanduser().resolve()))
     hidb = hidb_set.get(virus_type)
+    if lineage:
+        virus_type += "/" + lineage
+    for entry in sVaccines[virus_type]:
+        vv = chart.vaccines(entry["name"], hidb)
+        print(vv)
 
 # ----------------------------------------------------------------------
 
