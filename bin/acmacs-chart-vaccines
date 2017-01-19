@@ -18,6 +18,7 @@ from acmacs_base.timeit import timeit
 sVaccines = {
     "A(H1N1)": [
         {"name": "CALIFORNIA/7/2009", "type": "current"},
+        {"name": "MICHIGAN/45/2015", "type": "current"},
         ],
     "A(H3N2)": [
         {"name": "BRISBANE/10/2007",         "type": "previous"},
