@@ -1,3 +1,4 @@
+#include <sstream>
 #include <set>
 #include <regex>
 
@@ -194,7 +195,7 @@ Vaccines* Chart::vaccines(std::string aName, const hidb::HiDb& aHiDb) const
     AntigenRefs by_name;
     antigens().find_by_name(aName, by_name);
     for (const auto* ag: by_name) {
-        std::cerr << ag->full_name() << std::endl;
+          // std::cerr << ag->full_name() << std::endl;
         try {
             const auto& data = ag->find_in_hidb(aHiDb);
             result->add(ag, &data, aHiDb.charts()[data.most_recent_table().table_id()].chart_info().date());
@@ -241,25 +242,27 @@ void Vaccines::sort()
 
 // ----------------------------------------------------------------------
 
-void Vaccines::report() const
+std::string Vaccines::report() const
 {
+    std::ostringstream out;
     if (!mCell.empty()) {
-        std::cout << "CELL" << std::endl;
+        out << "CELL" << std::endl;
         for (const auto& entry: mCell)
-            std::cout << "  " << entry.antigen->full_name() << " tables:" << entry.data->number_of_tables() << " recent:" << entry.data->most_recent_table().table_id() << std::endl;
+            out << "  " << entry.antigen->full_name() << " tables:" << entry.data->number_of_tables() << " recent:" << entry.data->most_recent_table().table_id() << std::endl;
     }
 
     if (!mEgg.empty()) {
-        std::cout << "EGG" << std::endl;
+        out << "EGG" << std::endl;
         for (const auto& entry: mEgg)
-            std::cout << "  " << entry.antigen->full_name() << " tables:" << entry.data->number_of_tables() << " recent:" << entry.data->most_recent_table().table_id() << std::endl;
+            out << "  " << entry.antigen->full_name() << " tables:" << entry.data->number_of_tables() << " recent:" << entry.data->most_recent_table().table_id() << std::endl;
     }
 
     if (!mReassortant.empty()) {
-        std::cout << "REASSORTANT" << std::endl;
+        out << "REASSORTANT" << std::endl;
         for (const auto& entry: mReassortant)
-            std::cout << "  " << entry.antigen->full_name() << " tables:" << entry.data->number_of_tables() << " recent:" << entry.data->most_recent_table().table_id() << std::endl;
+            out << "  " << entry.antigen->full_name() << " tables:" << entry.data->number_of_tables() << " recent:" << entry.data->most_recent_table().table_id() << std::endl;
     }
+    return out.str();
 
 } // Vaccines::report
 

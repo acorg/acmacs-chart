@@ -58,7 +58,10 @@ def main(args):
         virus_type += "/" + lineage
     for entry in sVaccines[virus_type]:
         vv = chart.vaccines(entry["name"], hidb)
-        print(vv)
+        print("EGG:", vv.egg().full_name())
+        print("CELL:", vv.cell().full_name())
+        print("REASSORTANT:", vv.reassortant().full_name())
+        print(vv.report())
 
 # ----------------------------------------------------------------------
 

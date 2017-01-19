@@ -665,7 +665,11 @@ class Vaccines
 
     inline Vaccines() {}
 
-    void report() const;
+    inline const Antigen* egg() const { return mEgg.empty() ? nullptr : mEgg.front().antigen; }
+    inline const Antigen* cell() const { return mCell.empty() ? nullptr : mCell.front().antigen; }
+    inline const Antigen* reassortant() const { return mReassortant.empty() ? nullptr : mReassortant.front().antigen; }
+
+    std::string report() const;
 
  private:
     std::vector<Entry> mEgg;

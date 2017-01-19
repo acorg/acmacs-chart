@@ -43,7 +43,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
       // ----------------------------------------------------------------------
 
     py::class_<AntigenSerum>(m, "AntigenSerum")
-            // .def("full_name", &AntigenSerum::full_name)
+            .def("full_name", &AntigenSerum::full_name)
             // .def("variant_id", &AntigenSerum::variant_id)
             .def("name", static_cast<const std::string (AntigenSerum::*)() const>(&AntigenSerum::name))
             .def("lineage", static_cast<const std::string (AntigenSerum::*)() const>(&AntigenSerum::lineage))
@@ -100,6 +100,10 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
       // ----------------------------------------------------------------------
 
     py::class_<Vaccines>(m, "Vaccines")
+            .def("report", &Vaccines::report)
+            .def("egg", &Vaccines::egg, py::return_value_policy::reference)
+            .def("cell", &Vaccines::cell, py::return_value_policy::reference)
+            .def("reassortant", &Vaccines::reassortant, py::return_value_policy::reference)
             ;
 
       // ----------------------------------------------------------------------
