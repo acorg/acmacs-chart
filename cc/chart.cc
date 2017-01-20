@@ -144,6 +144,15 @@ void Antigens::find_by_name(std::string aName, AntigenRefs& aResult) const
 
 // ----------------------------------------------------------------------
 
+const Serum* Sera::find_by_full_name(std::string aFullName) const
+{
+    auto found = std::find_if(begin(), end(), [&aFullName](const auto& e) -> bool { return e.full_name() == aFullName; });
+    return found == end() ? nullptr : &*found;
+
+} // Sera::find_by_full_name
+
+// ----------------------------------------------------------------------
+
 std::string ChartInfo::merge_text_fields(std::string ChartInfo::* aMember) const
 {
     std::string result = this->*aMember;
@@ -198,7 +207,16 @@ Vaccines* Chart::vaccines(std::string aName, const hidb::HiDb& aHiDb) const
           // std::cerr << ag->full_name() << std::endl;
         try {
             const auto& data = ag->find_in_hidb(aHiDb);
-            result->add(ag, &data, aHiDb.charts()[data.most_recent_table().table_id()].chart_info().date());
+            std::vector<const Serum*> homologous_sera;
+            std::vector<const hidb::AntigenSerumData<hidb::Serum>*> homologous_serum_data;
+            for (const auto* sd: aHiDb.find_homologous_sera(data)) {
+                const Serum* serum = sera().find_by_full_name(sd->data().full_name());
+                if (serum != nullptr) {
+                    homologous_sera.push_back(serum);
+                    homologous_serum_data.push_back(sd);
+                }
+            }
+            result->add(ag, &data, std::move(homologous_sera), std::move(homologous_serum_data), aHiDb.charts()[data.most_recent_table().table_id()].chart_info().date());
         }
         catch (hidb::HiDb::NotFound&) {
         }
@@ -213,20 +231,20 @@ Vaccines* Chart::vaccines(std::string aName, const hidb::HiDb& aHiDb) const
 
 inline bool Vaccines::Entry::operator < (const Vaccines::Entry& a) const
 {
-    const auto a_nt = a.data->number_of_tables(), t_nt = data->number_of_tables();
+    const auto a_nt = a.antigen_data->number_of_tables(), t_nt = antigen_data->number_of_tables();
     return t_nt == a_nt ? most_recent_table_date > a.most_recent_table_date : t_nt > a_nt;
 }
 
 // ----------------------------------------------------------------------
 
-void Vaccines::add(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::string aMostRecentTableDate)
+void Vaccines::add(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::vector<const Serum*>&& aSera, std::vector<const hidb::AntigenSerumData<hidb::Serum>*>&& aSerumData, std::string aMostRecentTableDate)
 {
     if (aAntigen->is_reassortant())
-        mReassortant.emplace_back(aAntigen, aAntigenData, aMostRecentTableDate);
+        mReassortant.emplace_back(aAntigen, aAntigenData, std::move(aSera), std::move(aSerumData), aMostRecentTableDate);
     else if (aAntigen->is_egg())
-        mEgg.emplace_back(aAntigen, aAntigenData, aMostRecentTableDate);
+        mEgg.emplace_back(aAntigen, aAntigenData, std::move(aSera), std::move(aSerumData), aMostRecentTableDate);
     else
-        mCell.emplace_back(aAntigen, aAntigenData, aMostRecentTableDate);
+        mCell.emplace_back(aAntigen, aAntigenData, std::move(aSera), std::move(aSerumData), aMostRecentTableDate);
 
 } // Vaccines::add
 
@@ -248,19 +266,19 @@ std::string Vaccines::report() const
     if (!mCell.empty()) {
         out << "CELL" << std::endl;
         for (const auto& entry: mCell)
-            out << "  " << entry.antigen->full_name() << " tables:" << entry.data->number_of_tables() << " recent:" << entry.data->most_recent_table().table_id() << std::endl;
+            out << "  " << entry.antigen->full_name() << " tables:" << entry.antigen_data->number_of_tables() << " recent:" << entry.antigen_data->most_recent_table().table_id() << std::endl;
     }
 
     if (!mEgg.empty()) {
         out << "EGG" << std::endl;
         for (const auto& entry: mEgg)
-            out << "  " << entry.antigen->full_name() << " tables:" << entry.data->number_of_tables() << " recent:" << entry.data->most_recent_table().table_id() << std::endl;
+            out << "  " << entry.antigen->full_name() << " tables:" << entry.antigen_data->number_of_tables() << " recent:" << entry.antigen_data->most_recent_table().table_id() << std::endl;
     }
 
     if (!mReassortant.empty()) {
         out << "REASSORTANT" << std::endl;
         for (const auto& entry: mReassortant)
-            out << "  " << entry.antigen->full_name() << " tables:" << entry.data->number_of_tables() << " recent:" << entry.data->most_recent_table().table_id() << std::endl;
+            out << "  " << entry.antigen->full_name() << " tables:" << entry.antigen_data->number_of_tables() << " recent:" << entry.antigen_data->most_recent_table().table_id() << std::endl;
     }
     return out.str();
 

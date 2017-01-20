@@ -99,6 +99,11 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
 
       // ----------------------------------------------------------------------
 
+    py::class_<Vaccines::Entry>(m, "Vaccines_Entry")
+            .def_readonly("antigen", &Vaccines::Entry::antigen)
+            .def_readonly("homologous_sera", &Vaccines::Entry::homologous_sera)
+            ;
+
     py::class_<Vaccines>(m, "Vaccines")
             .def("report", &Vaccines::report)
             .def("egg", &Vaccines::egg, py::return_value_policy::reference)

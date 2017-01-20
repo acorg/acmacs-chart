@@ -209,6 +209,8 @@ class Sera : public std::vector<Serum>
  public:
     inline Sera() {}
 
+    const Serum* find_by_full_name(std::string aFullName) const;
+
 }; // class Sera
 
 // ----------------------------------------------------------------------
@@ -654,10 +656,12 @@ class Vaccines
     class Entry
     {
      public:
-        inline Entry(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::string aMostRecentTableDate)
-            : antigen(aAntigen), data(aAntigenData), most_recent_table_date(aMostRecentTableDate) {}
+        inline Entry(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::vector<const Serum*>&& aSera, std::vector<const hidb::AntigenSerumData<hidb::Serum>*>&& aSerumData, std::string aMostRecentTableDate)
+            : antigen(aAntigen), antigen_data(aAntigenData), homologous_sera(aSera), homologous_serum_data(aSerumData), most_recent_table_date(aMostRecentTableDate) {}
         const Antigen* antigen;
-        const hidb::AntigenSerumData<hidb::Antigen>* data;
+        const hidb::AntigenSerumData<hidb::Antigen>* antigen_data;
+        std::vector<const Serum*> homologous_sera;
+        std::vector<const hidb::AntigenSerumData<hidb::Serum>*> homologous_serum_data;
         std::string most_recent_table_date;
 
         bool operator < (const Entry& a) const;
@@ -665,9 +669,9 @@ class Vaccines
 
     inline Vaccines() {}
 
-    inline const Antigen* egg() const { return mEgg.empty() ? nullptr : mEgg.front().antigen; }
-    inline const Antigen* cell() const { return mCell.empty() ? nullptr : mCell.front().antigen; }
-    inline const Antigen* reassortant() const { return mReassortant.empty() ? nullptr : mReassortant.front().antigen; }
+    inline const Entry* egg() const { return mEgg.empty() ? nullptr : &mEgg.front(); }
+    inline const Entry* cell() const { return mCell.empty() ? nullptr : &mCell.front(); }
+    inline const Entry* reassortant() const { return mReassortant.empty() ? nullptr : &mReassortant.front(); }
 
     std::string report() const;
 
@@ -678,7 +682,7 @@ class Vaccines
 
     friend class Chart;
 
-    void add(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::string aMostRecentTableDate);
+    void add(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::vector<const Serum*>&& aSera, std::vector<const hidb::AntigenSerumData<hidb::Serum>*>&& aSerumData, std::string aMostRecentTableDate);
     void sort();
 
 }; // class Vaccines
