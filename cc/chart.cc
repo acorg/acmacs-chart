@@ -147,6 +147,12 @@ void Antigens::find_by_name(std::string aName, AntigenRefs& aResult) const
 const Serum* Sera::find_by_full_name(std::string aFullName) const
 {
     auto found = std::find_if(begin(), end(), [&aFullName](const auto& e) -> bool { return e.full_name() == aFullName; });
+
+    std::cerr << "find_by_full_name: \"" << aFullName << "\"" << std::endl;
+    // for (const auto& e: *this) {
+    //     std::cerr << "   \"" << e.full_name() << "\"" << std::endl;
+    // }
+
     return found == end() ? nullptr : &*found;
 
 } // Sera::find_by_full_name
@@ -204,13 +210,14 @@ Vaccines* Chart::vaccines(std::string aName, const hidb::HiDb& aHiDb) const
     AntigenRefs by_name;
     antigens().find_by_name(aName, by_name);
     for (const auto* ag: by_name) {
-          // std::cerr << ag->full_name() << std::endl;
+        std::cerr << ag->full_name() << std::endl;
         try {
             const auto& data = ag->find_in_hidb(aHiDb);
             std::vector<const Serum*> homologous_sera;
             std::vector<const hidb::AntigenSerumData<hidb::Serum>*> homologous_serum_data;
             for (const auto* sd: aHiDb.find_homologous_sera(data)) {
                 const Serum* serum = sera().find_by_full_name(sd->data().full_name());
+                std::cerr << "   " << sd->data().full_name() << " " << (serum ? "Y" : "N") << std::endl;
                 if (serum != nullptr) {
                     homologous_sera.push_back(serum);
                     homologous_serum_data.push_back(sd);

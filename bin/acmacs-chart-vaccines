@@ -63,7 +63,9 @@ def main(args):
                 print(name, e.antigen.full_name())
                 for es in e.homologous_sera:
                     print("  ", es.full_name())
+        print()
         print(vv.report())
+        print()
 
 # ----------------------------------------------------------------------
 
