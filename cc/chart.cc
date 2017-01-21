@@ -237,8 +237,15 @@ inline bool Vaccines::Entry::operator < (const Vaccines::Entry& a) const
 
 bool Vaccines::HomologousSerum::operator < (const Vaccines::HomologousSerum& a) const
 {
-    const auto s_nt = a.serum_data->number_of_tables(), t_nt = serum_data->number_of_tables();
-    return t_nt == s_nt ? most_recent_table_date > a.most_recent_table_date : t_nt > s_nt;
+    bool result = true;
+    if (serum->serum_species() == "SHEEP") { // avoid using sheep serum as homologous (NIMR)
+        result = false;
+    }
+    else {
+        const auto s_nt = a.serum_data->number_of_tables(), t_nt = serum_data->number_of_tables();
+        result = t_nt == s_nt ? most_recent_table_date > a.most_recent_table_date : t_nt > s_nt;
+    }
+    return result;
 
 } // Vaccines::HomologousSerum::operator <
 
