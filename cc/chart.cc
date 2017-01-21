@@ -207,17 +207,14 @@ Vaccines* Chart::vaccines(std::string aName, const hidb::HiDb& aHiDb) const
         // std::cerr << ag->full_name() << std::endl;
         try {
             const auto& data = ag->find_in_hidb(aHiDb);
-            std::vector<const Serum*> homologous_sera;
-            std::vector<const hidb::AntigenSerumData<hidb::Serum>*> homologous_serum_data;
+            std::vector<Vaccines::HomologousSerum> homologous_sera;
             for (const auto* sd: aHiDb.find_homologous_sera(data)) {
                 const Serum* serum = sera().find_by_name_for_exact_matching(sd->data().name_for_exact_matching());
                   // std::cerr << "   " << sd->data().name_for_exact_matching() << " " << (serum ? "Y" : "N") << std::endl;
-                if (serum != nullptr) {
-                    homologous_sera.push_back(serum);
-                    homologous_serum_data.push_back(sd);
-                }
+                if (serum != nullptr)
+                    homologous_sera.emplace_back(serum, sd, aHiDb.charts()[sd->most_recent_table().table_id()].chart_info().date());
             }
-            result->add(ag, &data, std::move(homologous_sera), std::move(homologous_serum_data), aHiDb.charts()[data.most_recent_table().table_id()].chart_info().date());
+            result->add(ag, &data, std::move(homologous_sera), aHiDb.charts()[data.most_recent_table().table_id()].chart_info().date());
         }
         catch (hidb::HiDb::NotFound&) {
         }
@@ -238,14 +235,31 @@ inline bool Vaccines::Entry::operator < (const Vaccines::Entry& a) const
 
 // ----------------------------------------------------------------------
 
-void Vaccines::add(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::vector<const Serum*>&& aSera, std::vector<const hidb::AntigenSerumData<hidb::Serum>*>&& aSerumData, std::string aMostRecentTableDate)
+bool Vaccines::HomologousSerum::operator < (const Vaccines::HomologousSerum& a) const
+{
+    const auto s_nt = a.serum_data->number_of_tables(), t_nt = serum_data->number_of_tables();
+    return t_nt == s_nt ? most_recent_table_date > a.most_recent_table_date : t_nt > s_nt;
+
+} // Vaccines::HomologousSerum::operator <
+
+// ----------------------------------------------------------------------
+
+size_t Vaccines::HomologousSerum::number_of_tables() const
+{
+    return serum_data->number_of_tables();
+
+} // Vaccines::HomologousSerum::number_of_tables
+
+// ----------------------------------------------------------------------
+
+void Vaccines::add(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::vector<HomologousSerum>&& aSera, std::string aMostRecentTableDate)
 {
     if (aAntigen->is_reassortant())
-        mReassortant.emplace_back(aAntigen, aAntigenData, std::move(aSera), std::move(aSerumData), aMostRecentTableDate);
+        mReassortant.emplace_back(aAntigen, aAntigenData, std::move(aSera), aMostRecentTableDate);
     else if (aAntigen->is_egg())
-        mEgg.emplace_back(aAntigen, aAntigenData, std::move(aSera), std::move(aSerumData), aMostRecentTableDate);
+        mEgg.emplace_back(aAntigen, aAntigenData, std::move(aSera), aMostRecentTableDate);
     else
-        mCell.emplace_back(aAntigen, aAntigenData, std::move(aSera), std::move(aSerumData), aMostRecentTableDate);
+        mCell.emplace_back(aAntigen, aAntigenData, std::move(aSera), aMostRecentTableDate);
 
 } // Vaccines::add
 

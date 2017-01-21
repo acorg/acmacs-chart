@@ -99,9 +99,15 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
 
       // ----------------------------------------------------------------------
 
+    py::class_<Vaccines::HomologousSerum>(m, "Vaccines_HomologousSerum")
+            .def_readonly("serum", &Vaccines::HomologousSerum::serum)
+            .def_readonly("most_recent_table", &Vaccines::HomologousSerum::most_recent_table_date)
+            .def("number_of_tables", &Vaccines::HomologousSerum::number_of_tables)
+            ;
+
     py::class_<Vaccines::Entry>(m, "Vaccines_Entry")
             .def_readonly("antigen", &Vaccines::Entry::antigen)
-            .def_readonly("homologous_sera", &Vaccines::Entry::homologous_sera)
+            .def_readonly("homologous_sera", &Vaccines::Entry::homologous_sera, py::return_value_policy::reference)
             ;
 
     py::class_<Vaccines>(m, "Vaccines")

@@ -62,7 +62,7 @@ def main(args):
             if e:
                 print(name, e.antigen.full_name())
                 for es in e.homologous_sera:
-                    print("  ", es.full_name())
+                    print("  ", es.serum.full_name(), " tables:", es.number_of_tables(), " most-recent:", es.most_recent_table, sep="")
         print()
         print(vv.report())
         print()

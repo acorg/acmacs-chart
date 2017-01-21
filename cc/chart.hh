@@ -646,18 +646,31 @@ class Chart
 class Vaccines
 {
  public:
+    class HomologousSerum
+    {
+     public:
+        inline HomologousSerum(const Serum* aSerum, const hidb::AntigenSerumData<hidb::Serum>* aSerumData, std::string aMostRecentTableDate)
+            : serum(aSerum), serum_data(aSerumData), most_recent_table_date(aMostRecentTableDate) {}
+        bool operator < (const HomologousSerum& a) const;
+        size_t number_of_tables() const;
+        
+        const Serum* serum;
+        const hidb::AntigenSerumData<hidb::Serum>* serum_data;
+        std::string most_recent_table_date;
+    };
+
     class Entry
     {
      public:
-        inline Entry(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::vector<const Serum*>&& aSera, std::vector<const hidb::AntigenSerumData<hidb::Serum>*>&& aSerumData, std::string aMostRecentTableDate)
-            : antigen(aAntigen), antigen_data(aAntigenData), homologous_sera(aSera), homologous_serum_data(aSerumData), most_recent_table_date(aMostRecentTableDate) {}
+        inline Entry(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::vector<HomologousSerum>&& aSera, std::string aMostRecentTableDate)
+            : antigen(aAntigen), antigen_data(aAntigenData), homologous_sera(aSera), most_recent_table_date(aMostRecentTableDate)
+            { std::sort(homologous_sera.begin(), homologous_sera.end()); }
+        bool operator < (const Entry& a) const;
+
         const Antigen* antigen;
         const hidb::AntigenSerumData<hidb::Antigen>* antigen_data;
-        std::vector<const Serum*> homologous_sera;
-        std::vector<const hidb::AntigenSerumData<hidb::Serum>*> homologous_serum_data;
+        std::vector<HomologousSerum> homologous_sera; // sorted by number of tables and the most recent table
         std::string most_recent_table_date;
-
-        bool operator < (const Entry& a) const;
     };
 
     inline Vaccines() {}
@@ -675,7 +688,7 @@ class Vaccines
 
     friend class Chart;
 
-    void add(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::vector<const Serum*>&& aSera, std::vector<const hidb::AntigenSerumData<hidb::Serum>*>&& aSerumData, std::string aMostRecentTableDate);
+    void add(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::vector<HomologousSerum>&& aSera, std::string aMostRecentTableDate);
     void sort();
 
 }; // class Vaccines
