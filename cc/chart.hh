@@ -98,13 +98,6 @@ class AntigenSerum
 
 //     virtual AntigenSerumMatch match_passage(const AntigenSerum& aNother) const;
 
- protected:
-    inline std::string name_join(std::initializer_list<std::string>&& parts) const
-        {
-            std::vector<std::string> p{parts};
-            return string::join(" ", std::begin(p), std::remove(std::begin(p), std::end(p), std::string()));
-        }
-
  private:
 //       // Chart& mChart;
     std::string mName; // "N" "[VIRUS_TYPE/][HOST/]LOCATION/ISOLATION/YEAR" or "CDC_ABBR NAME" or "NAME"
@@ -127,8 +120,8 @@ class Antigen : public AntigenSerum
       // inline Antigen(Chart& aChart) : AntigenSerum(aChart) {}
     inline Antigen(const Antigen&) = default;
     inline Antigen(Antigen&&) = default;
-    virtual inline std::string full_name() const { return name_join({name(), reassortant(), annotations().join(), passage()}); }
-    virtual inline std::string full_name_without_passage() const { return name_join({name(), reassortant(), annotations().join()}); }
+    virtual inline std::string full_name() const { return string::join({name(), reassortant(), annotations().join(), passage()}); }
+    virtual inline std::string full_name_without_passage() const { return string::join({name(), reassortant(), annotations().join()}); }
 
     // inline void name(const char* str, size_t length) { AntigenSerum::name(str, length); }
 
@@ -163,7 +156,7 @@ class Serum : public AntigenSerum
       // inline Serum(Chart& aChart) : AntigenSerum(aChart), mHomologous(-1) {}
     inline Serum(const Serum&) = default;
     inline Serum(Serum&&) = default;
-    virtual inline std::string full_name() const { return name_join({name(), reassortant(), serum_id(), annotations().join()}); } // serum_id comes before annotations, see hidb chart.cc Serum::variant_id
+    virtual inline std::string full_name() const { return string::join({name(), reassortant(), serum_id(), annotations().join()}); } // serum_id comes before annotations, see hidb chart.cc Serum::variant_id
     virtual inline std::string full_name_without_passage() const { return full_name(); }
 
     inline const std::string serum_id() const { return mSerumId; }
@@ -209,7 +202,7 @@ class Sera : public std::vector<Serum>
  public:
     inline Sera() {}
 
-    const Serum* find_by_full_name(std::string aFullName) const;
+    const Serum* find_by_name_for_exact_matching(std::string aFullName) const;
 
 }; // class Sera
 
