@@ -57,15 +57,18 @@ def main(args):
     if lineage:
         virus_type += "/" + lineage
     for entry in sVaccines[virus_type]:
+        present = False
         vv = chart.vaccines(entry["name"], hidb)
         for e, name in [[vv.egg(), "EGG:"], [vv.cell(), "CELL:"], [vv.reassortant(), "REASSORTANT:"]]:
             if e:
+                present = True
                 print(name, e.antigen.full_name())
                 for es in e.homologous_sera:
                     print("  ", es.serum.full_name(), " tables:", es.number_of_tables(), " most-recent:", es.most_recent_table, " species:", es.serum.serum_species(), sep="")
-        print()
-        # print(vv.report())
-        # print()
+        if present:
+            print()
+            print(vv.report())
+            print()
 
 # ----------------------------------------------------------------------
 

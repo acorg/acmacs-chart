@@ -653,7 +653,7 @@ class Vaccines
             : serum(aSerum), serum_data(aSerumData), most_recent_table_date(aMostRecentTableDate) {}
         bool operator < (const HomologousSerum& a) const;
         size_t number_of_tables() const;
-        
+
         const Serum* serum;
         const hidb::AntigenSerumData<hidb::Serum>* serum_data;
         std::string most_recent_table_date;
