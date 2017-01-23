@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "acmacs-draw/viewport.hh"
+
 class Chart;
 class Surface;
 
@@ -10,7 +12,7 @@ class Surface;
 class ChartDraw
 {
  public:
-    inline ChartDraw(Chart& aChart) : mChart(aChart) {}
+    inline ChartDraw(Chart& aChart, size_t aProjectionNo) : mChart(aChart), mProjectionNo(aProjectionNo) {}
 
     void prepare();
     void draw(Surface& aSurface);
@@ -18,6 +20,8 @@ class ChartDraw
 
  private:
     Chart& mChart;
+    size_t mProjectionNo;
+    Viewport mViewport;
 
 }; // class ChartDraw
 

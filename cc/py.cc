@@ -123,7 +123,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
       // ----------------------------------------------------------------------
 
     py::class_<ChartDraw>(m, "ChartDraw")
-            .def(py::init<Chart&>(), py::arg("chart"))
+            .def(py::init<Chart&, size_t>(), py::arg("chart"), py::arg("projection_no") = 0)
             .def("prepare", &ChartDraw::prepare)
             .def("draw", static_cast<void (ChartDraw::*)(std::string, double)>(&ChartDraw::draw), py::arg("filename"), py::arg("size"))
             ;

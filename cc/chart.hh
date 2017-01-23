@@ -8,6 +8,7 @@
 #include "acmacs-base/virus-name.hh"
 #include "acmacs-base/string.hh"
 #include "acmacs-draw/color.hh"
+#include "layout.hh"
 
 namespace hidb
 {
@@ -205,15 +206,6 @@ class Sera : public std::vector<Serum>
     const Serum* find_by_name_for_exact_matching(std::string aFullName) const;
 
 }; // class Sera
-
-// ----------------------------------------------------------------------
-
-class Layout : public std::vector<std::vector<double>>
-{
- public:
-    inline Layout() = default;
-
-}; // class Layout
 
 // ----------------------------------------------------------------------
 
@@ -628,6 +620,7 @@ class Chart
 
     inline std::vector<Projection>& projections() { return mProjections; }
     inline const std::vector<Projection>& projections() const { return mProjections; }
+    inline Projection& projection(size_t aProjectionNo) { return mProjections[aProjectionNo]; }
 
     inline const ChartPlotSpec& plot_spec() const { return mPlotSpec; }
     inline ChartPlotSpec& plot_spec() { return mPlotSpec; }
