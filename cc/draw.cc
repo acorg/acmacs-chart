@@ -12,7 +12,7 @@ void ChartDraw::prepare()
     std::unique_ptr<BoundingBall> bb(mChart.projection(mProjectionNo).layout().minimum_bounding_ball());
     mViewport.set_from_center_size(bb->center(), bb->diameter());
     mViewport.whole_width();
-    std::cerr << mViewport << std::endl;
+      // std::cerr << mViewport << std::endl;
 
 } // ChartDraw::prepare
 
@@ -20,8 +20,10 @@ void ChartDraw::prepare()
 
 void ChartDraw::draw(Surface& aSurface)
 {
-    aSurface.grid(100, "cyan3", 3);
-    aSurface.border("blue", 5);
+    double pix = 0.01;
+    aSurface.grid(1, "cyan3", pix);
+    aSurface.border("blue", pix * 5);
+    aSurface.circle({0, 0}, 1, 1, 0, "pink", pix);
 
 } // ChartDraw::draw
 
@@ -30,8 +32,10 @@ void ChartDraw::draw(Surface& aSurface)
 void ChartDraw::draw(std::string aFilename, double aSize)
 {
     PdfCairo surface(aFilename, aSize, aSize);
-
-    draw(surface);
+    // surface.resize(mViewport.size.width);
+    Surface& rescaled = surface.subsurface({0, 0}, surface.size(), mViewport.size.width, true);
+    rescaled.viewport_offset(mViewport.offset());
+    draw(rescaled);
 
 } // ChartDraw::draw
 
