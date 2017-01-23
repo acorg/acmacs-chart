@@ -208,6 +208,15 @@ class Sera : public std::vector<Serum>
 
 // ----------------------------------------------------------------------
 
+class Layout : public std::vector<std::vector<double>>
+{
+ public:
+    inline Layout() = default;
+
+}; // class Layout
+
+// ----------------------------------------------------------------------
+
 class Projection
 {
  public:
@@ -217,8 +226,8 @@ class Projection
     inline void comment(const char* str, size_t length) { mComment.assign(str, length); }
     inline std::string comment() const { return mComment; }
 
-    inline std::vector<std::vector<double>>& layout() { return mLayout; }
-    inline const std::vector<std::vector<double>>& layout() const { return mLayout; }
+    inline Layout& layout() { return mLayout; }
+    inline const Layout& layout() const { return mLayout; }
 
     inline void stress(double aStress) { mStress = aStress; }
     inline double stress() const { return mStress; }
@@ -255,7 +264,7 @@ class Projection
 
  private:
     std::string mComment;                           // "c"
-    std::vector<std::vector<double>> mLayout;       // "l": [[]] layout, list of lists of doubles, if point is disconnected: emtpy list or ?[NaN, NaN]
+    Layout mLayout;       // "l": [[]] layout, list of lists of doubles, if point is disconnected: emtpy list or ?[NaN, NaN]
       // size_t mNumberOfIterations;                // "i"
     double mStress;                                 // "s"
     std::string mMinimumColumnBasis;                // "m": "1280", "none" (default)

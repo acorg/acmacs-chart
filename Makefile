@@ -7,7 +7,7 @@ MAKEFLAGS = -w
 
 # ----------------------------------------------------------------------
 
-SOURCES = chart.cc ace.cc
+SOURCES = chart.cc ace.cc draw.cc
 PY_SOURCES = py.cc $(SOURCES)
 BACKEND = $(DIST)/acmacs_chart_backend$(PYTHON_MODULE_SUFFIX)
 
@@ -35,9 +35,9 @@ OPTIMIZATION = -O3 #-fvisibility=hidden -flto
 PROFILE = # -pg
 CXXFLAGS = -g -MMD $(OPTIMIZATION) $(PROFILE) -fPIC -std=$(STD) $(WEVERYTHING) $(WARNINGS) -Icc -I$(BUILD)/include -I$(ACMACSD_ROOT)/include $(PKG_INCLUDES)
 LDFLAGS = $(OPTIMIZATION) $(PROFILE)
-LDLIBS = -L$(LIB_DIR) -lacmacsbase -lacmacsdraw -lhidb -lboost_filesystem -lboost_system $$(pkg-config --libs liblzma) $$($(PYTHON_CONFIG) --ldflags | sed -E 's/-Wl,-stack_size,[0-9]+//')
+LDLIBS = -L$(LIB_DIR) -lacmacsbase -lacmacsdraw -lhidb -lboost_filesystem -lboost_system $$(pkg-config --libs cairo) $$(pkg-config --libs liblzma) $$($(PYTHON_CONFIG) --ldflags | sed -E 's/-Wl,-stack_size,[0-9]+//')
 
-PKG_INCLUDES = $$(pkg-config --cflags liblzma) $$($(PYTHON_CONFIG) --includes)
+PKG_INCLUDES = $$(pkg-config --cflags cairo) $$(pkg-config --cflags liblzma) $$($(PYTHON_CONFIG) --includes)
 
 
 # ----------------------------------------------------------------------

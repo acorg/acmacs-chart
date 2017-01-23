@@ -1,5 +1,6 @@
 #include "chart.hh"
 #include "ace.hh"
+#include "draw.hh"
 #include "hidb/hidb.hh"
 #include "acmacs-base/pybind11.hh"
 
@@ -115,6 +116,16 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("egg", &Vaccines::egg, py::return_value_policy::reference)
             .def("cell", &Vaccines::cell, py::return_value_policy::reference)
             .def("reassortant", &Vaccines::reassortant, py::return_value_policy::reference)
+            ;
+
+      // ----------------------------------------------------------------------
+      // Draw
+      // ----------------------------------------------------------------------
+
+    py::class_<ChartDraw>(m, "ChartDraw")
+            .def(py::init<Chart&>(), py::arg("chart"))
+            .def("prepare", &ChartDraw::prepare)
+            .def("draw", static_cast<void (ChartDraw::*)(std::string, double)>(&ChartDraw::draw), py::arg("filename"), py::arg("size"))
             ;
 
       // ----------------------------------------------------------------------

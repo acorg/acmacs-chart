@@ -95,6 +95,12 @@ static jsi::data<ChartInfo> chart_info_data = {
     {"S", jsi::field(&ChartInfo::sources, chart_info_data)},
 };
 
+inline std::shared_ptr<jsi::readers::makers::Base<Projection>> field(Layout& (Projection::*accessor)())
+{
+    using Storer = decltype(jsi::storers::type_detector<jsi::storers::ArrayOfArrayElement<double>>(std::declval<double>()));
+    return std::make_shared<jsi::readers::makers::ArrayOfArrayOfValuesAccessor<Projection, double, decltype(accessor), Storer>>(accessor);
+}
+
 static jsi::data<Projection> projection_data = {
     {"C", jsi::field(&Projection::column_bases)},
     {"D", jsi::field(&Projection::disconnected)},
@@ -102,7 +108,7 @@ static jsi::data<Projection> projection_data = {
     {"e", jsi::field(&Projection::stress_diff_to_stop)},
     {"f", jsi::field(&Projection::titer_multipliers)},
     {"g", jsi::field(&Projection::gradient_multipliers)},
-    {"l", jsi::field(&Projection::layout)},
+    {"l", field(&Projection::layout)},
     {"m", jsi::field(&Projection::minimum_column_basis)},
     {"s", jsi::field(&Projection::stress)},
     {"t", jsi::field(&Projection::transformation)},
