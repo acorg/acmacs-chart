@@ -204,7 +204,7 @@ Vaccines* Chart::vaccines(std::string aName, const hidb::HiDb& aHiDb) const
     AntigenRefs by_name;
     antigens().find_by_name(aName, by_name);
     for (const auto* ag: by_name) {
-        // std::cerr << ag->full_name() << std::endl;
+          // std::cerr << ag->full_name() << std::endl;
         try {
             const auto& data = ag->find_in_hidb(aHiDb);
             std::vector<Vaccines::HomologousSerum> homologous_sera;

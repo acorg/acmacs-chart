@@ -6,8 +6,8 @@
 #include <algorithm>
 
 #include "acmacs-base/virus-name.hh"
-#include "acmacs-base/color.hh"
 #include "acmacs-base/string.hh"
+#include "acmacs-draw/color.hh"
 
 namespace hidb
 {
