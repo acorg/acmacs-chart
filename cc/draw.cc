@@ -21,9 +21,9 @@ void ChartDraw::prepare()
 void ChartDraw::draw(Surface& aSurface)
 {
     double pix = 0.01;
-    aSurface.grid(1, "cyan3", pix);
-    aSurface.border("blue", pix * 5);
-    aSurface.circle({0, 0}, 1, 1, 0, "pink", pix);
+    aSurface.grid(Scaled{1}, "cyan3", Pixels{pix});
+    aSurface.border("blue", Pixels{pix * 5});
+    aSurface.circle({0, 0}, Scaled{1}, 1, 0, "pink", Pixels{pix});
 
 } // ChartDraw::draw
 
@@ -33,8 +33,7 @@ void ChartDraw::draw(std::string aFilename, double aSize)
 {
     PdfCairo surface(aFilename, aSize, aSize);
     // surface.resize(mViewport.size.width);
-    Surface& rescaled = surface.subsurface({0, 0}, surface.size(), mViewport.size.width, true);
-    rescaled.viewport_offset(mViewport.offset());
+    Surface& rescaled = surface.subsurface({0, 0}, Scaled{surface.viewport().size.width}, mViewport, true);
     draw(rescaled);
 
 } // ChartDraw::draw
