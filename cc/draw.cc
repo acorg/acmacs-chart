@@ -20,10 +20,10 @@ void ChartDraw::prepare()
 
 void ChartDraw::draw(Surface& aSurface)
 {
-    double pix = 0.01;
+    double pix = 1;
     aSurface.grid(Scaled{1}, "cyan3", Pixels{pix});
     aSurface.border("blue", Pixels{pix * 5});
-    aSurface.circle({0, 0}, Scaled{1}, 1, 0, "pink", Pixels{pix});
+    aSurface.circle(mViewport.center(), Scaled{1}, 1, 0, "pink", Pixels{pix});
 
 } // ChartDraw::draw
 
