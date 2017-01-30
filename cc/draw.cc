@@ -23,11 +23,13 @@ ChartDraw::ChartDraw(Chart& aChart, size_t aProjectionNo)
       mDrawingOrder(mChart)
 {
       // std::cerr << "DrawingOrder: " << mDrawingOrder << std::endl;
-    auto ag_ind = aChart.antigen_indices(), sr_ind = aChart.serum_indices();
-    std::vector<size_t> ag(ag_ind.begin(), ag_ind.end());
-    std::cerr << "AG " << ag << std::endl;
-    std::vector<size_t> sr(sr_ind.begin(), sr_ind.end());
-    std::cerr << "SR " << sr << std::endl;
+    // auto ag_ind = aChart.antigen_indices(), sr_ind = aChart.serum_indices();
+    // std::vector<size_t> ag(ag_ind.begin(), ag_ind.end());
+    // std::cerr << "AG " << ag << std::endl;
+    // std::vector<size_t> sr(sr_ind.begin(), sr_ind.end());
+    // std::cerr << "SR " << sr << std::endl;
+    // std::cerr << "AGref " << aChart.reference_antigen_indices() << std::endl;
+    // std::cerr << "AGegg " << aChart.egg_antigen_indices() << std::endl;
 }
 
 // ----------------------------------------------------------------------

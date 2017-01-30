@@ -81,7 +81,7 @@ class AntigenSerum
     inline bool distinct() const { return mAnnotations.distinct(); }
     inline const Annotations& annotations() const { return mAnnotations; }
     inline Annotations& annotations() { return mAnnotations; }
-//     inline bool has_semantic(char c) const { return mSemanticAttributes.find(c) != std::string::npos; }
+    inline bool has_semantic(char c) const { return mSemanticAttributes.find(c) != std::string::npos; }
     inline const std::string semantic() const { return mSemanticAttributes; }
     inline void semantic(const char* str, size_t length) { mSemanticAttributes.assign(str, length); }
 
@@ -131,7 +131,7 @@ class Antigen : public AntigenSerum
 
     inline const std::string date() const { return mDate; }
     inline void date(const char* str, size_t length) { mDate.assign(str, length); }
-//     inline bool reference() const { return has_semantic('R'); }
+    inline bool reference() const { return has_semantic('R'); }
     inline const std::vector<std::string>& lab_id() const { return mLabId; }
     inline std::vector<std::string>& lab_id() { return mLabId; }
     inline bool has_lab_id(std::string aLabId) const { return std::find(mLabId.begin(), mLabId.end(), aLabId) != mLabId.end(); }
@@ -428,6 +428,9 @@ class Chart
     Vaccines* vaccines(std::string aName, const hidb::HiDb& aHiDb) const;
 
     inline IndexGenerator antigen_indices() const { return {number_of_antigens(), [](size_t) { return true; } }; }
+    inline IndexGenerator reference_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].reference(); } }; }
+    inline IndexGenerator test_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return !mAntigens[index].reference(); } }; }
+    inline IndexGenerator egg_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].is_egg(); } }; }
     inline IndexGenerator serum_indices() const { return {number_of_antigens(), number_of_points(), [](size_t) { return true; } }; }
 
     // void find_homologous_antigen_for_sera();
