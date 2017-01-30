@@ -25,6 +25,9 @@ def main(args):
     #chart_draw.scale_points(3)
     chart_draw.all_grey()
     chart_draw.modify_point_by_index(0, acmacs_chart.PointStyle().fill("blue").outline("black").size(20))
+    ps = acmacs_chart.point_style(fill="red", outline="black", size=20)
+    # ps.modify(fill="red", outline="black", size=20)
+    # chart_draw.modify_point_by_index(10, acmacs_chart.PointStyle(fill="red", outline="black", size=20))
     chart_draw.draw(args.output[0], 600)
 
 # ----------------------------------------------------------------------
