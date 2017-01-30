@@ -126,6 +126,25 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def(py::init<std::string>(), py::arg("color") = "black")
             ;
 
+    py::class_<PointStyle> point_style(m, "PointStyle");
+
+    py::enum_<enum PointStyle::Empty>(point_style, "PointStyle_Empty").value("Empty", PointStyle::Empty).export_values();
+
+    point_style
+            .def(py::init<enum PointStyle::Empty>(), py::arg("_") = PointStyle::Empty)
+            .def("show", &PointStyle::show)
+            .def("hide", &PointStyle::hide)
+              // .def("shape", &PointStyle::shape, py::arg(""))
+            .def("fill", [](PointStyle& style, std::string color) -> PointStyle& { return style.fill(color); }, py::arg("fill"))
+            .def("outline", &PointStyle::outline, py::arg("outline"))
+            .def("size", [](PointStyle& style, double aSize) -> PointStyle& { return style.size(Pixels{aSize}); }, py::arg("size"))
+            .def("outline_width", &PointStyle::outline_width, py::arg("outline_width"))
+            .def("aspect", static_cast<PointStyle& (PointStyle::*)(double)>(&PointStyle::aspect), py::arg("aspect"))
+            .def("rotation", static_cast<PointStyle& (PointStyle::*)(double)>(&PointStyle::rotation), py::arg("rotation"))
+            .def("scale", &PointStyle::scale, py::arg("scale"))
+            .def("scale_outline", &PointStyle::scale_outline, py::arg("scale"))
+            ;
+
     py::class_<ChartDraw>(m, "ChartDraw")
             .def(py::init<Chart&, size_t>(), py::arg("chart"), py::arg("projection_no") = 0)
             .def("prepare", &ChartDraw::prepare)
@@ -134,6 +153,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("mark_reassortant_antigens", &ChartDraw::mark_reassortant_antigens)
             .def("all_grey", &ChartDraw::mark_all_grey, py::arg("color") = Color("grey80"))
             .def("scale_points", &ChartDraw::scale_points, py::arg("scale"), py::arg("outline_scale") = 1.0, py::doc("outline_scale=0 means use point scale for outline too"))
+            .def("modify_point_by_index", &ChartDraw::modify_point_by_index, py::arg("index"), py::arg("style"))
             ;
 
       // ----------------------------------------------------------------------

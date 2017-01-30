@@ -33,6 +33,7 @@ class ChartDraw
     void draw(std::string aFilename, double aSize);
 
     void modify(IndexGenerator&& aGen, const PointStyle& aStyle);
+    inline void modify_point_by_index(size_t aIndex, const PointStyle& aStyle) { mPointStyles[aIndex] = aStyle; }
 
     void mark_egg_antigens();
     void mark_reassortant_antigens();
