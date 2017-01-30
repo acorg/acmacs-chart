@@ -4,6 +4,8 @@
 
 #include "acmacs-draw/viewport.hh"
 
+#include "point-style.hh"
+
 class Chart;
 class Surface;
 
