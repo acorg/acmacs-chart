@@ -1,61 +1,45 @@
 #pragma once
 
 #include <string>
+#include <limits>
 
-#include "acmacs-draw/color.hh"
-#include "acmacs-draw/size-scale.hh"
+#include "acmacs-draw/surface.hh"
 
 #include "layout.hh"
 
 // ----------------------------------------------------------------------
 
-class Aspect
-{
- public:
-    inline Aspect(double a = 1.0) : mValue(a) {}
-    inline operator double() const { return mValue; }
-
- private:
-    double mValue;
-};
-
-class Rotation
-{
- public:
-    inline Rotation(double a = 0.0) : mValue(a) {}
-    inline operator double() const { return mValue; }
-
- private:
-    double mValue;
-};
+class Surface;
 
 #include "acmacs-base/global-constructors-push.hh"
 
 const Aspect AspectRegular{1.0};
 const Aspect AspectEgg{0.75};
+const Aspect AspectNoChange{std::numeric_limits<double>::quiet_NaN()};
 
 const Rotation RotationRegular{0.0};
 const Rotation RotationReassortant{0.5};
+const Rotation RotationNoChange{std::numeric_limits<double>::quiet_NaN()};
 
 #include "acmacs-base/diagnostics-pop.hh"
 
 // ----------------------------------------------------------------------
 
-class Surface;
-
 class PointStyle
 {
  public:
+    enum class Shown { Hidden, Shown, NoChange };
     enum class Shape { NoChange, Circle, Box, Triangle };
 
     inline PointStyle()
-        : mShown(true), mShape(Shape::Circle), mFill("green"), mOutline("black"),
+        : mShown(Shown::Shown), mShape(Shape::Circle), mFill("green"), mOutline("black"),
           mSize(5), mOutlineWidth(1), mAspect(AspectRegular), mRotation(RotationRegular) {}
+    PointStyle& operator = (const PointStyle& aPS);
 
     void draw(Surface& aSurface, const Point& aCoord);
 
  private:
-    bool mShown;
+    Shown mShown;
     Shape mShape;
     Color mFill;
     Color mOutline;
