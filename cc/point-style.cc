@@ -29,7 +29,7 @@ PointStyle& PointStyle::operator = (const PointStyle& aPS)
 
 void PointStyle::draw(Surface& aSurface, const Point& aCoord)
 {
-    if (mShown == Shown::Shown) {
+    if (mShown == Shown::Shown && !aCoord.empty()) {
         switch (mShape) {
           case Shape::NoChange:
               throw std::runtime_error("Invalid point shape NoChange");

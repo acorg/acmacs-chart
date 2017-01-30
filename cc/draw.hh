@@ -10,6 +10,7 @@
 
 class Chart;
 class Surface;
+class IndexGenerator;
 
 // ----------------------------------------------------------------------
 
@@ -30,6 +31,8 @@ class ChartDraw
     void prepare();
     void draw(Surface& aSurface);
     void draw(std::string aFilename, double aSize);
+
+    void modify(IndexGenerator&& aGen, const PointStyle& aStyle);
 
  private:
     Chart& mChart;

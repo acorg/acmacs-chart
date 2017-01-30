@@ -41,6 +41,11 @@ void ChartDraw::prepare()
     mViewport.whole_width();
       // std::cerr << mViewport << std::endl;
 
+    modify(mChart.reference_antigen_indices(), PointStyle(PointStyle::Empty).fill("transparent").size(Pixels{8}));
+    modify(mChart.egg_antigen_indices(), PointStyle(PointStyle::Empty).aspect(AspectEgg));
+    modify(mChart.reassortant_antigen_indices(), PointStyle(PointStyle::Empty).rotation(RotationReassortant));
+    modify(mChart.serum_indices(), PointStyle(PointStyle::Empty).shape(PointStyle::Shape::Box).fill("transparent").size(Pixels{8}));
+
 } // ChartDraw::prepare
 
 // ----------------------------------------------------------------------
@@ -66,6 +71,15 @@ void ChartDraw::draw(std::string aFilename, double aSize)
     draw(rescaled);
 
 } // ChartDraw::draw
+
+// ----------------------------------------------------------------------
+
+void ChartDraw::modify(IndexGenerator&& aGen, const PointStyle& aStyle)
+{
+    for (auto index: aGen)
+        mPointStyles[index] = aStyle;
+
+} // ChartDraw::modify
 
 // ----------------------------------------------------------------------
 
