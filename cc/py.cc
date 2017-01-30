@@ -6,6 +6,19 @@
 
 // ----------------------------------------------------------------------
 
+static inline PointStyle& point_style_shape(PointStyle& aStyle, std::string aShape)
+{
+    if (aShape == "circle")
+        return aStyle.shape(PointStyle::Shape::Circle);
+    if (aShape == "box")
+        return aStyle.shape(PointStyle::Shape::Box);
+    if (aShape == "triangle")
+        return aStyle.shape(PointStyle::Shape::Triangle);
+    throw std::runtime_error("Unrecognized point style shape: " + aShape);
+}
+
+// ----------------------------------------------------------------------
+
 PYBIND11_PLUGIN(acmacs_chart_backend)
 {
     py::module m("acmacs_chart_backend", "Acmacs chart access plugin");
@@ -17,7 +30,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
     py::register_exception<hidb::HiDb::NotFound>(m, "hidb_NotFound");
 
     py::class_<hidb::PerTable>(m, "hidb_PerTable")
-            .def("table_id", static_cast<const std::string (hidb::PerTable::*)() const>(&hidb::PerTable::table_id))
+            .def("table_id", py::overload_cast<>(&hidb::PerTable::table_id, py::const_))
             ;
 
     py::class_<hidb::AntigenData>(m, "hidb_AntigenSerumData_Antigen")
@@ -46,24 +59,24 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
     py::class_<AntigenSerum>(m, "AntigenSerum")
             .def("full_name", &AntigenSerum::full_name)
             // .def("variant_id", &AntigenSerum::variant_id)
-            .def("name", static_cast<const std::string (AntigenSerum::*)() const>(&AntigenSerum::name))
-            .def("lineage", static_cast<const std::string (AntigenSerum::*)() const>(&AntigenSerum::lineage))
-            .def("passage", static_cast<const std::string (AntigenSerum::*)() const>(&AntigenSerum::passage))
-            .def("reassortant", static_cast<const std::string (AntigenSerum::*)() const>(&AntigenSerum::reassortant))
-            .def("semantic", static_cast<const std::string (AntigenSerum::*)() const>(&AntigenSerum::semantic))
+            .def("name", py::overload_cast<>(&AntigenSerum::name, py::const_))
+            .def("lineage", py::overload_cast<>(&AntigenSerum::lineage, py::const_))
+            .def("passage", py::overload_cast<>(&AntigenSerum::passage, py::const_))
+            .def("reassortant", py::overload_cast<>(&AntigenSerum::reassortant, py::const_))
+            .def("semantic", py::overload_cast<>(&AntigenSerum::semantic, py::const_))
             .def("annotations", [](const AntigenSerum &as) { py::list list; for (const auto& anno: as.annotations()) { list.append(py::str(anno)); } return list; }, py::doc("returns a copy of the annotation list, modifications to the returned list are not applied"))
             ;
 
     py::class_<Antigen, AntigenSerum>(m, "Antigen")
-            .def("date", static_cast<const std::string (Antigen::*)() const>(&Antigen::date))
+            .def("date", py::overload_cast<>(&Antigen::date, py::const_))
             .def("lab_id", [](const Antigen &a) { py::list list; for (const auto& li: a.lab_id()) { list.append(py::str(li)); } return list; }, py::doc("returns a copy of the lab_id list, modifications to the returned list are not applied"))
             .def("find_in_hidb", &Antigen::find_in_hidb, py::arg("hidb"), py::return_value_policy::reference)
             ;
 
     py::class_<Serum, AntigenSerum>(m, "Serum")
-            .def("serum_id", static_cast<const std::string (Serum::*)() const>(&Serum::serum_id))
-            .def("serum_species", static_cast<const std::string (Serum::*)() const>(&Serum::serum_species))
-            .def("homologous", static_cast<int (Serum::*)() const>(&Serum::homologous))
+            .def("serum_id", py::overload_cast<>(&Serum::serum_id, py::const_))
+            .def("serum_species", py::overload_cast<>(&Serum::serum_species, py::const_))
+            .def("homologous", py::overload_cast<>(&Serum::homologous, py::const_))
             .def("find_in_hidb", &Serum::find_in_hidb, py::arg("hidb"), py::return_value_policy::reference)
             ;
 
@@ -72,14 +85,14 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
       // ----------------------------------------------------------------------
 
     py::class_<ChartInfo>(m, "ChartInfo")
-            .def("virus", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::virus))
-            .def("virus_type", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::virus_type))
-            .def("assay", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::assay))
-            .def("date", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::date))
-            .def("lab", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::lab))
-            .def("rbc", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::rbc))
-            .def("name", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::name))
-            .def("subset", static_cast<const std::string (ChartInfo::*)() const>(&ChartInfo::subset))
+            .def("virus", py::overload_cast<>(&ChartInfo::virus, py::const_))
+            .def("virus_type", py::overload_cast<>(&ChartInfo::virus_type, py::const_))
+            .def("assay", py::overload_cast<>(&ChartInfo::assay, py::const_))
+            .def("date", py::overload_cast<>(&ChartInfo::date, py::const_))
+            .def("lab", py::overload_cast<>(&ChartInfo::lab, py::const_))
+            .def("rbc", py::overload_cast<>(&ChartInfo::rbc, py::const_))
+            .def("name", py::overload_cast<>(&ChartInfo::name, py::const_))
+            .def("subset", py::overload_cast<>(&ChartInfo::subset, py::const_))
             .def("type", &ChartInfo::type_as_string)
             ;
 
@@ -92,7 +105,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("vaccines", &Chart::vaccines, py::arg("name"), py::arg("hidb"))
             // .def("table_id", &Chart::table_id)
             // .def("find_homologous_antigen_for_sera", &Chart::find_homologous_antigen_for_sera)
-            .def("chart_info", static_cast<const ChartInfo& (Chart::*)() const>(&Chart::chart_info), py::return_value_policy::reference)
+            .def("chart_info", py::overload_cast<>(&Chart::chart_info, py::const_), py::return_value_policy::reference)
         ;
 
     m.def("import_chart", &import_chart, py::arg("data"), py::doc("Imports chart from a buffer or file in the ace format."));
@@ -134,13 +147,15 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def(py::init<enum PointStyle::Empty>(), py::arg("_") = PointStyle::Empty)
             .def("show", &PointStyle::show)
             .def("hide", &PointStyle::hide)
-              // .def("shape", &PointStyle::shape, py::arg(""))
+            .def("shape", &point_style_shape, py::arg("shape"))
             .def("fill", [](PointStyle& style, std::string color) -> PointStyle& { return style.fill(color); }, py::arg("fill"))
+            .def("fill", &PointStyle::fill, py::arg("fill"))
+            .def("outline", [](PointStyle& style, std::string color) -> PointStyle& { return style.outline(color); }, py::arg("outline"))
             .def("outline", &PointStyle::outline, py::arg("outline"))
             .def("size", [](PointStyle& style, double aSize) -> PointStyle& { return style.size(Pixels{aSize}); }, py::arg("size"))
             .def("outline_width", &PointStyle::outline_width, py::arg("outline_width"))
-            .def("aspect", static_cast<PointStyle& (PointStyle::*)(double)>(&PointStyle::aspect), py::arg("aspect"))
-            .def("rotation", static_cast<PointStyle& (PointStyle::*)(double)>(&PointStyle::rotation), py::arg("rotation"))
+            .def("aspect", py::overload_cast<double>(&PointStyle::aspect), py::arg("aspect"))
+            .def("rotation", py::overload_cast<double>(&PointStyle::rotation), py::arg("rotation"))
             .def("scale", &PointStyle::scale, py::arg("scale"))
             .def("scale_outline", &PointStyle::scale_outline, py::arg("scale"))
             ;
@@ -148,7 +163,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
     py::class_<ChartDraw>(m, "ChartDraw")
             .def(py::init<Chart&, size_t>(), py::arg("chart"), py::arg("projection_no") = 0)
             .def("prepare", &ChartDraw::prepare)
-            .def("draw", static_cast<void (ChartDraw::*)(std::string, double)>(&ChartDraw::draw), py::arg("filename"), py::arg("size"))
+            .def("draw", py::overload_cast<std::string, double>(&ChartDraw::draw), py::arg("filename"), py::arg("size"))
             .def("mark_egg_antigens", &ChartDraw::mark_egg_antigens)
             .def("mark_reassortant_antigens", &ChartDraw::mark_reassortant_antigens)
             .def("all_grey", &ChartDraw::mark_all_grey, py::arg("color") = Color("grey80"))
