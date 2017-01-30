@@ -1,9 +1,11 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "acmacs-draw/viewport.hh"
 
+#include "layout.hh"
 #include "point-style.hh"
 
 class Chart;
@@ -11,10 +13,19 @@ class Surface;
 
 // ----------------------------------------------------------------------
 
+class DrawingOrder : public std::vector<size_t>
+{
+ public:
+    DrawingOrder(Chart& aChart);
+
+}; // class DrawingOrder
+
+// ----------------------------------------------------------------------
+
 class ChartDraw
 {
  public:
-    inline ChartDraw(Chart& aChart, size_t aProjectionNo) : mChart(aChart), mProjectionNo(aProjectionNo) {}
+    ChartDraw(Chart& aChart, size_t aProjectionNo);
 
     void prepare();
     void draw(Surface& aSurface);
@@ -22,8 +33,10 @@ class ChartDraw
 
  private:
     Chart& mChart;
-    size_t mProjectionNo;
     Viewport mViewport;
+    Layout mLayout;
+    std::vector<PointStyle> mPointStyles;
+    DrawingOrder mDrawingOrder;
 
 }; // class ChartDraw
 
