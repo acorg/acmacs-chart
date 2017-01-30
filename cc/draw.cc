@@ -23,6 +23,11 @@ ChartDraw::ChartDraw(Chart& aChart, size_t aProjectionNo)
       mDrawingOrder(mChart)
 {
       // std::cerr << "DrawingOrder: " << mDrawingOrder << std::endl;
+    auto ag_ind = aChart.antigen_indices(), sr_ind = aChart.serum_indices();
+    std::vector<size_t> ag(ag_ind.begin(), ag_ind.end());
+    std::cerr << "AG " << ag << std::endl;
+    std::vector<size_t> sr(sr_ind.begin(), sr_ind.end());
+    std::cerr << "SR " << sr << std::endl;
 }
 
 // ----------------------------------------------------------------------
@@ -40,10 +45,8 @@ void ChartDraw::prepare()
 
 void ChartDraw::draw(Surface& aSurface)
 {
-    double pix = 1;
-    aSurface.grid(Scaled{1}, "cyan3", Pixels{pix});
-    aSurface.border("blue", Pixels{pix * 5});
-
+    aSurface.grid(Scaled{1}, "grey80", Pixels{1});
+    aSurface.border("black", Pixels{1});
 
     for (size_t index: mDrawingOrder) {
         mPointStyles[index].draw(aSurface, mLayout[index]);
