@@ -54,6 +54,9 @@ class PointStyle
     inline PointStyle& rotation(Rotation aRotation) { mRotation = aRotation; return *this; }
     inline PointStyle& rotation(double aRotation) { mRotation = aRotation; return *this; }
 
+    inline PointStyle& scale(double aScale) { mSize *= aScale; return *this; }
+    inline PointStyle& scale_outline(double aScale) { mOutlineWidth *= aScale; return *this; }
+
  private:
     Shown mShown;
     Shape mShape;

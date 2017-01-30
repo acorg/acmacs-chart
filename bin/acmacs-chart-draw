@@ -22,6 +22,8 @@ def main(args):
     hidb = hidb_set.get(chart.chart_info().virus_type())
     chart_draw = acmacs_chart.ChartDraw(chart)
     chart_draw.prepare()
+    #chart_draw.scale_points(3)
+    chart_draw.all_grey()
     chart_draw.draw(args.output[0], 600)
 
 # ----------------------------------------------------------------------

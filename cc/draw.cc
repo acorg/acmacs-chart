@@ -4,6 +4,7 @@
 #include "chart.hh"
 
 #include "acmacs-base/range.hh"
+#include "acmacs-base/float.hh"
 #include "acmacs-draw/surface-cairo.hh"
 
 // ----------------------------------------------------------------------
@@ -42,9 +43,9 @@ void ChartDraw::prepare()
       // std::cerr << mViewport << std::endl;
 
     modify(mChart.reference_antigen_indices(), PointStyle(PointStyle::Empty).fill("transparent").size(Pixels{8}));
-    modify(mChart.egg_antigen_indices(), PointStyle(PointStyle::Empty).aspect(AspectEgg));
-    modify(mChart.reassortant_antigen_indices(), PointStyle(PointStyle::Empty).rotation(RotationReassortant));
     modify(mChart.serum_indices(), PointStyle(PointStyle::Empty).shape(PointStyle::Shape::Box).fill("transparent").size(Pixels{8}));
+    mark_egg_antigens();
+    mark_reassortant_antigens();
 
 } // ChartDraw::prepare
 
@@ -80,6 +81,43 @@ void ChartDraw::modify(IndexGenerator&& aGen, const PointStyle& aStyle)
         mPointStyles[index] = aStyle;
 
 } // ChartDraw::modify
+
+// ----------------------------------------------------------------------
+
+void ChartDraw::mark_egg_antigens()
+{
+    modify(mChart.egg_antigen_indices(), PointStyle(PointStyle::Empty).aspect(AspectEgg));
+
+} // ChartDraw::mark_egg_antigens
+
+// ----------------------------------------------------------------------
+
+void ChartDraw::mark_reassortant_antigens()
+{
+    modify(mChart.reassortant_antigen_indices(), PointStyle(PointStyle::Empty).rotation(RotationReassortant));
+
+} // ChartDraw::mark_reassortant_antigens
+
+// ----------------------------------------------------------------------
+
+void ChartDraw::scale_points(double aPointScale, double aOulineScale)
+{
+    if (float_zero(aOulineScale))
+        aOulineScale = aPointScale;
+    for (auto& style: mPointStyles)
+        style.scale(aPointScale).scale_outline(aOulineScale);
+
+} // ChartDraw::scale_points
+
+// ----------------------------------------------------------------------
+
+void ChartDraw::mark_all_grey(Color aColor)
+{
+    modify(mChart.reference_antigen_indices(), PointStyle(PointStyle::Empty).outline(aColor));
+    modify(mChart.test_antigen_indices(), PointStyle(PointStyle::Empty).fill(aColor).outline(aColor));
+    modify(mChart.serum_indices(), PointStyle(PointStyle::Empty).outline(aColor));
+
+} // ChartDraw::mark_all_grey
 
 // ----------------------------------------------------------------------
 

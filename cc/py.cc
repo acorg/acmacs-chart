@@ -122,10 +122,18 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
       // Draw
       // ----------------------------------------------------------------------
 
+    py::class_<Color>(m, "Color")
+            .def(py::init<std::string>(), py::arg("color") = "black")
+            ;
+
     py::class_<ChartDraw>(m, "ChartDraw")
             .def(py::init<Chart&, size_t>(), py::arg("chart"), py::arg("projection_no") = 0)
             .def("prepare", &ChartDraw::prepare)
             .def("draw", static_cast<void (ChartDraw::*)(std::string, double)>(&ChartDraw::draw), py::arg("filename"), py::arg("size"))
+            .def("mark_egg_antigens", &ChartDraw::mark_egg_antigens)
+            .def("mark_reassortant_antigens", &ChartDraw::mark_reassortant_antigens)
+            .def("all_grey", &ChartDraw::mark_all_grey, py::arg("color") = Color("grey80"))
+            .def("scale_points", &ChartDraw::scale_points, py::arg("scale"), py::arg("outline_scale") = 1.0, py::doc("outline_scale=0 means use point scale for outline too"))
             ;
 
       // ----------------------------------------------------------------------

@@ -34,6 +34,11 @@ class ChartDraw
 
     void modify(IndexGenerator&& aGen, const PointStyle& aStyle);
 
+    void mark_egg_antigens();
+    void mark_reassortant_antigens();
+    void mark_all_grey(Color aColor);
+    void scale_points(double aPointScale, double aOulineScale);
+
  private:
     Chart& mChart;
     Viewport mViewport;
