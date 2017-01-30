@@ -22,8 +22,7 @@ def main(args):
     hidb = hidb_set.get(chart.chart_info().virus_type())
     chart_draw = acmacs_chart.ChartDraw(chart)
     chart_draw.prepare()
-    module_logger.error('NO DRAW')
-    # chart_draw.draw(args.output[0], 600)
+    chart_draw.draw(args.output[0], 600)
 
 # ----------------------------------------------------------------------
 

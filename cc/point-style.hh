@@ -5,6 +5,8 @@
 #include "acmacs-draw/color.hh"
 #include "acmacs-draw/size-scale.hh"
 
+#include "layout.hh"
+
 // ----------------------------------------------------------------------
 
 class Aspect
@@ -39,16 +41,21 @@ const Rotation RotationReassortant{0.5};
 
 // ----------------------------------------------------------------------
 
+class Surface;
+
 class PointStyle
 {
  public:
-    enum class Shape { Circle, Box, Triangle };
+    enum class Shape { NoChange, Circle, Box, Triangle };
 
     inline PointStyle()
-        : mShape(Shape::Circle), mFill("green"), mOutline("black"),
+        : mShown(true), mShape(Shape::Circle), mFill("green"), mOutline("black"),
           mSize(5), mOutlineWidth(1), mAspect(AspectRegular), mRotation(RotationRegular) {}
 
+    void draw(Surface& aSurface, const Point& aCoord);
+
  private:
+    bool mShown;
     Shape mShape;
     Color mFill;
     Color mOutline;

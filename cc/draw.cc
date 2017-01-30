@@ -22,7 +22,7 @@ ChartDraw::ChartDraw(Chart& aChart, size_t aProjectionNo)
       mPointStyles(mChart.number_of_points()),
       mDrawingOrder(mChart)
 {
-    std::cerr << "DrawingOrder: " << mDrawingOrder << std::endl;
+      // std::cerr << "DrawingOrder: " << mDrawingOrder << std::endl;
 }
 
 // ----------------------------------------------------------------------
@@ -43,7 +43,11 @@ void ChartDraw::draw(Surface& aSurface)
     double pix = 1;
     aSurface.grid(Scaled{1}, "cyan3", Pixels{pix});
     aSurface.border("blue", Pixels{pix * 5});
-    aSurface.circle(mViewport.center(), Scaled{1}, 1, 0, "pink", Pixels{pix});
+
+
+    for (size_t index: mDrawingOrder) {
+        mPointStyles[index].draw(aSurface, mLayout[index]);
+    }
 
 } // ChartDraw::draw
 
