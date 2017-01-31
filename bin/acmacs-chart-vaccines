@@ -18,13 +18,10 @@ from acmacs_base.timeit import timeit
 def main(args):
     with timeit("Reading chart from " + args.chart[0]):
         chart = acmacs_chart.import_chart(args.chart[0])
-    virus_type = chart.chart_info().virus_type()
-    lineage = chart.lineage()
-    print(virus_type, lineage)
-    hidb = acmacs_chart.get_hidb(virus_type, args.hidb_dir)
-    if lineage:
-        virus_type += "/" + lineage
-    for entry in acmacs_chart.vaccines(virus_type):
+    with timeit("Loading hidb"):
+        hidb = acmacs_chart.get_hidb(chart=chart, hidb_dir=args.hidb_dir)
+
+    for entry in acmacs_chart.vaccines(chart=chart):
         present = False
         vv = chart.vaccines(entry["name"], hidb)
         for e, name in [[vv.egg(), "EGG:"], [vv.cell(), "CELL:"], [vv.reassortant(), "REASSORTANT:"]]:

@@ -20,6 +20,11 @@ def draw_chart(output_file, chart, settings, hidb_dir, output_width):
 
 # ----------------------------------------------------------------------
 
+def mark_vaccines(chart_draw, chart, hidb_dir):
+    p
+
+# ----------------------------------------------------------------------
+
 def make_point_style(data):
     ps = PointStyle()
     for k, v in data.items():

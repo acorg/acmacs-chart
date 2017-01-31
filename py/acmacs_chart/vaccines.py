@@ -34,11 +34,16 @@ sVaccines = {
 
 # ----------------------------------------------------------------------
 
-def vaccines(virus_type):
+def vaccines(virus_type=None, lineage=None, chart=None):
+    if chart is not None:
+        virus_type = chart.chart_info().virus_type()
+        lineage = chart.lineage()
+    if lineage:
+        virus_type += "/" + lineage
     try:
         return sVaccines[virus_type]
     except:
-        raise RuntimeError("Unrecognized virus type for getting vaccines: {}\nAvailable virus types: {}".format(virus_type, " ".join(sorted(sVaccines))))
+        raise RuntimeError("Unrecognized virus type for getting vaccines: {!r}\nAvailable virus types: {}".format(virus_type, " ".join(sorted(sVaccines))))
 
 # ----------------------------------------------------------------------
 ### Local Variables:
