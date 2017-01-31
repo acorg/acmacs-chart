@@ -93,10 +93,12 @@ void Layout::transform(const Transformation& aTransformation)
 {
       // multiply matrices: this x aTransformation
     for (auto& row: *this) {
-        const double x1 = row[0] * aTransformation[0] + row[1] * aTransformation[2];
-        const double x2 = row[0] * aTransformation[1] + row[1] * aTransformation[3];
-        row[0] = x1;
-        row[1] = x2;
+        if (!row.empty()) {     // empty row is for disconnected points
+            const double x1 = row[0] * aTransformation[0] + row[1] * aTransformation[2];
+            const double x2 = row[0] * aTransformation[1] + row[1] * aTransformation[3];
+            row[0] = x1;
+            row[1] = x2;
+        }
     }
 
 } // Layout::transform

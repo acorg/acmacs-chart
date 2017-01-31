@@ -108,8 +108,8 @@ const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_suggestions(std::s
             return **found;
     }
 
-    std::cerr << "Suggestions for " << aName << std::endl
-              << hidb::report(aSuggestions, "  "); // << std::endl;
+    // std::cerr << "Suggestions for " << aName << std::endl
+    //           << hidb::report(aSuggestions, "  "); // << std::endl;
     throw hidb::HiDb::NotFound(aName, aSuggestions);
 
 } // Antigen::find_in_suggestions
