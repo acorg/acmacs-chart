@@ -46,6 +46,12 @@ class ChartDraw
                 drawing_order().lower(aIndex);
         }
 
+    inline void modify_points_by_indices(const std::vector<size_t>& aIndices, const PointStyle& aStyle, bool aRaise = false, bool aLower = false)
+        {
+            for (size_t index: aIndices)
+                modify_point_by_index(index, aStyle, aRaise, aLower);
+        }
+
     void mark_egg_antigens();
     void mark_reassortant_antigens();
     void mark_all_grey(Color aColor);

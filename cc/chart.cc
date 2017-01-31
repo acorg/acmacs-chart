@@ -2,8 +2,11 @@
 #include <set>
 #include <regex>
 
-#include "chart.hh"
+#include "acmacs-base/virus-name.hh"
 #include "hidb/hidb.hh"
+#include "locationdb/locdb.hh"
+
+#include "chart.hh"
 
 // ----------------------------------------------------------------------
 
@@ -150,6 +153,31 @@ size_t Sera::find_by_name_for_exact_matching(std::string aFullName) const
     return found == end() ? static_cast<size_t>(-1) : static_cast<size_t>(found - begin());
 
 } // Sera::find_by_name_for_exact_matching
+
+// ----------------------------------------------------------------------
+
+void Antigens::continents(ContinentData& aContinentData, const LocDb& aLocDb) const
+{
+    for (auto ag = begin(); ag != end(); ++ag) {
+        const std::string location = virus_name::location(ag->name());
+        const std::string continent = aLocDb.continent(location);
+        aContinentData[continent].push_back(static_cast<size_t>(ag - begin()));
+    }
+
+} // Antigens::continents
+
+// ----------------------------------------------------------------------
+
+void Antigens::country(std::string aCountry, std::vector<size_t>& aAntigenIndices, const LocDb& aLocDb) const
+{
+    for (auto ag = begin(); ag != end(); ++ag) {
+        const std::string location = virus_name::location(ag->name());
+        const std::string country = aLocDb.country(location);
+        if (country == aCountry)
+            aAntigenIndices.push_back(static_cast<size_t>(ag - begin()));
+    }
+
+} // Antigens::country
 
 // ----------------------------------------------------------------------
 

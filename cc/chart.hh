@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include <algorithm>
 
 #include "acmacs-base/virus-name.hh"
@@ -21,6 +22,8 @@ namespace hidb
     template <typename AS> class AntigenSerumData;
     class AntigenRefs;
 }
+
+class LocDb;
 
 // ----------------------------------------------------------------------
 
@@ -193,9 +196,13 @@ class Serum : public AntigenSerum
 class Antigens : public std::vector<Antigen>
 {
  public:
+    using ContinentData = std::map<std::string, std::vector<size_t>>; // continent name to list of antigen indices
+
     inline Antigens() {}
 
     void find_by_name(std::string aName, std::vector<size_t>& aAntigenIndices) const;
+    void continents(ContinentData& aContinentData, const LocDb& aLocDb) const;
+    void country(std::string aCountry, std::vector<size_t>& aAntigenIndices, const LocDb& aLocDb) const;
 
 }; // class Antigens
 

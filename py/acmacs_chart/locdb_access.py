@@ -6,23 +6,21 @@
 import os
 from pathlib import Path
 from acmacs_base.timeit import timeit
-from acmacs_chart_backend import HiDbSet
+from acmacs_chart_backend import LocDb
 
 # ----------------------------------------------------------------------
 
-def get_hidb(virus_type=None, chart=None, hidb_dir :Path = Path(os.environ["ACMACSD_ROOT"], "data")):
-    global sHidbSet
-    if sHidbSet is None:
-        sHidbSet = HiDbSet(str(Path(hidb_dir).expanduser().resolve()))
-    if chart is not None:
-        virus_type = chart.chart_info().virus_type()
-    with timeit("Getting hidb for " + virus_type):
-        hidb = sHidbSet.get(virus_type)
-    return hidb
+def get_locdb(locdb_file :Path = Path(os.environ["ACMACSD_ROOT"], "data", "locationdb.json.xz")):
+    global sLocDb
+    if sLocDb is None:
+        with timeit("Loading locationdb from " + str(locdb_file)):
+            sLocDb = LocDb()
+            sLocDb.import_from(str(locdb_file))
+    return sLocDb
 
 # ----------------------------------------------------------------------
 
-sHidbSet = None
+sLocDb = None
 
 # ----------------------------------------------------------------------
 ### Local Variables:

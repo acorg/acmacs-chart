@@ -1,8 +1,10 @@
+#include "acmacs-base/pybind11.hh"
+#include "locationdb/locdb.hh"
+#include "hidb/hidb.hh"
+
 #include "chart.hh"
 #include "ace.hh"
 #include "draw.hh"
-#include "hidb/hidb.hh"
-#include "acmacs-base/pybind11.hh"
 
 // ----------------------------------------------------------------------
 
@@ -102,6 +104,18 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("find_in_hidb", &Serum::find_in_hidb, py::arg("hidb"), py::return_value_policy::reference)
             ;
 
+    py::class_<LocDb>(m, "LocDb")
+            .def(py::init<>())
+            .def("import_from", &LocDb::importFrom, py::arg("filename"))
+            ;
+
+    py::class_<Antigens>(m, "Antigens")
+            .def("continents", [](const Antigens& antigens, const LocDb& aLocDb) { Antigens::ContinentData data; antigens.continents(data, aLocDb); return data; })
+            ;
+
+    py::class_<Sera>(m, "Sera")
+            ;
+
       // ----------------------------------------------------------------------
       // Chart
       // ----------------------------------------------------------------------
@@ -121,6 +135,8 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
     py::class_<Chart>(m, "Chart")
             .def("number_of_antigens", &Chart::number_of_antigens)
             .def("number_of_sera", &Chart::number_of_sera)
+            .def("antigens", py::overload_cast<>(&Chart::antigens), py::return_value_policy::reference)
+            .def("sera", py::overload_cast<>(&Chart::sera), py::return_value_policy::reference)
             .def("antigen", &Chart::antigen, py::arg("no"), py::return_value_policy::reference)
             .def("serum", &Chart::serum, py::arg("no"), py::return_value_policy::reference)
             .def("lineage", &Chart::lineage)
@@ -199,6 +215,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("all_grey", &ChartDraw::mark_all_grey, py::arg("color") = Color("grey80"))
             .def("scale_points", &ChartDraw::scale_points, py::arg("scale"), py::arg("outline_scale") = 1.0, py::doc("outline_scale=0 means use point scale for outline too"))
             .def("modify_point_by_index", &ChartDraw::modify_point_by_index, py::arg("index"), py::arg("style"), py::arg("raise_") = false, py::arg("lower") = false)
+            .def("modify_points_by_indices", &ChartDraw::modify_points_by_indices, py::arg("indices"), py::arg("style"), py::arg("raise_") = false, py::arg("lower") = false)
             .def("drawing_order", &ChartDraw::drawing_order, py::return_value_policy::reference)
             .def("rotate", &ChartDraw::rotate, py::arg("angle"))
             .def("flip", &ChartDraw::flip, py::arg("x"), py::arg("y"))

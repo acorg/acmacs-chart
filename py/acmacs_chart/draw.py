@@ -24,11 +24,13 @@ def draw_chart(output_file, chart, settings, hidb_dir, output_width):
     # chart_draw.modify_point_by_index(0, PointStyle().fill("blue").outline("black").size(20))
     # chart_draw.modify_point_by_index(0, make_point_style({"fill": "blue", "outline": "black", "size": 20}))
     # chart_draw.modify_point_by_index(10, acmacs_chart.PointStyle(fill="red", outline="black", size=20))
-    mark_vaccines(chart_draw=chart_draw, chart=chart, hidb_dir=hidb_dir)
     # chart_draw.rotate(1.57)
     # chart_draw.flip_ns()
     # chart_draw.flip_ew()
     # chart_draw.flip(-1, 1)                # flip about diagonal from [0,0] to [1,1], i.e. flip in direction [-1,1]
+
+    mark_continents(chart_draw=chart_draw, chart=chart)
+    mark_vaccines(chart_draw=chart_draw, chart=chart, hidb_dir=hidb_dir)
     chart_draw.draw(str(output_file), output_width)
 
 # ----------------------------------------------------------------------
@@ -59,6 +61,30 @@ def mark_vaccines(chart_draw, chart, hidb_dir, style={"size": 15}, raise_=True):
                     vstyle.update(style)
                 module_logger.info('Marking vaccine {} {}'.format(vaccine_data.antigen_index, vaccine_data.antigen.full_name()))
                 chart_draw.modify_point_by_index(vaccine_data.antigen_index, make_point_style(vstyle), raise_=raise_)
+
+# ----------------------------------------------------------------------
+
+sStyleByContinent = {
+    "EUROPE":            {"fill": "green"},
+    "CENTRAL-AMERICA":   {"fill": "#AAF9FF"},
+    "MIDDLE-EAST":       {"fill": "#8000FF"},
+    "NORTH-AMERICA":     {"fill": "blue4"},
+    "AFRICA":            {"fill": "darkorange1"},
+    "ASIA":              {"fill": "red"},
+    "RUSSIA":            {"fill": "maroon"},
+    "AUSTRALIA-OCEANIA": {"fill": "hotpink"},
+    "SOUTH-AMERICA":     {"fill": "turquoise"},
+    "ANTARCTICA":        {"fill": "grey50"},
+    "":                  {"fill": "grey50"},
+    }
+
+def mark_continents(chart_draw, chart):
+    from .locdb_access import get_locdb
+    data = chart.antigens().continents(get_locdb())
+    module_logger.info('[Continents] {}'.format(" ".join(f"{continent}:{len(data[continent])}" for continent in sorted(data))))
+    global sStyleByContinent
+    for continent, indices in data.items():
+        chart_draw.modify_points_by_indices(indices, make_point_style(sStyleByContinent[continent]))
 
 # ----------------------------------------------------------------------
 
