@@ -50,6 +50,7 @@ class ChartDraw
     void mark_reassortant_antigens();
     void mark_all_grey(Color aColor);
     void scale_points(double aPointScale, double aOulineScale);
+    void rotate(double aAngle);
 
     DrawingOrder& drawing_order() { return mDrawingOrder; }
 

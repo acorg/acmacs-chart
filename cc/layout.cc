@@ -2,6 +2,13 @@
 
 // ----------------------------------------------------------------------
 
+void Transformation::rotate(double aAngle)
+{
+
+} // Transformation::rotate
+
+// ----------------------------------------------------------------------
+
 BoundingBall* Layout::minimum_bounding_ball() const
 {
     const size_t nd = number_of_dimensions();
