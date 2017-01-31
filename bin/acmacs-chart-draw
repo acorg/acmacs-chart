@@ -18,7 +18,8 @@ from acmacs_base.timeit import timeit
 def main(args):
     with timeit("Reading chart from " + args.chart[0]):
         chart = acmacs_chart.import_chart(args.chart[0])
-    acmacs_chart.draw_chart(output_file=args.output[0], chart=chart, settings={}, hidb_dir=args.hidb_dir, output_width=args.output_width)
+    with timeit("Drawing chart to " + args.output[0]):
+        acmacs_chart.draw_chart(output_file=args.output[0], chart=chart, settings={}, hidb_dir=args.hidb_dir, output_width=args.output_width)
 
 # ----------------------------------------------------------------------
 
