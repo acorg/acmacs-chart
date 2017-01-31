@@ -18,15 +18,7 @@ from acmacs_base.timeit import timeit
 def main(args):
     with timeit("Reading chart from " + args.chart[0]):
         chart = acmacs_chart.import_chart(args.chart[0])
-    hidb_set = acmacs_chart.HiDbSet(str(Path("~/AD/data").expanduser().resolve()))
-    hidb = hidb_set.get(chart.chart_info().virus_type())
-    chart_draw = acmacs_chart.ChartDraw(chart)
-    chart_draw.prepare()
-    #chart_draw.scale_points(3)
-    chart_draw.all_grey()
-    chart_draw.modify_point_by_index(0, acmacs_chart.PointStyle().fill("blue").outline("black").size(20))
-    # chart_draw.modify_point_by_index(10, acmacs_chart.PointStyle(fill="red", outline="black", size=20))
-    chart_draw.draw(args.output[0], 600)
+    acmacs_chart.draw_chart(output_file=args.output[0], chart=chart, settings={}, hidb_dir=args.hidb_dir, output_width=args.output_width)
 
 # ----------------------------------------------------------------------
 
@@ -34,6 +26,9 @@ try:
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-d', '--debug', action='store_const', dest='loglevel', const=logging.DEBUG, default=logging.INFO, help='Enable debugging output.')
+
+    parser.add_argument('--hidb-dir', action='store', dest='hidb_dir', default="~/AD/data", help='Directory with hidb4.*.json.xz.')
+    parser.add_argument('-s', '--output-size', action='store', dest='output_width', default=600, help='Width of the output image.')
 
     parser.add_argument('chart', nargs=1, help='Chart file.')
     parser.add_argument('output', nargs=1, help='Output pdf file.')
