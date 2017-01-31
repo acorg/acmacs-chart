@@ -25,9 +25,9 @@ def draw_chart(output_file, chart, settings, hidb_dir, output_width):
 # ----------------------------------------------------------------------
 
 sStyleByVaccineType = {
-    "previous": {"size": 20, "fill": "blue", "outline": "black"},
-    "current": {"size": 20, "fill": "red", "outline": "black"},
-    "surrogate": {"size": 20, "fill": "pink", "outline": "black"},
+    "previous": {"fill": "blue", "outline": "black"},
+    "current": {"fill": "red", "outline": "black"},
+    "surrogate": {"fill": "pink", "outline": "black"},
     }
 
 sStyleByPassageType = {
@@ -36,7 +36,7 @@ sStyleByPassageType = {
     "cell": {}
     }
 
-def mark_vaccines(chart_draw, chart, hidb_dir):
+def mark_vaccines(chart_draw, chart, hidb_dir, style={"size": 15}, raise_=True):
     hidb = get_hidb(chart=chart, hidb_dir=hidb_dir)
     for vaccine_entry in vaccines(chart=chart):
         # module_logger.debug('{}'.format(vaccine_entry))
@@ -44,10 +44,12 @@ def mark_vaccines(chart_draw, chart, hidb_dir):
         for passage_type in ["egg", "reassortant", "cell"]:
             vaccine_data = getattr(antigens, passage_type)()
             if vaccine_data:
-                style = copy.deepcopy(sStyleByVaccineType[vaccine_entry["type"]])
-                style.update(sStyleByPassageType[passage_type])
+                vstyle = copy.deepcopy(sStyleByVaccineType[vaccine_entry["type"]])
+                vstyle.update(sStyleByPassageType[passage_type])
+                if style:
+                    vstyle.update(style)
                 module_logger.info('Marking vaccine {} {}'.format(vaccine_data.antigen_index, vaccine_data.antigen.full_name()))
-                chart_draw.modify_point_by_index(vaccine_data.antigen_index, make_point_style(style))
+                chart_draw.modify_point_by_index(vaccine_data.antigen_index, make_point_style(vstyle), raise_=raise_)
 
 # ----------------------------------------------------------------------
 

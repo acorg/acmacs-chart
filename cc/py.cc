@@ -185,6 +185,11 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             ;
       // m.def("point_style", &new_point_style_kw);
 
+    py::class_<DrawingOrder>(m, "DrawingOrder")
+            .def("raise_", &DrawingOrder::raise, py::arg("point_no"))
+            .def("lower", &DrawingOrder::lower, py::arg("point_no"))
+            ;
+
     py::class_<ChartDraw>(m, "ChartDraw")
             .def(py::init<Chart&, size_t>(), py::arg("chart"), py::arg("projection_no") = 0)
             .def("prepare", &ChartDraw::prepare)
@@ -193,7 +198,8 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("mark_reassortant_antigens", &ChartDraw::mark_reassortant_antigens)
             .def("all_grey", &ChartDraw::mark_all_grey, py::arg("color") = Color("grey80"))
             .def("scale_points", &ChartDraw::scale_points, py::arg("scale"), py::arg("outline_scale") = 1.0, py::doc("outline_scale=0 means use point scale for outline too"))
-            .def("modify_point_by_index", &ChartDraw::modify_point_by_index, py::arg("index"), py::arg("style"))
+            .def("modify_point_by_index", &ChartDraw::modify_point_by_index, py::arg("index"), py::arg("style"), py::arg("raise_") = false, py::arg("lower") = false)
+            .def("drawing_order", &ChartDraw::drawing_order, py::return_value_policy::reference)
             ;
 
       // ----------------------------------------------------------------------

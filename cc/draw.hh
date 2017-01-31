@@ -19,6 +19,9 @@ class DrawingOrder : public std::vector<size_t>
  public:
     DrawingOrder(Chart& aChart);
 
+    void raise(size_t aPointNo);
+    void lower(size_t aPointNo);
+
 }; // class DrawingOrder
 
 // ----------------------------------------------------------------------
@@ -33,12 +36,22 @@ class ChartDraw
     void draw(std::string aFilename, double aSize);
 
     void modify(IndexGenerator&& aGen, const PointStyle& aStyle);
-    inline void modify_point_by_index(size_t aIndex, const PointStyle& aStyle) { mPointStyles[aIndex] = aStyle; }
+
+    inline void modify_point_by_index(size_t aIndex, const PointStyle& aStyle, bool aRaise = false, bool aLower = false)
+        {
+            mPointStyles[aIndex] = aStyle;
+            if (aRaise)
+                drawing_order().raise(aIndex);
+            else if (aLower)
+                drawing_order().lower(aIndex);
+        }
 
     void mark_egg_antigens();
     void mark_reassortant_antigens();
     void mark_all_grey(Color aColor);
     void scale_points(double aPointScale, double aOulineScale);
+
+    DrawingOrder& drawing_order() { return mDrawingOrder; }
 
  private:
     Chart& mChart;

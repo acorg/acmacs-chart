@@ -1,4 +1,5 @@
 #include <memory>
+#include <algorithm>
 
 #include "draw.hh"
 #include "chart.hh"
@@ -14,6 +15,26 @@ DrawingOrder::DrawingOrder(Chart& aChart)
 {
 
 } // DrawingOrder::DrawingOrder
+
+// ----------------------------------------------------------------------
+
+void DrawingOrder::raise(size_t aPointNo)
+{
+    auto p = std::find(begin(), end(), aPointNo);
+    if (p != end())
+        std::rotate(p, p + 1, end());
+
+} // DrawingOrder::raise
+
+// ----------------------------------------------------------------------
+
+void DrawingOrder::lower(size_t aPointNo)
+{
+    auto p = std::find(rbegin(), rend(), aPointNo);
+    if (p != rend())
+        std::rotate(p, p + 1, rend());
+
+} // DrawingOrder::lower
 
 // ----------------------------------------------------------------------
 
