@@ -50,6 +50,20 @@ void Layout::min_max_points(std::vector<size_t>& aMin, std::vector<size_t>& aMax
 
 // ----------------------------------------------------------------------
 
+void Layout::transform(const Transformation& aTransformation)
+{
+      // multiply matrices: this x aTransformation
+    for (auto& row: *this) {
+        const double x1 = row[0] * aTransformation[0] + row[1] * aTransformation[2];
+        const double x2 = row[0] * aTransformation[1] + row[1] * aTransformation[3];
+        row[0] = x1;
+        row[1] = x2;
+    }
+
+} // Layout::transform
+
+// ----------------------------------------------------------------------
+
 void BoundingBall::extend(const Point& aPoint)
 {
     const double distance2_to_center = distance2FromCenter(aPoint);

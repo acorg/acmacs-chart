@@ -14,6 +14,11 @@ from acmacs_chart_backend import ChartDraw, PointStyle
 def draw_chart(output_file, chart, settings, hidb_dir, output_width):
     chart_draw = ChartDraw(chart)
     chart_draw.prepare()
+    # chart_draw.background_color("green")
+    # chart_draw.grid("red", 1)
+    # chart_draw.border("orange", 2)
+    chart_draw.mark_egg_antigens()
+    chart_draw.mark_reassortant_antigens()
     #chart_draw.scale_points(3)
     chart_draw.all_grey()
     # chart_draw.modify_point_by_index(0, PointStyle().fill("blue").outline("black").size(20))

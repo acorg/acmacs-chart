@@ -53,12 +53,22 @@ class ChartDraw
 
     DrawingOrder& drawing_order() { return mDrawingOrder; }
 
+    inline void background_color(Color aBackgroud) { mBackgroud = aBackgroud; }
+    inline void grid(Color aGridColor, double aGridLineWidth) { mGridColor = aGridColor; mGridLineWidth = aGridLineWidth; }
+    inline void border(Color aBorderColor, double aBorderWidth) { mBorderColor = aBorderColor; mBorderWidth = aBorderWidth; }
+
  private:
     Chart& mChart;
+    size_t mProjectionNo;
     Viewport mViewport;
-    Layout mLayout;
+    Transformation mTransformation;
     std::vector<PointStyle> mPointStyles;
     DrawingOrder mDrawingOrder;
+    Color mBackgroud;
+    Color mGridColor;
+    Pixels mGridLineWidth;
+    Color mBorderColor;
+    Pixels mBorderWidth;
 
 }; // class ChartDraw
 

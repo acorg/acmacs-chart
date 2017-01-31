@@ -40,9 +40,11 @@ void DrawingOrder::lower(size_t aPointNo)
 
 ChartDraw::ChartDraw(Chart& aChart, size_t aProjectionNo)
     : mChart(aChart),
-      mLayout(mChart.projection(aProjectionNo).layout()),
+      mProjectionNo(aProjectionNo),
+      mTransformation(mChart.projection(mProjectionNo).transformation()),
       mPointStyles(mChart.number_of_points()),
-      mDrawingOrder(mChart)
+      mDrawingOrder(mChart),
+      mBackgroud("white"), mGridColor("grey80"), mGridLineWidth(1), mBorderColor("black"), mBorderWidth(1)
 {
       // std::cerr << "DrawingOrder: " << mDrawingOrder << std::endl;
     // auto ag_ind = aChart.antigen_indices(), sr_ind = aChart.serum_indices();
@@ -58,15 +60,8 @@ ChartDraw::ChartDraw(Chart& aChart, size_t aProjectionNo)
 
 void ChartDraw::prepare()
 {
-    std::unique_ptr<BoundingBall> bb(mLayout.minimum_bounding_ball());
-    mViewport.set_from_center_size(bb->center(), bb->diameter());
-    mViewport.whole_width();
-      // std::cerr << mViewport << std::endl;
-
     modify(mChart.reference_antigen_indices(), PointStyle(PointStyle::Empty).fill("transparent").size(Pixels{8}));
     modify(mChart.serum_indices(), PointStyle(PointStyle::Empty).shape(PointStyle::Shape::Box).fill("transparent").size(Pixels{8}));
-    mark_egg_antigens();
-    mark_reassortant_antigens();
 
 } // ChartDraw::prepare
 
@@ -74,11 +69,25 @@ void ChartDraw::prepare()
 
 void ChartDraw::draw(Surface& aSurface)
 {
-    aSurface.grid(Scaled{1}, "grey80", Pixels{1});
-    aSurface.border("black", Pixels{1});
+    Layout layout = mChart.projection(mProjectionNo).layout();
+    layout.transform(mTransformation);
+
+    std::unique_ptr<BoundingBall> bb(layout.minimum_bounding_ball());
+    Viewport viewport;
+    viewport.set_from_center_size(bb->center(), bb->diameter());
+    viewport.whole_width();
+    std::cout << "[Calculated]: " << viewport << std::endl;
+    if (mViewport.empty())
+        mViewport = viewport;
+    std::cout << "[Used]:       " << viewport << std::endl;
+    Surface& rescaled_surface = aSurface.subsurface({0, 0}, Scaled{aSurface.viewport().size.width}, mViewport, true);
+
+    rescaled_surface.background(mBackgroud);
+    rescaled_surface.grid(Scaled{1}, mGridColor, mGridLineWidth);
+    rescaled_surface.border(mBorderColor, mBorderWidth);
 
     for (size_t index: mDrawingOrder) {
-        mPointStyles[index].draw(aSurface, mLayout[index]);
+        mPointStyles[index].draw(rescaled_surface, layout[index]);
     }
 
 } // ChartDraw::draw
@@ -88,9 +97,7 @@ void ChartDraw::draw(Surface& aSurface)
 void ChartDraw::draw(std::string aFilename, double aSize)
 {
     PdfCairo surface(aFilename, aSize, aSize);
-    // surface.resize(mViewport.size.width);
-    Surface& rescaled = surface.subsurface({0, 0}, Scaled{surface.viewport().size.width}, mViewport, true);
-    draw(rescaled);
+    draw(surface);
 
 } // ChartDraw::draw
 

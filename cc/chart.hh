@@ -234,8 +234,8 @@ class Projection
     inline std::vector<double>& column_bases() { return mColumnBases; }
     inline const std::vector<double>& column_bases() const { return mColumnBases; }
 
-    inline std::vector<double>& transformation() { return mTransformation; }
-    inline const std::vector<double>& transformation() const { return mTransformation; }
+    inline Transformation& transformation() { return mTransformation; }
+    inline const Transformation& transformation() const { return mTransformation; }
 
     inline std::vector<double>& gradient_multipliers() { return mGradientMultipliers; }
     inline const std::vector<double>& gradient_multipliers() const { return mGradientMultipliers; }
@@ -265,7 +265,7 @@ class Projection
     double mStress;                                 // "s"
     std::string mMinimumColumnBasis;                // "m": "1280", "none" (default)
     std::vector<double> mColumnBases;               // "C"
-    std::vector<double> mTransformation;            // "t": [1.0, 0.0, 0.0, 1.0]
+    Transformation mTransformation;                 // "t": [1.0, 0.0, 0.0, 1.0]
     std::vector<double> mGradientMultipliers;       // "g": [] double for each point
     std::vector<double> mTiterMultipliers;          // "f": [],  antigens_sera_titers_multipliers, double for each point
     bool mDodgyTiterIsRegular;                      // "d": false

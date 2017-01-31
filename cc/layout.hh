@@ -81,12 +81,21 @@ inline std::ostream& operator << (std::ostream& out, const BoundingBall& a) { re
 
 // ----------------------------------------------------------------------
 
+class Transformation : public std::vector<double>
+{
+ public:
+    inline Transformation() : std::vector<double>{{1, 0, 0, 1}} {}
+};
+
+// ----------------------------------------------------------------------
+
 class Layout : public std::vector<Point>
 {
  public:
     inline Layout() = default;
 
     BoundingBall* minimum_bounding_ball() const;
+    void transform(const Transformation& aTransformation);
 
     inline size_t number_of_dimensions() const { return front().size(); }
 

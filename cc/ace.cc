@@ -107,7 +107,7 @@ static jsi::data<Projection> projection_data = {
     {"l", jsi::field(&Projection::layout)},
     {"m", jsi::field(&Projection::minimum_column_basis)},
     {"s", jsi::field(&Projection::stress)},
-    {"t", jsi::field(&Projection::transformation)},
+    {"t", jsi::field<double, Projection, Projection, Transformation>(&Projection::transformation)},
     {"U", jsi::field(&Projection::unmovable)},
     {"u", jsi::field(&Projection::unmovable_in_last_dimension)},
     {"d", jsi::field(&Projection::dodgy_titer_is_regular)},
