@@ -18,8 +18,7 @@ from acmacs_base.timeit import timeit
 def main(args):
     with timeit("Reading chart from " + args.chart[0]):
         chart = acmacs_chart.import_chart(args.chart[0])
-    with timeit("Loading hidb"):
-        hidb = acmacs_chart.get_hidb(chart=chart, hidb_dir=args.hidb_dir)
+    hidb = acmacs_chart.get_hidb(chart=chart, hidb_dir=args.hidb_dir)
 
     for entry in acmacs_chart.vaccines(chart=chart):
         present = False
@@ -27,9 +26,9 @@ def main(args):
         for e, name in [[vv.egg(), "EGG:"], [vv.cell(), "CELL:"], [vv.reassortant(), "REASSORTANT:"]]:
             if e:
                 present = True
-                print(name, e.antigen.full_name())
+                print(name, e.antigen_index, e.antigen.full_name())
                 for es in e.homologous_sera:
-                    print("  ", es.serum.full_name(), " tables:", es.number_of_tables(), " most-recent:", es.most_recent_table, " species:", es.serum.serum_species(), sep="")
+                    print("  ", es.serum_index, " ", es.serum.full_name(), " tables:", es.number_of_tables(), " most-recent:", es.most_recent_table, " species:", es.serum.serum_species(), sep="")
         if present:
             print()
             print(vv.report())

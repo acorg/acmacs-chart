@@ -188,14 +188,14 @@ class Serum : public AntigenSerum
 
 // ----------------------------------------------------------------------
 
-using AntigenRefs = std::vector<const Antigen*>;
+// using AntigenRefs = std::vector<const Antigen*>;
 
 class Antigens : public std::vector<Antigen>
 {
  public:
     inline Antigens() {}
 
-    void find_by_name(std::string aName, AntigenRefs& aResult) const;
+    void find_by_name(std::string aName, std::vector<size_t>& aAntigenIndices) const;
 
 }; // class Antigens
 
@@ -206,7 +206,8 @@ class Sera : public std::vector<Serum>
  public:
     inline Sera() {}
 
-    const Serum* find_by_name_for_exact_matching(std::string aFullName) const;
+      // returns -1 if not found
+    size_t find_by_name_for_exact_matching(std::string aFullName) const;
 
 }; // class Sera
 
@@ -458,12 +459,13 @@ class Vaccines
     class HomologousSerum
     {
      public:
-        inline HomologousSerum(const Serum* aSerum, const hidb::AntigenSerumData<hidb::Serum>* aSerumData, std::string aMostRecentTableDate)
-            : serum(aSerum), serum_data(aSerumData), most_recent_table_date(aMostRecentTableDate) {}
+        inline HomologousSerum(size_t aSerumIndex, const Serum* aSerum, const hidb::AntigenSerumData<hidb::Serum>* aSerumData, std::string aMostRecentTableDate)
+            : serum(aSerum), serum_index(aSerumIndex), serum_data(aSerumData), most_recent_table_date(aMostRecentTableDate) {}
         bool operator < (const HomologousSerum& a) const;
         size_t number_of_tables() const;
 
         const Serum* serum;
+        size_t serum_index;
         const hidb::AntigenSerumData<hidb::Serum>* serum_data;
         std::string most_recent_table_date;
     };
@@ -471,12 +473,13 @@ class Vaccines
     class Entry
     {
      public:
-        inline Entry(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::vector<HomologousSerum>&& aSera, std::string aMostRecentTableDate)
-            : antigen(aAntigen), antigen_data(aAntigenData), homologous_sera(aSera), most_recent_table_date(aMostRecentTableDate)
+        inline Entry(size_t aAntigenIndex, const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::vector<HomologousSerum>&& aSera, std::string aMostRecentTableDate)
+            : antigen(aAntigen), antigen_index(aAntigenIndex), antigen_data(aAntigenData), homologous_sera(aSera), most_recent_table_date(aMostRecentTableDate)
             { std::sort(homologous_sera.begin(), homologous_sera.end()); }
         bool operator < (const Entry& a) const;
 
         const Antigen* antigen;
+        size_t antigen_index;
         const hidb::AntigenSerumData<hidb::Antigen>* antigen_data;
         std::vector<HomologousSerum> homologous_sera; // sorted by number of tables and the most recent table
         std::string most_recent_table_date;
@@ -497,7 +500,7 @@ class Vaccines
 
     friend class Chart;
 
-    void add(const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::vector<HomologousSerum>&& aSera, std::string aMostRecentTableDate);
+    void add(size_t aAntigenIndex, const Antigen& aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::vector<HomologousSerum>&& aSera, std::string aMostRecentTableDate);
     void sort();
 
 }; // class Vaccines

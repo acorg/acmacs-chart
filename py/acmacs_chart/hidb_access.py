@@ -4,6 +4,7 @@
 # ----------------------------------------------------------------------
 
 from pathlib import Path
+from acmacs_base.timeit import timeit
 from acmacs_chart_backend import HiDbSet
 
 # ----------------------------------------------------------------------
@@ -14,7 +15,9 @@ def get_hidb(virus_type=None, chart=None, hidb_dir :Path = Path("~/AD/data")):
         sHidbSet = HiDbSet(str(Path(hidb_dir).expanduser().resolve()))
     if chart is not None:
         virus_type = chart.chart_info().virus_type()
-    return sHidbSet.get(virus_type)
+    with timeit("Getting hidb for " + virus_type):
+        hidb = sHidbSet.get(virus_type)
+    return hidb
 
 # ----------------------------------------------------------------------
 
