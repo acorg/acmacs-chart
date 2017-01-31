@@ -26,18 +26,18 @@ static inline PointStyle& point_style_shape(PointStyle& aStyle, std::string aSha
 //     return obj;
 // }
 
-static inline PointStyle* point_style_modify_kw(PointStyle* aStyle, py::args args, py::kwargs kwargs)
-{
-    std::cerr << "point_style_modify_kw" << std::endl;
-    return aStyle;
-}
+// static inline PointStyle* point_style_modify_kw(PointStyle* aStyle, py::args args, py::kwargs kwargs)
+// {
+//     std::cerr << "point_style_modify_kw" << std::endl;
+//     return aStyle;
+// }
 
-static inline PointStyle* new_point_style_kw(py::args args, py::kwargs kwargs)
-{
-    PointStyle* style = new PointStyle(PointStyle::Empty);
-    std::cerr << "new_point_style_kw" << std::endl;
-    return style;
-}
+// static inline PointStyle* new_point_style_kw(py::args args, py::kwargs kwargs)
+// {
+//     PointStyle* style = new PointStyle(PointStyle::Empty);
+//     std::cerr << "new_point_style_kw" << std::endl;
+//     return style;
+// }
 
 // ----------------------------------------------------------------------
 
@@ -162,13 +162,11 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             ;
 
     py::class_<PointStyle> point_style(m, "PointStyle");
-
     py::enum_<enum PointStyle::Empty>(point_style, "PointStyle_Empty").value("Empty", PointStyle::Empty).export_values();
-
     point_style
             .def(py::init<enum PointStyle::Empty>(), py::arg("_") = PointStyle::Empty)
               // .def("__init__", &point_style_kw)
-            .def("modify", &point_style_modify_kw)
+              // .def("modify", &point_style_modify_kw)
             .def("show", &PointStyle::show)
             .def("hide", &PointStyle::hide)
             .def("shape", &point_style_shape, py::arg("shape"))
@@ -183,8 +181,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("scale", &PointStyle::scale, py::arg("scale"))
             .def("scale_outline", &PointStyle::scale_outline, py::arg("scale"))
             ;
-
-    m.def("point_style", &new_point_style_kw);
+      // m.def("point_style", &new_point_style_kw);
 
     py::class_<ChartDraw>(m, "ChartDraw")
             .def(py::init<Chart&, size_t>(), py::arg("chart"), py::arg("projection_no") = 0)
