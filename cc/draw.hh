@@ -35,7 +35,7 @@ class ChartDraw
     void draw(Surface& aSurface);
     void draw(std::string aFilename, double aSize);
 
-    void modify(IndexGenerator&& aGen, const PointStyle& aStyle);
+    void modify(IndexGenerator&& aGen, const PointStyle& aStyle, bool aRaise = false, bool aLower = false);
 
     inline void modify_point_by_index(size_t aIndex, const PointStyle& aStyle, bool aRaise = false, bool aLower = false)
         {

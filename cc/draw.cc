@@ -60,8 +60,8 @@ ChartDraw::ChartDraw(Chart& aChart, size_t aProjectionNo)
 
 void ChartDraw::prepare()
 {
-    modify(mChart.reference_antigen_indices(), PointStyle(PointStyle::Empty).fill("transparent").size(Pixels{8}));
-    modify(mChart.serum_indices(), PointStyle(PointStyle::Empty).shape(PointStyle::Shape::Box).fill("transparent").size(Pixels{8}));
+    modify(mChart.reference_antigen_indices(), PointStyle(PointStyle::Empty).fill("transparent").size(Pixels{8}), false, true); // lower
+    modify(mChart.serum_indices(), PointStyle(PointStyle::Empty).shape(PointStyle::Shape::Box).fill("transparent").size(Pixels{8}), false, true); // lower
 
 } // ChartDraw::prepare
 
@@ -103,10 +103,10 @@ void ChartDraw::draw(std::string aFilename, double aSize)
 
 // ----------------------------------------------------------------------
 
-void ChartDraw::modify(IndexGenerator&& aGen, const PointStyle& aStyle)
+void ChartDraw::modify(IndexGenerator&& aGen, const PointStyle& aStyle, bool aRaise, bool aLower)
 {
     for (auto index: aGen)
-        mPointStyles[index] = aStyle;
+        modify_point_by_index(index, aStyle, aRaise, aLower);
 
 } // ChartDraw::modify
 
