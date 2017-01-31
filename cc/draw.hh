@@ -50,7 +50,8 @@ class ChartDraw
     void mark_reassortant_antigens();
     void mark_all_grey(Color aColor);
     void scale_points(double aPointScale, double aOulineScale);
-    void rotate(double aAngle);
+    inline void rotate(double aAngle) { mTransformation.rotate(aAngle); }
+    inline void flip(double aX, double aY) { mTransformation.flip(aX, aY); } // reflect about a line specified with vector [aX, aY]
 
     DrawingOrder& drawing_order() { return mDrawingOrder; }
 

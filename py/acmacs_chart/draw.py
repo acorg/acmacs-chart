@@ -25,7 +25,10 @@ def draw_chart(output_file, chart, settings, hidb_dir, output_width):
     # chart_draw.modify_point_by_index(0, make_point_style({"fill": "blue", "outline": "black", "size": 20}))
     # chart_draw.modify_point_by_index(10, acmacs_chart.PointStyle(fill="red", outline="black", size=20))
     mark_vaccines(chart_draw=chart_draw, chart=chart, hidb_dir=hidb_dir)
-    chart_draw.rotate(0.5)
+    # chart_draw.rotate(1.57)
+    # chart_draw.flip_ns()
+    # chart_draw.flip_ew()
+    # chart_draw.flip(-1, 1)                # flip about diagonal from [0,0] to [1,1], i.e. flip in direction [-1,1]
     chart_draw.draw(str(output_file), output_width)
 
 # ----------------------------------------------------------------------

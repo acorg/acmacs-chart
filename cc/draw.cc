@@ -67,14 +67,6 @@ void ChartDraw::prepare()
 
 // ----------------------------------------------------------------------
 
-void ChartDraw::rotate(double aAngle)
-{
-    mTransformation.rotate(aAngle);
-
-} // ChartDraw::rotate
-
-// ----------------------------------------------------------------------
-
 void ChartDraw::draw(Surface& aSurface)
 {
     Layout layout = mChart.projection(mProjectionNo).layout();

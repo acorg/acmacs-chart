@@ -86,6 +86,7 @@ class Transformation : public std::vector<double>
  public:
     inline Transformation() : std::vector<double>{{1, 0, 0, 1}} {}
     void rotate(double aAngle);
+    void flip(double aX, double aY); // reflect about a line specified with vector [aX, aY]
 };
 
 // ----------------------------------------------------------------------
