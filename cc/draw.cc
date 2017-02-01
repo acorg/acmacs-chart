@@ -44,8 +44,7 @@ ChartDraw::ChartDraw(Chart& aChart, size_t aProjectionNo)
       mProjectionNo(aProjectionNo),
       mTransformation(mChart.projection(mProjectionNo).transformation()),
       mPointStyles(mChart.number_of_points()),
-      mDrawingOrder(mChart),
-      mBackgroud("white"), mGridColor("grey80"), mGridLineWidth(1), mBorderColor("black"), mBorderWidth(1)
+      mDrawingOrder(mChart)
 {
       // std::cerr << "DrawingOrder: " << mDrawingOrder << std::endl;
     // auto ag_ind = aChart.antigen_indices(), sr_ind = aChart.serum_indices();
@@ -83,13 +82,13 @@ void ChartDraw::draw(Surface& aSurface)
     std::cout << "[Used]:       " << viewport << std::endl;
     Surface& rescaled_surface = aSurface.subsurface({0, 0}, Scaled{aSurface.viewport().size.width}, mViewport, true);
 
-    rescaled_surface.background(mBackgroud);
-    rescaled_surface.grid(Scaled{1}, mGridColor, mGridLineWidth);
-    rescaled_surface.border(mBorderColor, mBorderWidth);
+    mMapElements.draw(rescaled_surface, MapElements::BeforePoints);
 
     for (size_t index: mDrawingOrder) {
         mPointStyles[index].draw(rescaled_surface, layout[index]);
     }
+
+    mMapElements.draw(rescaled_surface, MapElements::AfterPoints);
 
     Surface& continent_surface = rescaled_surface.subsurface({0, rescaled_surface.viewport().size.height - 0.95}, Scaled{2}, continent_map_size(), true);
     continent_map_draw(continent_surface);

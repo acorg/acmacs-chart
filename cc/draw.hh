@@ -7,6 +7,7 @@
 
 #include "layout.hh"
 #include "point-style.hh"
+#include "map-elements.hh"
 
 class Chart;
 class Surface;
@@ -61,9 +62,9 @@ class ChartDraw
 
     DrawingOrder& drawing_order() { return mDrawingOrder; }
 
-    inline void background_color(Color aBackgroud) { mBackgroud = aBackgroud; }
-    inline void grid(Color aGridColor, double aGridLineWidth) { mGridColor = aGridColor; mGridLineWidth = aGridLineWidth; }
-    inline void border(Color aBorderColor, double aBorderWidth) { mBorderColor = aBorderColor; mBorderWidth = aBorderWidth; }
+    inline void background_color(Color aBackgroud) { dynamic_cast<BackgroundBorderGrid&>(mMapElements["background-border-grid"]).background_color(aBackgroud); }
+    inline void grid(Color aGridColor, double aGridLineWidth) { dynamic_cast<BackgroundBorderGrid&>(mMapElements["background-border-grid"]).grid(aGridColor, aGridLineWidth); }
+    inline void border(Color aBorderColor, double aBorderWidth) { dynamic_cast<BackgroundBorderGrid&>(mMapElements["background-border-grid"]).border(aBorderColor, aBorderWidth); }
 
  private:
     Chart& mChart;
@@ -72,11 +73,7 @@ class ChartDraw
     Transformation mTransformation;
     std::vector<PointStyle> mPointStyles;
     DrawingOrder mDrawingOrder;
-    Color mBackgroud;
-    Color mGridColor;
-    Pixels mGridLineWidth;
-    Color mBorderColor;
-    Pixels mBorderWidth;
+    MapElements mMapElements;
 
 }; // class ChartDraw
 
