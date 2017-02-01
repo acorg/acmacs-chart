@@ -29,7 +29,9 @@ def draw_chart(output_file, chart, settings, output_width):
     # chart_draw.flip_ew()
     # chart_draw.flip(-1, 1)                # flip about diagonal from [0,0] to [1,1], i.e. flip in direction [-1,1]
 
-    mark_continents(chart_draw=chart_draw, chart=chart)
+    # mark_continents(chart_draw=chart_draw, chart=chart)
+    mark_clades(chart_draw=chart_draw, chart=chart)
+
     mark_vaccines(chart_draw=chart_draw, chart=chart)
     chart_draw.draw(str(output_file), output_width)
 
@@ -86,6 +88,12 @@ def mark_continents(chart_draw, chart):
     for continent, indices in data.items():
         chart_draw.modify_points_by_indices(indices, make_point_style(sStyleByContinent[continent]))
     chart_draw.continent_map([0, -50], 100)
+
+# ----------------------------------------------------------------------
+
+def mark_clades(chart_draw, chart):
+    from .seqdb_access import match
+    match(chart)
 
 # ----------------------------------------------------------------------
 

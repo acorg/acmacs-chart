@@ -9,6 +9,7 @@
 #include "acmacs-base/virus-name.hh"
 #include "acmacs-base/string.hh"
 #include "acmacs-base/range.hh"
+#include "seqdb/seqdb.hh"
 #include "acmacs-draw/color.hh"
 
 #include "layout.hh"
@@ -142,6 +143,7 @@ class Antigen : public AntigenSerum
     inline std::vector<std::string>& clades() { return mClades; }
 
     const hidb::AntigenSerumData<hidb::Antigen>& find_in_hidb(const hidb::HiDb& aHiDb) const;
+    bool match_seqdb(const seqdb::Seqdb& aSeqdb) const;
 
 //     virtual std::string variant_id() const;
 
@@ -149,6 +151,8 @@ class Antigen : public AntigenSerum
     std::string mDate; // "D"
     std::vector<std::string> mLabId; // "l"
     std::vector<std::string> mClades; // "c"
+
+    mutable seqdb::SeqdbEntrySeq mSeqdbEntrySeq; // not stored
 
     const hidb::AntigenSerumData<hidb::Antigen>& find_in_suggestions(std::string aName, const hidb::AntigenRefs& aSuggestions) const;
 
@@ -203,6 +207,8 @@ class Antigens : public std::vector<Antigen>
     void find_by_name(std::string aName, std::vector<size_t>& aAntigenIndices) const;
     void continents(ContinentData& aContinentData, const LocDb& aLocDb) const;
     void country(std::string aCountry, std::vector<size_t>& aAntigenIndices, const LocDb& aLocDb) const;
+
+    size_t match_seqdb(const seqdb::Seqdb& aSeqdb) const;
 
 }; // class Antigens
 

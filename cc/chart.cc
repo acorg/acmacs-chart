@@ -3,8 +3,8 @@
 #include <regex>
 
 #include "acmacs-base/virus-name.hh"
-#include "hidb/hidb.hh"
 #include "locationdb/locdb.hh"
+#include "hidb/hidb.hh"
 
 #include "chart.hh"
 
@@ -133,6 +133,37 @@ const hidb::AntigenSerumData<hidb::Serum>& Serum::find_in_hidb(const hidb::HiDb&
     }
 
 } // Serum::find_in_hidb
+
+// ----------------------------------------------------------------------
+
+bool Antigen::match_seqdb(const seqdb::Seqdb& aSeqdb) const
+{
+    bool matched = false;
+    const seqdb::SeqdbEntry* entry = aSeqdb.find_by_name(name());
+    if (entry) {
+        const seqdb::SeqdbSeq* seq = entry->find_by_hi_name(full_name());
+        if (seq) {
+              // std::cerr << "[Seq] for " << full_name() << std::endl;
+            mSeqdbEntrySeq.assign(entry, seq);
+            matched = true;
+        }
+    }
+    return matched;
+
+} // Antigen::match_seqdb
+
+// ----------------------------------------------------------------------
+
+size_t Antigens::match_seqdb(const seqdb::Seqdb& aSeqdb) const
+{
+    size_t matched = 0;
+    for (const auto& antigen: *this) {
+        if (antigen.match_seqdb(aSeqdb))
+            ++matched;
+    }
+    return matched;
+
+} // Antigens::match_seqdb
 
 // ----------------------------------------------------------------------
 

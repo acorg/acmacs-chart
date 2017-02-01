@@ -77,6 +77,15 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             ;
 
       // ----------------------------------------------------------------------
+      // SeqDb
+      // ----------------------------------------------------------------------
+
+    py::class_<seqdb::Seqdb>(m, "Seqdb")
+            .def(py::init<>())
+            .def("load", &seqdb::Seqdb::load, py::arg("filename") = std::string(), py::doc("reads seqdb from file containing json"))
+            ;
+
+      // ----------------------------------------------------------------------
       // Antigen, Serum
       // ----------------------------------------------------------------------
 
@@ -111,6 +120,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
 
     py::class_<Antigens>(m, "Antigens")
             .def("continents", [](const Antigens& antigens, const LocDb& aLocDb) { Antigens::ContinentData data; antigens.continents(data, aLocDb); return data; })
+            .def("match_seqdb", &Antigens::match_seqdb, py::arg("seqdb"))
             ;
 
     py::class_<Sera>(m, "Sera")
