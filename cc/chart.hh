@@ -131,6 +131,7 @@ class Antigen : public AntigenSerum
     inline Antigen(Antigen&&) = default;
     virtual inline std::string full_name() const { return string::join({name(), reassortant(), annotations().join(), passage()}); }
     virtual inline std::string full_name_without_passage() const { return string::join({name(), reassortant(), annotations().join()}); }
+    virtual inline std::string full_name_for_seqdb_matching() const { return string::join({name(), reassortant(), passage(), annotations().join()}); } // annotations may part of the passage in seqdb (NIMR ISOLATE 1)
 
     // inline void name(const char* str, size_t length) { AntigenSerum::name(str, length); }
 
