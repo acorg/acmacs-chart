@@ -22,35 +22,35 @@ AntigenSerum::~AntigenSerum()
 
 // ----------------------------------------------------------------------
 
-std::string AntigenSerum::passage_without_date() const
-{
-    if (mPassage.size() > 13 && mPassage[mPassage.size() - 1] == ')' && mPassage[mPassage.size() - 12] == '(' && mPassage[mPassage.size() - 13] == ' ' && mPassage[mPassage.size() - 4] == '-' && mPassage[mPassage.size() - 7] == '-')
-        return std::string(mPassage, 0, mPassage.size() - 13);
-    else
-        return mPassage;
+// std::string AntigenSerum::passage_without_date() const
+// {
+//     if (mPassage.size() > 13 && mPassage[mPassage.size() - 1] == ')' && mPassage[mPassage.size() - 12] == '(' && mPassage[mPassage.size() - 13] == ' ' && mPassage[mPassage.size() - 4] == '-' && mPassage[mPassage.size() - 7] == '-')
+//         return std::string(mPassage, 0, mPassage.size() - 13);
+//     else
+//         return mPassage;
 
-} // AntigenSerum::passage_without_date
+// } // AntigenSerum::passage_without_date
 
 // ----------------------------------------------------------------------
 
-#pragma GCC diagnostic push
-#ifdef __clang__
-#pragma GCC diagnostic ignored "-Wexit-time-destructors"
-#endif
+// #pragma GCC diagnostic push
+// #ifdef __clang__
+// #pragma GCC diagnostic ignored "-Wexit-time-destructors"
+// #endif
 
-bool AntigenSerum::is_egg() const
-{
-    static std::regex egg_passage{
-        R"#(E(\?|[0-9][0-9]?))#"  // passage
-        R"#(( (ISOLATE|CLONE) [0-9\-]+)*)#"         // NIMR isolate and/or clone, NIMR H1pdm has CLONE 38-32
-        R"#(( *\+[1-9])?)#"         // NIID has +1 at the end of passage
-        R"#(( \([12][0129][0-9][0-9]-[01][0-9]-[0-3][0-9]\))?$)#" // passage date
-       };
-    return std::regex_search(mPassage, egg_passage) || is_reassortant(); // reassortant is always egg (2016-10-21)
+// bool AntigenSerum::is_egg() const
+// {
+//     static std::regex egg_passage{
+//         R"#(E(\?|[0-9][0-9]?))#"  // passage
+//         R"#(( (ISOLATE|CLONE) [0-9\-]+)*)#"         // NIMR isolate and/or clone, NIMR H1pdm has CLONE 38-32
+//         R"#(( *\+[1-9])?)#"         // NIID has +1 at the end of passage
+//         R"#(( \([12][0129][0-9][0-9]-[01][0-9]-[0-3][0-9]\))?$)#" // passage date
+//        };
+//     return std::regex_search(mPassage, egg_passage) || is_reassortant(); // reassortant is always egg (2016-10-21)
 
-} // AntigenSerum::is_egg
+// } // AntigenSerum::is_egg
 
-#pragma GCC diagnostic pop
+// #pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------
 

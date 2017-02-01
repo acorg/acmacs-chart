@@ -9,6 +9,7 @@
 #include "acmacs-base/virus-name.hh"
 #include "acmacs-base/string.hh"
 #include "acmacs-base/range.hh"
+#include "acmacs-base/passage.hh"
 #include "seqdb/seqdb.hh"
 #include "acmacs-draw/color.hh"
 
@@ -77,10 +78,10 @@ class AntigenSerum
     inline const std::string passage() const { return mPassage; }
     inline void passage(const char* str, size_t length) { mPassage.assign(str, length); }
     inline bool has_passage() const { return !mPassage.empty(); }
-    std::string passage_without_date() const;
+    inline std::string passage_without_date() const { return passage::without_date(mPassage); }
     inline const std::string reassortant() const { return mReassortant; }
     inline void reassortant(const char* str, size_t length) { mReassortant.assign(str, length); }
-    bool is_egg() const;
+    inline bool is_egg() const { return passage::is_egg(mPassage) || is_reassortant(); } // reassortant is always egg (2016-10-21)
     inline bool is_reassortant() const { return !mReassortant.empty(); }
     inline bool distinct() const { return mAnnotations.distinct(); }
     inline const Annotations& annotations() const { return mAnnotations; }
