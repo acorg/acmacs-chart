@@ -142,17 +142,13 @@ bool Antigen::match_seqdb(const seqdb::Seqdb& aSeqdb) const
     const seqdb::SeqdbEntry* entry = aSeqdb.find_by_name(name());
     if (entry) {
         const seqdb::SeqdbSeq* seq = entry->find_by_hi_name(full_name());
-        if (!seq) {
-            std::cerr << "[NO Seq] for " << full_name() << std::endl;
-            entry->find_best_match(reassortant(), passage());
-        }
         if (seq) {
               // std::cerr << "[Seq] for " << full_name() << std::endl;
             mSeqdbEntrySeq.assign(entry, seq);
             matched = true;
         }
         else {
-            // std::cerr << "[NO Seq] for " << full_name() << " " << entry->make_all_variants() << std::endl;
+            std::cerr << "[NO Seq] for " << full_name() << " " << entry->make_all_variants() << std::endl;
               // auto all_names = entry->make_all_names();
         }
     }
