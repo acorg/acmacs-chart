@@ -68,7 +68,23 @@ class BackgroundBorderGrid : public MapElement
     Pixels mGridLineWidth;
     Color mBorderColor;
     Pixels mBorderWidth;
-};
+}; // class BackgroundBorderGrid
+
+// ----------------------------------------------------------------------
+
+class ContinentMap : public MapElement
+{
+ public:
+    inline ContinentMap() : MapElement("continent-map", MapElements::AfterPoints), mOrigin{0, 0}, mWidthInParent(100) {}
+
+    virtual void draw(Surface& aSurface) const;
+    inline void offset_width(const Location& aOrigin, Pixels aWidthInParent) { mOrigin = aOrigin; mWidthInParent = aWidthInParent; }
+
+ private:
+    Location mOrigin;
+    Pixels mWidthInParent;
+
+}; // class ContinentMap
 
 // ----------------------------------------------------------------------
 /// Local Variables:

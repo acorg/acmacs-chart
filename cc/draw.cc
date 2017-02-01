@@ -7,7 +7,6 @@
 #include "acmacs-base/range.hh"
 #include "acmacs-base/float.hh"
 #include "acmacs-draw/surface-cairo.hh"
-#include "acmacs-draw/continent-map.hh"
 
 // ----------------------------------------------------------------------
 
@@ -89,9 +88,6 @@ void ChartDraw::draw(Surface& aSurface)
     }
 
     mMapElements.draw(rescaled_surface, MapElements::AfterPoints);
-
-    Surface& continent_surface = rescaled_surface.subsurface({0, rescaled_surface.viewport().size.height - 0.95}, Scaled{2}, continent_map_size(), true);
-    continent_map_draw(continent_surface);
 
 } // ChartDraw::draw
 

@@ -1,4 +1,5 @@
 #include "acmacs-draw/surface.hh"
+#include "acmacs-draw/continent-map.hh"
 #include "map-elements.hh"
 
 // ----------------------------------------------------------------------
@@ -27,6 +28,9 @@ MapElement& MapElements::add(std::string aKeyword)
 {
     if (aKeyword == "background-border-grid") {
         mElements.emplace_back(new BackgroundBorderGrid{});
+    }
+    else if (aKeyword == "continent-map") {
+        mElements.emplace_back(new ContinentMap{});
     }
     else {
         throw std::runtime_error("Don't know how to make map element " + aKeyword);
@@ -62,6 +66,15 @@ void BackgroundBorderGrid::draw(Surface& aSurface) const
     aSurface.border(mBorderColor, mBorderWidth);
 
 } // BackgroundBorderGrid::draw
+
+// ----------------------------------------------------------------------
+
+void ContinentMap::draw(Surface& aSurface) const
+{
+    Surface& continent_surface = aSurface.subsurface({0, aSurface.viewport().size.height - 0.95}, Scaled{2}, continent_map_size(), true);
+    continent_map_draw(continent_surface);
+
+} // ContinentMap::draw
 
 // ----------------------------------------------------------------------
 
