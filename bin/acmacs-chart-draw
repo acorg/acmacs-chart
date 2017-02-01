@@ -19,7 +19,7 @@ def main(args):
     with timeit("Reading chart from " + args.chart[0]):
         chart = acmacs_chart.import_chart(args.chart[0])
     with timeit("Drawing chart to " + args.output[0]):
-        acmacs_chart.draw_chart(output_file=args.output[0], chart=chart, settings={}, hidb_dir=args.hidb_dir, output_width=args.output_width)
+        acmacs_chart.draw_chart(output_file=args.output[0], chart=chart, settings={}, output_width=args.output_width)
 
 # ----------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ try:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-d', '--debug', action='store_const', dest='loglevel', const=logging.DEBUG, default=logging.INFO, help='Enable debugging output.')
 
-    parser.add_argument('--hidb-dir', action='store', dest='hidb_dir', default="~/AD/data", help='Directory with hidb4.*.json.xz.')
+    # parser.add_argument('--hidb-dir', action='store', dest='hidb_dir', default="~/AD/data", help='Directory with hidb4.*.json.xz.')
     parser.add_argument('-s', '--output-size', action='store', dest='output_width', default=600, help='Width of the output image.')
 
     parser.add_argument('chart', nargs=1, help='Chart file.')

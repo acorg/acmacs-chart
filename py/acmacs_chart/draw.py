@@ -11,7 +11,7 @@ from acmacs_chart_backend import ChartDraw, PointStyle
 
 # ----------------------------------------------------------------------
 
-def draw_chart(output_file, chart, settings, hidb_dir, output_width):
+def draw_chart(output_file, chart, settings, output_width):
     chart_draw = ChartDraw(chart)
     chart_draw.prepare()
     # chart_draw.background_color("green")
@@ -30,7 +30,7 @@ def draw_chart(output_file, chart, settings, hidb_dir, output_width):
     # chart_draw.flip(-1, 1)                # flip about diagonal from [0,0] to [1,1], i.e. flip in direction [-1,1]
 
     mark_continents(chart_draw=chart_draw, chart=chart)
-    mark_vaccines(chart_draw=chart_draw, chart=chart, hidb_dir=hidb_dir)
+    mark_vaccines(chart_draw=chart_draw, chart=chart)
     chart_draw.draw(str(output_file), output_width)
 
 # ----------------------------------------------------------------------
@@ -47,8 +47,8 @@ sStyleByPassageType = {
     "cell": {}
     }
 
-def mark_vaccines(chart_draw, chart, hidb_dir, style={"size": 15}, raise_=True):
-    hidb = get_hidb(chart=chart, hidb_dir=hidb_dir)
+def mark_vaccines(chart_draw, chart, style={"size": 15}, raise_=True):
+    hidb = get_hidb(chart=chart)
     for vaccine_entry in vaccines(chart=chart):
         # module_logger.debug('{}'.format(vaccine_entry))
         antigens = chart.vaccines(vaccine_entry["name"], hidb)
