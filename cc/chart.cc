@@ -172,8 +172,15 @@ void Antigens::clades(CladeData& aCladeData) const // must be called after match
     for (auto ag = begin(); ag != end(); ++ag) {
         const auto entry_seq = ag->seqdb_entry_seq();
         if (entry_seq) {
-            for (const auto& clade: entry_seq.seq().clades())
-                aCladeData[clade].push_back(static_cast<size_t>(ag - begin()));
+            const size_t index = static_cast<size_t>(ag - begin());
+            if (!entry_seq.seq().clades().empty()) {
+                for (const auto& clade: entry_seq.seq().clades())
+                    aCladeData[clade].push_back(index);
+            }
+            else {
+                  // no clades but sequenced (for B/Vic)
+                aCladeData[""].push_back(index);
+            }
         }
     }
 

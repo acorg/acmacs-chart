@@ -91,11 +91,35 @@ def mark_continents(chart_draw, chart):
 
 # ----------------------------------------------------------------------
 
+sStyleByClade = {
+    # H3
+    "3C3":  {"fill": "cornflowerblue"},
+    "3C2a": {"fill": "red"},
+    "3C3a": {"fill": "green"},
+    "3C3b": {"fill": "blue"},
+    # H1pdm
+    "6B1": {"fill": "blue"},
+    "6B2": {"fill": "red"},
+    # B/Yam
+    "Y2": {"fill": "cornflowerblue"},
+    "Y3": {"fill": "red"},
+    # B/Vic
+    "": {"fill": "red"},            # sequenced
+    }
+
 def mark_clades(chart_draw, chart):
     from .seqdb_access import match
     match(chart)
     clade_data = chart.antigens().clades()
     # pprint.pprint(clade_data)
+    global sStyleByClade
+    clades_used = {}                      # for legend
+    for clade, indices in clade_data.items():
+        style = sStyleByClade.get(clade)
+        if style:
+            chart_draw.modify_points_by_indices(indices, make_point_style(style), raise_=True)
+            clades_used[clade] = style
+    pprint.pprint(clades_used)
 
 # ----------------------------------------------------------------------
 
