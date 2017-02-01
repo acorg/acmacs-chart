@@ -224,7 +224,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("background_color", [](ChartDraw& cd, std::string color) { cd.background_color(color); }, py::arg("color"))
             .def("grid", [](ChartDraw& cd, std::string color, double line_width) { cd.grid(color, line_width); }, py::arg("color") = "grey80", py::arg("line_width") = 1.0)
             .def("border", [](ChartDraw& cd, std::string color, double line_width) { cd.border(color, line_width); }, py::arg("color") = "black", py::arg("line_width") = 1.0)
-            .def("continent_map", [](ChartDraw& cd, std::vector<double> aOrigin, double aWidth) { cd.continent_map({aOrigin[0], aOrigin[1]}, Pixels{aWidth}); }, py::arg("origin"), py::arg("width"), py::doc("Negative values in orinin mean from right/bottom of the surface"))
+            .def("continent_map", [](ChartDraw& cd, std::vector<double> aOrigin, double aWidth) { cd.continent_map({aOrigin[0], aOrigin[1]}, Pixels{aWidth}); }, py::arg("origin"), py::arg("width"), py::doc("Origin and width are in pixels. Negative values in orinin mean from right/bottom of the surface"))
             ;
 
       // ----------------------------------------------------------------------

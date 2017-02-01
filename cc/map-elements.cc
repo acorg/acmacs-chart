@@ -71,7 +71,12 @@ void BackgroundBorderGrid::draw(Surface& aSurface) const
 
 void ContinentMap::draw(Surface& aSurface) const
 {
-    Surface& continent_surface = aSurface.subsurface({0, aSurface.viewport().size.height - 0.95}, Scaled{2}, continent_map_size(), true);
+    Location origin = mOrigin;
+    if (origin.x < 0)
+        origin.x += aSurface.width_in_pixels();
+    if (origin.y < 0)
+        origin.y += aSurface.height_in_pixels();
+    Surface& continent_surface = aSurface.subsurface(origin, mWidthInParent, continent_map_size(), true);
     continent_map_draw(continent_surface);
 
 } // ContinentMap::draw

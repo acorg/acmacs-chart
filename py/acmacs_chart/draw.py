@@ -85,7 +85,7 @@ def mark_continents(chart_draw, chart):
     global sStyleByContinent
     for continent, indices in data.items():
         chart_draw.modify_points_by_indices(indices, make_point_style(sStyleByContinent[continent]))
-    chart_draw.continent_map([0, 0], 200)
+    chart_draw.continent_map([0, -50], 100)
 
 # ----------------------------------------------------------------------
 
