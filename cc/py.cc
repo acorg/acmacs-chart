@@ -121,6 +121,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
     py::class_<Antigens>(m, "Antigens")
             .def("continents", [](const Antigens& antigens, const LocDb& aLocDb) { Antigens::ContinentData data; antigens.continents(data, aLocDb); return data; })
             .def("match_seqdb", &Antigens::match_seqdb, py::arg("seqdb"))
+            .def("clades", [](const Antigens& antigens) { Antigens::CladeData data; antigens.clades(data); return data; })
             ;
 
     py::class_<Sera>(m, "Sera")

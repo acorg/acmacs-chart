@@ -167,6 +167,20 @@ size_t Antigens::match_seqdb(const seqdb::Seqdb& aSeqdb) const
 
 // ----------------------------------------------------------------------
 
+void Antigens::clades(CladeData& aCladeData) const // must be called after match_seqdb
+{
+    for (auto ag = begin(); ag != end(); ++ag) {
+        const auto entry_seq = ag->seqdb_entry_seq();
+        if (entry_seq) {
+            for (const auto& clade: entry_seq.seq().clades())
+                aCladeData[clade].push_back(static_cast<size_t>(ag - begin()));
+        }
+    }
+
+} // Antigens::clades
+
+// ----------------------------------------------------------------------
+
 void Antigens::find_by_name(std::string aName, std::vector<size_t>& aAntigenIndices) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {

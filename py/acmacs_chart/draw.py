@@ -3,7 +3,7 @@
 # license.
 # ----------------------------------------------------------------------
 
-import copy
+import copy, pprint
 import logging; module_logger = logging.getLogger(__name__)
 from .hidb_access import get_hidb
 from .vaccines import vaccines
@@ -94,6 +94,8 @@ def mark_continents(chart_draw, chart):
 def mark_clades(chart_draw, chart):
     from .seqdb_access import match
     match(chart)
+    clade_data = chart.antigens().clades()
+    # pprint.pprint(clade_data)
 
 # ----------------------------------------------------------------------
 
