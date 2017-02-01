@@ -145,7 +145,7 @@ class Antigen : public AntigenSerum
     const hidb::AntigenSerumData<hidb::Antigen>& find_in_hidb(const hidb::HiDb& aHiDb) const;
     bool match_seqdb(const seqdb::Seqdb& aSeqdb) const;
     const seqdb::SeqdbEntrySeq& seqdb_entry_seq() const { return mSeqdbEntrySeq; }
-    
+
 //     virtual std::string variant_id() const;
 
  private:
@@ -212,7 +212,7 @@ class Antigens : public std::vector<Antigen>
 
     size_t match_seqdb(const seqdb::Seqdb& aSeqdb) const;
     void clades(CladeData& aCladeData) const; // must be called after match_seqdb
-    
+
 }; // class Antigens
 
 // ----------------------------------------------------------------------
