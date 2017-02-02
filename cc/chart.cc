@@ -146,6 +146,9 @@ bool Antigen::match_seqdb(const seqdb::Seqdb& aSeqdb) const
         mSeqdbEntrySeq = *entry;
         matched = true;
     }
+    // else {
+    //     std::cerr << "warning:0: hi name not matched \"" << full_name() << "\"" << std::endl;
+    // }
     return matched;
 
 } // Antigen::match_seqdb
