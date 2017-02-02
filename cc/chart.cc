@@ -139,27 +139,12 @@ const hidb::AntigenSerumData<hidb::Serum>& Serum::find_in_hidb(const hidb::HiDb&
 bool Antigen::match_seqdb(const seqdb::Seqdb& aSeqdb) const
 {
     bool matched = false;
-    const seqdb::SeqdbEntry* entry = aSeqdb.find_by_name(name());
+    const seqdb::SeqdbEntrySeq* entry = aSeqdb.find_hi_name(full_name());
+    if (!entry)
+        entry = aSeqdb.find_hi_name(full_name_for_seqdb_matching());
     if (entry) {
-        if (entry->number_of_seqs() == 1) {
-              // just one seq for this name, match it regardless of anything
-            mSeqdbEntrySeq.assign(entry, &*entry->begin_seq());
-            matched = true;
-        }
-        else {
-            const seqdb::SeqdbSeq* seq = entry->find_by_hi_name(full_name());
-            if (!seq)
-                seq = entry->find_by_hi_name(full_name_for_seqdb_matching());
-            if (seq) {
-                  // std::cerr << "[Seq] for " << full_name() << std::endl;
-                mSeqdbEntrySeq.assign(entry, seq);
-                matched = true;
-            }
-            else {
-                std::cerr << "[NO Seq] for " << full_name() << " " << entry->make_all_variants() << std::endl;
-                  // auto all_names = entry->make_all_names();
-            }
-        }
+        mSeqdbEntrySeq = *entry;
+        matched = true;
     }
     return matched;
 

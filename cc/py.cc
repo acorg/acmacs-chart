@@ -83,6 +83,8 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
     py::class_<seqdb::Seqdb>(m, "Seqdb")
             .def(py::init<>())
             .def("load", &seqdb::Seqdb::load, py::arg("filename") = std::string(), py::doc("reads seqdb from file containing json"))
+            .def("build_hi_name_index", &seqdb::Seqdb::build_hi_name_index)
+              // .def("find_hi_name", &seqdb::Seqdb::find_hi_name, py::arg("name"), py::return_value_policy::reference, py::doc("returns entry_seq found by hi name or None"))
             ;
 
       // ----------------------------------------------------------------------

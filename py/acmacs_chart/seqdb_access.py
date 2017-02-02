@@ -26,6 +26,8 @@ def get_seqdb(seqdb_file :Path = Path(os.environ["ACMACSD_ROOT"], "data", "seqdb
         with timeit("Loading seqdb from " + filename):
             sSeqdb = Seqdb()
             sSeqdb.load(filename)
+        with timeit("Building hi name index"):
+            sSeqdb.build_hi_name_index()
     return sSeqdb
 
 # ----------------------------------------------------------------------
