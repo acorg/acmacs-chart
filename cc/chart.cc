@@ -136,7 +136,7 @@ const hidb::AntigenSerumData<hidb::Serum>& Serum::find_in_hidb(const hidb::HiDb&
 
 // ----------------------------------------------------------------------
 
-bool Antigen::match_seqdb(const seqdb::Seqdb& aSeqdb) const
+bool Antigen::match_seqdb(const seqdb::Seqdb& aSeqdb, bool aVerbose) const
 {
     bool matched = false;
     const seqdb::SeqdbEntrySeq* entry = aSeqdb.find_hi_name(full_name());
@@ -146,20 +146,20 @@ bool Antigen::match_seqdb(const seqdb::Seqdb& aSeqdb) const
         mSeqdbEntrySeq = *entry;
         matched = true;
     }
-    // else {
-    //     std::cerr << "warning:0: hi name not matched \"" << full_name() << "\"" << std::endl;
-    // }
+    else if (aVerbose) {
+        std::cerr << "warning:0: match_seqdb failed for \"" << full_name() << "\"" << std::endl;
+    }
     return matched;
 
 } // Antigen::match_seqdb
 
 // ----------------------------------------------------------------------
 
-size_t Antigens::match_seqdb(const seqdb::Seqdb& aSeqdb) const
+size_t Antigens::match_seqdb(const seqdb::Seqdb& aSeqdb, bool aVerbose) const
 {
     size_t matched = 0;
     for (const auto& antigen: *this) {
-        if (antigen.match_seqdb(aSeqdb))
+        if (antigen.match_seqdb(aSeqdb, aVerbose))
             ++matched;
     }
     return matched;

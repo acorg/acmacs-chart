@@ -14,7 +14,7 @@ from acmacs_chart_backend import Seqdb
 def match(chart):
     seqdb = get_seqdb()
     with timeit("Matching seqdb"):
-        matched = chart.antigens().match_seqdb(seqdb)
+        matched = chart.antigens().match_seqdb(seqdb, verbose=True)
         module_logger.info('{} antigens matched against seqdb'.format(matched))
 
 # ----------------------------------------------------------------------

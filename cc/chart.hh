@@ -145,7 +145,7 @@ class Antigen : public AntigenSerum
     inline std::vector<std::string>& clades() { return mClades; }
 
     const hidb::AntigenSerumData<hidb::Antigen>& find_in_hidb(const hidb::HiDb& aHiDb) const;
-    bool match_seqdb(const seqdb::Seqdb& aSeqdb) const;
+    bool match_seqdb(const seqdb::Seqdb& aSeqdb, bool aVerbose = false) const;
     const seqdb::SeqdbEntrySeq& seqdb_entry_seq() const { return mSeqdbEntrySeq; }
 
 //     virtual std::string variant_id() const;
@@ -212,7 +212,7 @@ class Antigens : public std::vector<Antigen>
     void continents(ContinentData& aContinentData, const LocDb& aLocDb) const;
     void country(std::string aCountry, std::vector<size_t>& aAntigenIndices, const LocDb& aLocDb) const;
 
-    size_t match_seqdb(const seqdb::Seqdb& aSeqdb) const;
+    size_t match_seqdb(const seqdb::Seqdb& aSeqdb, bool aVerbose = false) const;
     void clades(CladeData& aCladeData) const; // must be called after match_seqdb
 
 }; // class Antigens
