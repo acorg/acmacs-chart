@@ -109,7 +109,9 @@ sStyleByClade = {
     "Y2": {"fill": "cornflowerblue"},
     "Y3": {"fill": "red"},
     # B/Vic
-    "": {"fill": "red"},            # sequenced
+    "1A": {"fill": "cornflowerblue", "outline": "cornflowerblue"},
+    "1B": {"fill": "red", "outline": "red"},
+    "": {"fill": "green", "outline": "green"},                # sequenced but not in any clade
     }
 
 def mark_clades(chart_draw, chart):
@@ -123,7 +125,7 @@ def mark_clades(chart_draw, chart):
         style = sStyleByClade.get(clade)
         if style:
             chart_draw.modify_points_by_indices(indices, make_point_style(style), raise_=True)
-            clades_used[clade] = style
+            clades_used[clade] = [style, len(indices), indices if len(indices) < 10 else []]
     pprint.pprint(clades_used)
 
 # ----------------------------------------------------------------------
