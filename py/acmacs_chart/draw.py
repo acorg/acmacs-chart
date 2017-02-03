@@ -38,15 +38,21 @@ def draw_chart(output_file, chart, settings, output_width):
 # ----------------------------------------------------------------------
 
 sStyleByVaccineType = {
-    "previous": {"fill": "blue", "outline": "black"},
-    "current": {"fill": "red", "outline": "black"},
-    "surrogate": {"fill": "pink", "outline": "black"},
-    }
-
-sStyleByPassageType = {
-    "egg": {"aspect": 0.75},
-    "reassortant": {"aspect": 0.75, "rotation": 0.5},
-    "cell": {}
+    "previous": {
+        "egg": {"fill": "blue", "outline": "black", "aspect": 0.75},
+        "reassortant": {"fill": "blue", "outline": "black", "aspect": 0.75, "rotation": 0.5},
+        "cell": {"fill": "blue", "outline": "black"}
+        },
+    "current": {
+        "egg": {"fill": "red", "outline": "black", "aspect": 0.75},
+        "reassortant": {"fill": "green", "outline": "black", "aspect": 0.75, "rotation": 0.5},
+        "cell": {"fill": "red", "outline": "black"}
+        },
+    "surrogate": {
+        "egg": {"fill": "pink", "outline": "black", "aspect": 0.75},
+        "reassortant": {"fill": "pink", "outline": "black", "aspect": 0.75, "rotation": 0.5},
+        "cell": {"fill": "pink", "outline": "black"}
+        },
     }
 
 def mark_vaccines(chart_draw, chart, style={"size": 15}, raise_=True):
@@ -57,8 +63,7 @@ def mark_vaccines(chart_draw, chart, style={"size": 15}, raise_=True):
         for passage_type in ["egg", "reassortant", "cell"]:
             vaccine_data = getattr(antigens, passage_type)()
             if vaccine_data:
-                vstyle = copy.deepcopy(sStyleByVaccineType[vaccine_entry["type"]])
-                vstyle.update(sStyleByPassageType[passage_type])
+                vstyle = sStyleByVaccineType[vaccine_entry["type"]][passage_type] # copy.deepcopy
                 if style:
                     vstyle.update(style)
                 module_logger.info('Marking vaccine {} {}'.format(vaccine_data.antigen_index, vaccine_data.antigen.full_name()))
