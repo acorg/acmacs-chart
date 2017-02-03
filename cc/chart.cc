@@ -392,9 +392,6 @@ std::string Vaccines::report() const
 } // Vaccines::report
 
 // ----------------------------------------------------------------------
-
-
-// ----------------------------------------------------------------------
 /// Local Variables:
 /// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
 /// End:
