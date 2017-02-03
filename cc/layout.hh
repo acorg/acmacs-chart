@@ -99,7 +99,15 @@ class Layout : public std::vector<Point>
     BoundingBall* minimum_bounding_ball() const;
     void transform(const Transformation& aTransformation);
 
-    inline size_t number_of_dimensions() const { return front().size(); }
+    inline size_t number_of_dimensions() const
+        {
+            for (const auto& coordinates: *this) {
+                const size_t num_dims = coordinates.size();
+                if (num_dims)
+                    return num_dims;
+            }
+            throw std::runtime_error("getting number_of_dimensions for empty layout");
+        }
 
  private:
     void min_max_points(std::vector<size_t>& aMin, std::vector<size_t>& aMax) const;
@@ -111,9 +119,6 @@ class Layout : public std::vector<Point>
         }
 
 }; // class Layout
-
-// ----------------------------------------------------------------------
-
 
 // ----------------------------------------------------------------------
 /// Local Variables:

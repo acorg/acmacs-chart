@@ -63,8 +63,9 @@ BoundingBall* Layout::minimum_bounding_ball() const
 
 void Layout::min_max_points(std::vector<size_t>& aMin, std::vector<size_t>& aMax) const
 {
-    std::fill(aMin.begin(), aMin.end(), 0);
-    std::fill(aMax.begin(), aMax.end(), 0);
+    constexpr const size_t none = static_cast<size_t>(-1);
+    std::fill(aMin.begin(), aMin.end(), none);
+    std::fill(aMax.begin(), aMax.end(), none);
     for (auto point = cbegin(); point != cend(); ++point) {
         const size_t point_no = static_cast<size_t>(std::distance(cbegin(), point));
         for (size_t dim = 0; dim < point->size(); ++dim) {
@@ -77,9 +78,9 @@ void Layout::min_max_points(std::vector<size_t>& aMin, std::vector<size_t>& aMax
                     aMax[dim] = point_no + 1;
             }
             else {
-                if (v < (*this)[aMin[dim]][dim])
+                if (aMin[dim] == none || v < (*this)[aMin[dim]][dim])
                     aMin[dim] = point_no;
-                if (v > (*this)[aMax[dim]][dim])
+                if (aMax[dim] == none || v > (*this)[aMax[dim]][dim])
                     aMax[dim] = point_no;
             }
         }
