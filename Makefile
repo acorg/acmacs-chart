@@ -55,7 +55,7 @@ install: check-acmacsd-root $(ACMACS_CHART_LIB) $(BACKEND)
 	ln -sf $(BACKEND) $(ACMACSD_ROOT)/lib
 	ln -sf $(BACKEND) $(ACMACSD_ROOT)/py
 	if [ ! -d $(ACMACSD_ROOT)/include/acmacs-chart ]; then mkdir $(ACMACSD_ROOT)/include/acmacs-chart; fi
-	ln -sf $(abspath cc)/acmacs-chart.hh $(abspath cc)/chart.hh $(ACMACSD_ROOT)/include/acmacs-chart
+	ln -sf $(abspath cc)/*.hh $(ACMACSD_ROOT)/include/acmacs-chart
 	ln -sf $(abspath py)/* $(ACMACSD_ROOT)/py
 	ln -sf $(abspath bin)/acmacs-chart-* $(ACMACSD_ROOT)/bin
 
