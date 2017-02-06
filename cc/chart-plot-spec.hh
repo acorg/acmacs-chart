@@ -3,8 +3,6 @@
 #include <string>
 #include <vector>
 
-#include "acmacs-draw/color.hh"
-
 // ----------------------------------------------------------------------
 
 class LabelStyle
@@ -13,7 +11,7 @@ class LabelStyle
     enum class Slant {Normal, Italic, Oblique};
     enum class Weight {Normal, Bold};
 
-    inline LabelStyle() : mShown(true), mSlant(Slant::Normal), mWeight(Weight::Normal), mSize(1), mColor(0), mRotation(0), mInterline(0.2) {}
+    inline LabelStyle() : mShown(true), mSlant(Slant::Normal), mWeight(Weight::Normal), mSize(1), mColor("black"), mRotation(0), mInterline(0.2) {}
 
     inline void shown(bool aShown) { mShown = aShown; }
     inline bool shown() const { return mShown; }
@@ -58,7 +56,7 @@ class LabelStyle
     inline void size(double aSize) { mSize = aSize; }
     inline double size() const { return mSize; }
 
-    inline void color(const char* str, size_t length) { mColor.from_string(str, length); }
+    inline void color(const char* str, size_t length) { mColor.assign(str, length); }
     inline std::string color() const { return mColor; }
 
     inline void rotation(double aRotation) { mRotation = aRotation; }
@@ -75,7 +73,7 @@ class LabelStyle
     Slant mSlant;                  // "S": "normal OR italic OR oblique", // font slant, default normal
     Weight mWeight;                // "W": "normal OR bold", // font weight, default normal
     double mSize;                  // "s": 1.0,           // size, default 1.0
-    Color mColor;                  // "c": "black",   // color, default black
+    std::string mColor;            // "c": "black",   // color, default black
     double mRotation;              // "r": 0.0,       // rotation, default 0.0
     double mInterline;             // "i": 0.2, // addtional interval between lines as a fraction of line height, default - 0.2
 
@@ -115,10 +113,10 @@ class ChartPlotSpecStyle
     inline void shown(bool aShown) { mShown = aShown; }
     inline bool shown() const { return mShown; }
 
-    inline void fill_color(const char* str, size_t length) { mFillColor.from_string(str, length); }
+    inline void fill_color(const char* str, size_t length) { mFillColor.assign(str, length); }
     inline std::string fill_color() const { return mFillColor; }
 
-    inline void outline_color(const char* str, size_t length) { mOutlineColor.from_string(str, length); }
+    inline void outline_color(const char* str, size_t length) { mOutlineColor.assign(str, length); }
     inline std::string outline_color() const { return mOutlineColor; }
 
     inline void outline_width(double aOutlineWidth) { mOutlineWidth = aOutlineWidth; }
@@ -152,15 +150,15 @@ class ChartPlotSpecStyle
     inline const LabelStyle& label() const { return mLabel; }
 
  private:
-    bool mShown;          // "+"
-    Color mFillColor;     //  "F": "fill color: #FF0000 or T[RANSPARENT] or color name (red, green, blue, etc.), default is transparent",
-    Color mOutlineColor;  // "O": "outline color: #000000 or T[RANSPARENT] or color name (red, green, blue, etc.), default is black",
-    double mOutlineWidth; // "o": 1.0,             // outline width, default 1.0
-    Shape mShape;         // "S": "shape: C[IRCLE], B[OX], T[RIANGLE], default is circle",
-    double mSize;         // "s": 1.0,             // size, default is 1.0
-    double mRotation;     // "r": 0.0,             // rotation in radians, default is 0.0
-    double mAspect;       // "a": 1.0,              // aspect ratio, default is 1.0
-    LabelStyle mLabel;    // "l"
+    bool mShown;               // "+"
+    std::string mFillColor;    //  "F": "fill color: #FF0000 or T[RANSPARENT] or color name (red, green, blue, etc.), default is transparent",
+    std::string mOutlineColor; // "O": "outline color: #000000 or T[RANSPARENT] or color name (red, green, blue, etc.), default is black",
+    double mOutlineWidth;      // "o": 1.0,             // outline width, default 1.0
+    Shape mShape;              // "S": "shape: C[IRCLE], B[OX], T[RIANGLE], default is circle",
+    double mSize;              // "s": 1.0,             // size, default is 1.0
+    double mRotation;          // "r": 0.0,             // rotation in radians, default is 0.0
+    double mAspect;            // "a": 1.0,              // aspect ratio, default is 1.0
+    LabelStyle mLabel;         // "l"
 
     inline Shape shape_from_string(const char* str, size_t length) const
         {

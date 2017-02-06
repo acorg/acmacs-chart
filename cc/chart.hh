@@ -4,26 +4,15 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <algorithm>
+// #include <algorithm>
 
 #include "acmacs-base/virus-name.hh"
 #include "acmacs-base/string.hh"
 #include "acmacs-base/range.hh"
 #include "acmacs-base/passage.hh"
-#include "seqdb/seqdb.hh"
-#include "acmacs-draw/color.hh"
 
 #include "layout.hh"
 #include "chart-plot-spec.hh"
-
-namespace hidb
-{
-    class HiDb;
-    class Antigen;
-    class Serum;
-    template <typename AS> class AntigenSerumData;
-    class AntigenRefs;
-}
 
 class LocDb;
 
@@ -144,9 +133,9 @@ class Antigen : public AntigenSerum
     inline const std::vector<std::string>& clades() const { return mClades; }
     inline std::vector<std::string>& clades() { return mClades; }
 
-    const hidb::AntigenSerumData<hidb::Antigen>& find_in_hidb(const hidb::HiDb& aHiDb) const;
-    bool match_seqdb(const seqdb::Seqdb& aSeqdb, bool aVerbose = false) const;
-    const seqdb::SeqdbEntrySeq& seqdb_entry_seq() const { return mSeqdbEntrySeq; }
+    // const hidb::AntigenSerumData<hidb::Antigen>& find_in_hidb(const hidb::HiDb& aHiDb) const;
+    // bool match_seqdb(const seqdb::Seqdb& aSeqdb, bool aVerbose = false) const;
+    // const seqdb::SeqdbEntrySeq& seqdb_entry_seq() const { return mSeqdbEntrySeq; }
 
 //     virtual std::string variant_id() const;
 
@@ -155,9 +144,9 @@ class Antigen : public AntigenSerum
     std::vector<std::string> mLabId; // "l"
     std::vector<std::string> mClades; // "c"
 
-    mutable seqdb::SeqdbEntrySeq mSeqdbEntrySeq; // not stored
+    // mutable seqdb::SeqdbEntrySeq mSeqdbEntrySeq; // not stored
 
-    const hidb::AntigenSerumData<hidb::Antigen>& find_in_suggestions(std::string aName, const hidb::AntigenRefs& aSuggestions) const;
+    // const hidb::AntigenSerumData<hidb::Antigen>& find_in_suggestions(std::string aName, const hidb::AntigenRefs& aSuggestions) const;
 
 }; // class Antigen
 
@@ -184,7 +173,7 @@ class Serum : public AntigenSerum
     inline void homologous(int aHomologous) { mHomologous = aHomologous; }
 //     virtual bool is_egg() const;
 
-    const hidb::AntigenSerumData<hidb::Serum>& find_in_hidb(const hidb::HiDb& aHiDb) const;
+    // const hidb::AntigenSerumData<hidb::Serum>& find_in_hidb(const hidb::HiDb& aHiDb) const;
 
 //  protected:
 //     virtual AntigenSerumMatch match_passage(const AntigenSerum& aNother) const;
@@ -212,8 +201,8 @@ class Antigens : public std::vector<Antigen>
     void continents(ContinentData& aContinentData, const LocDb& aLocDb) const;
     void country(std::string aCountry, std::vector<size_t>& aAntigenIndices, const LocDb& aLocDb) const;
 
-    size_t match_seqdb(const seqdb::Seqdb& aSeqdb, bool aVerbose = false) const;
-    void clades(CladeData& aCladeData) const; // must be called after match_seqdb
+    // size_t match_seqdb(const seqdb::Seqdb& aSeqdb, bool aVerbose = false) const;
+    // void clades(CladeData& aCladeData) const; // must be called after match_seqdb
 
 }; // class Antigens
 
@@ -403,8 +392,6 @@ class ChartTiters
 
 // ----------------------------------------------------------------------
 
-class Vaccines;
-
 class Chart
 {
  public:
@@ -444,7 +431,7 @@ class Chart
     inline const ChartPlotSpec& plot_spec() const { return mPlotSpec; }
     inline ChartPlotSpec& plot_spec() { return mPlotSpec; }
 
-    Vaccines* vaccines(std::string aName, const hidb::HiDb& aHiDb) const;
+    // Vaccines* vaccines(std::string aName, const hidb::HiDb& aHiDb) const;
 
     inline IndexGenerator antigen_indices() const { return {number_of_antigens(), [](size_t) { return true; } }; }
     inline IndexGenerator reference_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].reference(); } }; }
@@ -470,58 +457,6 @@ class Chart
 }; // class Chart
 
 // ----------------------------------------------------------------------
-
-class Vaccines
-{
- public:
-    class HomologousSerum
-    {
-     public:
-        inline HomologousSerum(size_t aSerumIndex, const Serum* aSerum, const hidb::AntigenSerumData<hidb::Serum>* aSerumData, std::string aMostRecentTableDate)
-            : serum(aSerum), serum_index(aSerumIndex), serum_data(aSerumData), most_recent_table_date(aMostRecentTableDate) {}
-        bool operator < (const HomologousSerum& a) const;
-        size_t number_of_tables() const;
-
-        const Serum* serum;
-        size_t serum_index;
-        const hidb::AntigenSerumData<hidb::Serum>* serum_data;
-        std::string most_recent_table_date;
-    };
-
-    class Entry
-    {
-     public:
-        inline Entry(size_t aAntigenIndex, const Antigen* aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::vector<HomologousSerum>&& aSera, std::string aMostRecentTableDate)
-            : antigen(aAntigen), antigen_index(aAntigenIndex), antigen_data(aAntigenData), homologous_sera(aSera), most_recent_table_date(aMostRecentTableDate)
-            { std::sort(homologous_sera.begin(), homologous_sera.end()); }
-        bool operator < (const Entry& a) const;
-
-        const Antigen* antigen;
-        size_t antigen_index;
-        const hidb::AntigenSerumData<hidb::Antigen>* antigen_data;
-        std::vector<HomologousSerum> homologous_sera; // sorted by number of tables and the most recent table
-        std::string most_recent_table_date;
-    };
-
-    inline Vaccines() {}
-
-    inline const Entry* egg() const { return mEgg.empty() ? nullptr : &mEgg.front(); }
-    inline const Entry* cell() const { return mCell.empty() ? nullptr : &mCell.front(); }
-    inline const Entry* reassortant() const { return mReassortant.empty() ? nullptr : &mReassortant.front(); }
-
-    std::string report() const;
-
- private:
-    std::vector<Entry> mEgg;
-    std::vector<Entry> mCell;
-    std::vector<Entry> mReassortant;
-
-    friend class Chart;
-
-    void add(size_t aAntigenIndex, const Antigen& aAntigen, const hidb::AntigenSerumData<hidb::Antigen>* aAntigenData, std::vector<HomologousSerum>&& aSera, std::string aMostRecentTableDate);
-    void sort();
-
-}; // class Vaccines
 
 // ----------------------------------------------------------------------
 /// Local Variables:
