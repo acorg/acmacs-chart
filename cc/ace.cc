@@ -49,11 +49,11 @@ class Ace
 #endif
 
 static jsi::data<Antigen> antigen_data = {
-    {"N", jsi::field<Antigen>(&Antigen::name)},
+    {"N", jsi::field<Antigen>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Antigen::name))},
     {"D", jsi::field(&Antigen::date)},
-    {"L", jsi::field<Antigen>(&Antigen::lineage)},
-    {"P", jsi::field<Antigen>(&Antigen::passage)},
-    {"R", jsi::field<Antigen>(&Antigen::reassortant)},
+    {"L", jsi::field<Antigen>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Antigen::lineage))},
+    {"P", jsi::field<Antigen>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Antigen::passage))},
+    {"R", jsi::field<Antigen>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Antigen::reassortant))},
     {"l", jsi::field(&Antigen::lab_id)},
     {"S", jsi::field<Antigen>(&Antigen::semantic)},
     {"a", jsi::field<std::string, Antigen>(&Antigen::annotations)},
@@ -61,26 +61,26 @@ static jsi::data<Antigen> antigen_data = {
 };
 
 static jsi::data<Serum> serum_data = {
-    {"N", jsi::field<Serum>(&Serum::name)},
-    {"L", jsi::field<Serum>(&Serum::lineage)},
-    {"P", jsi::field<Serum>(&Serum::passage)},
-    {"R", jsi::field<Serum>(&Serum::reassortant)},
-    {"I", jsi::field(&Serum::serum_id)},
+    {"N", jsi::field<Serum>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Serum::name))},
+    {"L", jsi::field<Serum>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Serum::lineage))},
+    {"P", jsi::field<Serum>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Serum::passage))},
+    {"R", jsi::field<Serum>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Serum::reassortant))},
+    {"I", jsi::field(static_cast<void (Serum::*)(const char*, size_t)>(&Serum::serum_id))},
     {"S", jsi::field<Serum>(&Serum::semantic)},
     {"h", jsi::field(&Serum::homologous)},
     {"a", jsi::field<std::string, Serum>(&Serum::annotations)},
-    {"s", jsi::field(&Serum::serum_species)},
+    {"s", jsi::field(static_cast<void (Serum::*)(const char*, size_t)>(&Serum::serum_species))},
 };
 
 static jsi::data<ChartInfo> chart_info_data = {
-    {"v", jsi::field(&ChartInfo::virus)},
-    {"V", jsi::field(&ChartInfo::virus_type)},
-    {"A", jsi::field(&ChartInfo::assay)},
-    {"D", jsi::field(&ChartInfo::date)},
-    {"N", jsi::field(&ChartInfo::name)},
-    {"l", jsi::field(&ChartInfo::lab)},
-    {"r", jsi::field(&ChartInfo::rbc)},
-    {"s", jsi::field(&ChartInfo::subset)},
+    {"v", jsi::field(static_cast<void (ChartInfo::*)(const char*, size_t)>(&ChartInfo::virus))},
+    {"V", jsi::field(static_cast<void (ChartInfo::*)(const char*, size_t)>(&ChartInfo::virus_type))},
+    {"A", jsi::field(static_cast<void (ChartInfo::*)(const char*, size_t)>(&ChartInfo::assay))},
+    {"D", jsi::field(static_cast<void (ChartInfo::*)(const char*, size_t)>(&ChartInfo::date))},
+    {"N", jsi::field(static_cast<void (ChartInfo::*)(const char*, size_t)>(&ChartInfo::name))},
+    {"l", jsi::field(static_cast<void (ChartInfo::*)(const char*, size_t)>(&ChartInfo::lab))},
+    {"r", jsi::field(static_cast<void (ChartInfo::*)(const char*, size_t)>(&ChartInfo::rbc))},
+    {"s", jsi::field(static_cast<void (ChartInfo::*)(const char*, size_t)>(&ChartInfo::subset))},
     {"T", jsi::field(&ChartInfo::type)},
     {"S", jsi::field(&ChartInfo::sources, chart_info_data)},
 };

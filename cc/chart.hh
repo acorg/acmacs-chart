@@ -61,14 +61,18 @@ class AntigenSerum
     virtual std::string full_name_without_passage() const = 0;
 
     inline const std::string name() const { return mName; }
+    inline std::string& name() { return mName; }
     inline void name(const char* str, size_t length) { mName.assign(str, length); }
     inline const std::string lineage() const { return mLineage; }
+    inline std::string& lineage() { return mLineage; }
     inline void lineage(const char* str, size_t length) { mLineage.assign(str, length); }
     inline const std::string passage() const { return mPassage; }
+    inline std::string& passage() { return mPassage; }
     inline void passage(const char* str, size_t length) { mPassage.assign(str, length); }
     inline bool has_passage() const { return !mPassage.empty(); }
     inline std::string passage_without_date() const { return passage::without_date(mPassage); }
     inline const std::string reassortant() const { return mReassortant; }
+    inline std::string& reassortant() { return mReassortant; }
     inline void reassortant(const char* str, size_t length) { mReassortant.assign(str, length); }
     inline bool is_egg() const { return passage::is_egg(mPassage) || is_reassortant(); } // reassortant is always egg (2016-10-21)
     inline bool is_reassortant() const { return !mReassortant.empty(); }
@@ -156,8 +160,10 @@ class Serum : public AntigenSerum
     virtual inline std::string full_name_without_passage() const { return full_name(); }
 
     inline const std::string serum_id() const { return mSerumId; }
+    inline std::string& serum_id() { return mSerumId; }
     inline void serum_id(const char* str, size_t length) { mSerumId.assign(str, length); }
     inline const std::string serum_species() const { return mSerumSpecies; }
+    inline std::string& serum_species() { return mSerumSpecies; }
     inline void serum_species(const char* str, size_t length) { mSerumSpecies.assign(str, length); }
 
     template <typename No> inline void set_homologous(No ag_no) { mHomologous = static_cast<decltype(mHomologous)>(ag_no); }
@@ -331,6 +337,15 @@ class ChartInfo
                   throw std::runtime_error("ChartInfo: unrecognized table type: " + std::string(str, length));
             }
         }
+
+    inline std::string& virus() { return mVirus; }
+    inline std::string& virus_type() { return mVirusType; }
+    inline std::string& assay() { return mAssay; }
+    inline std::string& date() { return mDate; }
+    inline std::string& lab() { return mLab; }
+    inline std::string& rbc() { return mRbc; }
+    inline std::string& name() { return mName; }
+    inline std::string& subset() { return mSubset; }
 
     inline auto& sources() { return mSources; }
     inline const auto& sources() const { return mSources; }
