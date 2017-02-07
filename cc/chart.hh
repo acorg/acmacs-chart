@@ -11,8 +11,9 @@
 #include "acmacs-base/range.hh"
 #include "acmacs-base/passage.hh"
 
-#include "layout.hh"
-#include "chart-plot-spec.hh"
+#include "acmacs-chart/antigen-serum-match.hh"
+#include "acmacs-chart/layout.hh"
+#include "acmacs-chart/chart-plot-spec.hh"
 
 class LocDb;
 
@@ -79,8 +80,9 @@ class AntigenSerum
     inline const std::string semantic() const { return mSemanticAttributes; }
     inline void semantic(const char* str, size_t length) { mSemanticAttributes.assign(str, length); }
 
+    virtual AntigenSerumMatch match(const AntigenSerum& aNother) const;
+
 //     virtual std::string variant_id() const = 0;
-//     virtual AntigenSerumMatch match(const AntigenSerum& aNother) const;
 
 //       // returned cdc abbreviation starts with #
 //     inline std::string location() const { return virus_name::location(mName); }
@@ -89,12 +91,8 @@ class AntigenSerum
 //     inline bool operator == (const AntigenSerum& aNother) const { return name() == aNother.name() && variant_id() == aNother.variant_id(); }
 //     inline bool operator < (const AntigenSerum& aNother) const { return name() == aNother.name() ? variant_id() < aNother.variant_id() : name() < aNother.name(); }
 
-//  protected:
-//     inline AntigenSerum() = default;
-//     inline AntigenSerum(const AntigenSerum&) = default;
-//       //inline AntigenSerum(Chart& aChart) : mChart(aChart) {}
-
-//     virtual AntigenSerumMatch match_passage(const AntigenSerum& aNother) const;
+ protected:
+    virtual AntigenSerumMatch match_passage(const AntigenSerum& aNother) const;
 
  private:
 //       // Chart& mChart;
@@ -133,11 +131,13 @@ class Antigen : public AntigenSerum
     inline const std::vector<std::string>& clades() const { return mClades; }
     inline std::vector<std::string>& clades() { return mClades; }
 
+    using AntigenSerum::match;
+    virtual AntigenSerumMatch match(const Antigen& aAntigen) const;
+    virtual AntigenSerumMatch match(const Serum& aSerum) const;
+
     // const hidb::AntigenSerumData<hidb::Antigen>& find_in_hidb(const hidb::HiDb& aHiDb) const;
     // bool match_seqdb(const seqdb::Seqdb& aSeqdb, bool aVerbose = false) const;
     // const seqdb::SeqdbEntrySeq& seqdb_entry_seq() const { return mSeqdbEntrySeq; }
-
-//     virtual std::string variant_id() const;
 
  private:
     std::string mDate; // "D"
@@ -167,16 +167,19 @@ class Serum : public AntigenSerum
     inline const std::string serum_species() const { return mSerumSpecies; }
     inline void serum_species(const char* str, size_t length) { mSerumSpecies.assign(str, length); }
 
-//     template <typename No> inline void set_homologous(No ag_no) { mHomologous = static_cast<decltype(mHomologous)>(ag_no); }
-//     inline bool has_homologous() const { return mHomologous >= 0; }
+    template <typename No> inline void set_homologous(No ag_no) { mHomologous = static_cast<decltype(mHomologous)>(ag_no); }
+    inline bool has_homologous() const { return mHomologous >= 0; }
     inline int homologous() const { return mHomologous; }
     inline void homologous(int aHomologous) { mHomologous = aHomologous; }
-//     virtual bool is_egg() const;
+
+    using AntigenSerum::match;
+    virtual AntigenSerumMatch match(const Serum& aSerum) const;
+    virtual AntigenSerumMatch match(const Antigen& aAntigen) const;
 
     // const hidb::AntigenSerumData<hidb::Serum>& find_in_hidb(const hidb::HiDb& aHiDb) const;
 
-//  protected:
-//     virtual AntigenSerumMatch match_passage(const AntigenSerum& aNother) const;
+ protected:
+    virtual AntigenSerumMatch match_passage(const AntigenSerum& aNother) const;
 
  private:
     std::string mSerumId; // "I"
@@ -440,8 +443,8 @@ class Chart
     inline IndexGenerator reassortant_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].is_reassortant(); } }; }
     inline IndexGenerator serum_indices() const { return {number_of_antigens(), number_of_points(), [](size_t) { return true; } }; }
 
-    // void find_homologous_antigen_for_sera();
-    // inline void find_homologous_antigen_for_sera_const() const { const_cast<Chart*>(this)->find_homologous_antigen_for_sera(); }
+    void find_homologous_antigen_for_sera();
+    inline void find_homologous_antigen_for_sera_const() const { const_cast<Chart*>(this)->find_homologous_antigen_for_sera(); }
 
     // inline bool operator < (const Chart& aNother) const { return table_id() < aNother.table_id(); }
 
