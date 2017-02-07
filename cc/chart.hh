@@ -53,7 +53,6 @@ class AntigenSerum
  public:
     inline AntigenSerum() = default;
     inline AntigenSerum(const AntigenSerum&) = default;
-    inline AntigenSerum(AntigenSerum&&) = default;
     virtual ~AntigenSerum();
 
     inline AntigenSerum& operator=(const AntigenSerum&) = default;
@@ -113,9 +112,6 @@ class Antigen : public AntigenSerum
 {
  public:
     inline Antigen() = default;
-      // inline Antigen(Chart& aChart) : AntigenSerum(aChart) {}
-    inline Antigen(const Antigen&) = default;
-    inline Antigen(Antigen&&) = default;
     virtual inline std::string full_name() const { return string::join({name(), reassortant(), annotations().join(), passage()}); }
     virtual inline std::string full_name_without_passage() const { return string::join({name(), reassortant(), annotations().join()}); }
     virtual inline std::string full_name_for_seqdb_matching() const { return string::join({name(), reassortant(), passage(), annotations().join()}); } // annotations may part of the passage in seqdb (NIMR ISOLATE 1)
@@ -156,9 +152,6 @@ class Serum : public AntigenSerum
 {
  public:
     inline Serum() : mHomologous(-1) {}
-      // inline Serum(Chart& aChart) : AntigenSerum(aChart), mHomologous(-1) {}
-    inline Serum(const Serum&) = default;
-    inline Serum(Serum&&) = default;
     virtual inline std::string full_name() const { return string::join({name(), reassortant(), serum_id(), annotations().join()}); } // serum_id comes before annotations, see hidb chart.cc Serum::variant_id
     virtual inline std::string full_name_without_passage() const { return full_name(); }
 
@@ -368,15 +361,6 @@ class ChartTiters
     using Layers = std::vector<Dict>;
 
     inline ChartTiters() {}
-
-//     inline const List& as_list() const
-//         {
-//             if (mList.empty()) {
-//                 std::cerr << "Warning: sparse matrix of titers ignored" << std::endl;
-//                   //throw std::runtime_error("ChartTiters::as_list");
-//             }
-//             return mList;
-//         }
 
     inline List& list() { return mList; }
     inline Dict& dict() { return mDict; }
