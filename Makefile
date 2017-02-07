@@ -49,15 +49,17 @@ DIST = $(abspath dist)
 
 all: check-acmacsd-root $(ACMACS_CHART_LIB) $(BACKEND)
 
-install: check-acmacsd-root $(ACMACS_CHART_LIB) $(BACKEND)
+install: check-acmacsd-root install-headers $(ACMACS_CHART_LIB) $(BACKEND)
 	ln -sf $(ACMACS_CHART_LIB) $(ACMACSD_ROOT)/lib
 	if [ $$(uname) = "Darwin" ]; then /usr/bin/install_name_tool -id $(ACMACSD_ROOT)/lib/$(notdir $(ACMACS_CHART_LIB)) $(ACMACSD_ROOT)/lib/$(notdir $(ACMACS_CHART_LIB)); fi
 	ln -sf $(BACKEND) $(ACMACSD_ROOT)/lib
 	ln -sf $(BACKEND) $(ACMACSD_ROOT)/py
-	if [ ! -d $(ACMACSD_ROOT)/include/acmacs-chart ]; then mkdir $(ACMACSD_ROOT)/include/acmacs-chart; fi
-	ln -sf $(abspath cc)/*.hh $(ACMACSD_ROOT)/include/acmacs-chart
 	ln -sf $(abspath py)/* $(ACMACSD_ROOT)/py
 	ln -sf $(abspath bin)/acmacs-chart-* $(ACMACSD_ROOT)/bin
+
+install-headers: check-acmacsd-root
+	if [ ! -d $(ACMACSD_ROOT)/include/acmacs-chart ]; then mkdir $(ACMACSD_ROOT)/include/acmacs-chart; fi
+	ln -sf $(abspath cc)/*.hh $(ACMACSD_ROOT)/include/acmacs-chart
 
 test: install
 	test/test
@@ -82,7 +84,7 @@ distclean: clean
 
 # ----------------------------------------------------------------------
 
-$(BUILD)/%.o: cc/%.cc | $(BUILD)
+$(BUILD)/%.o: cc/%.cc | $(BUILD) install-headers
 	@echo $<
 	@g++ $(CXXFLAGS) -c -o $@ $<
 
