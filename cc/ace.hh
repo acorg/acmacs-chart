@@ -22,6 +22,17 @@ void export_chart(std::string aFilename, const Chart& aChart);
 
 // ----------------------------------------------------------------------
 
+template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const std::vector<std::pair<std::string, std::string>>& aVectorOfStringPairs)
+{
+    writer << jsw::start_object;
+    for (const auto& e: aVectorOfStringPairs)
+        writer << jsw::key(e.first) << e.second;
+    writer << jsw::end_object;
+    return writer;
+}
+
+// ----------------------------------------------------------------------
+
 template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const Antigen& aAntigen)
 {
     return writer << jsw::start_object
@@ -36,6 +47,8 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
                   << jsw::if_not_empty("c", aAntigen.clades())
                   << jsw::end_object;
 }
+
+// ----------------------------------------------------------------------
 
 template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const Serum& aSerum)
 {

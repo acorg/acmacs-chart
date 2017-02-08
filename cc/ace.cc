@@ -377,15 +377,6 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
                   << jsw::end_object;
 }
 
-template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const std::vector<std::pair<std::string, std::string>>& aChartTitersDict)
-{
-    writer << jsw::start_object;
-    for (const auto& e: aChartTitersDict)
-        writer << jsw::key(e.first) << e.second;
-    writer << jsw::end_object;
-    return writer;
-}
-
 template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const ChartTiters& aChartTiters)
 {
     return writer << jsw::start_object
