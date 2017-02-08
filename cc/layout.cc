@@ -1,43 +1,4 @@
-#include <cmath>
-
 #include "layout.hh"
-
-// ----------------------------------------------------------------------
-
-void Transformation::rotate(double aAngle)
-{
-    const double cos = std::cos(aAngle);
-    const double sin = std::sin(aAngle);
-    const double r0 = cos * (*this)[0] + -sin * (*this)[2];
-    const double r1 = cos * (*this)[1] + -sin * (*this)[3];
-    const double r2 = sin * (*this)[0] +  cos * (*this)[2];
-    const double r3 = sin * (*this)[1] +  cos * (*this)[3];
-    (*this)[0] = r0;
-    (*this)[1] = r1;
-    (*this)[2] = r2;
-    (*this)[3] = r3;
-
-} // Transformation::rotate
-
-// ----------------------------------------------------------------------
-
-void Transformation::flip(double aX, double aY)
-{
-      // vector [aX, aY] must be first transformed using this
-    const double x = aX * (*this)[0] + aY * (*this)[2];
-    const double y = aX * (*this)[1] + aY * (*this)[3];
-
-    const double x2y2 = x * x - y * y, xy = 2 * x * y;
-    const double r0 = x2y2 * (*this)[0] + xy    * (*this)[2];
-    const double r1 = x2y2 * (*this)[1] + xy    * (*this)[3];
-    const double r2 = xy   * (*this)[0] + -x2y2 * (*this)[2];
-    const double r3 = xy   * (*this)[1] + -x2y2 * (*this)[3];
-    (*this)[0] = r0;
-    (*this)[1] = r1;
-    (*this)[2] = r2;
-    (*this)[3] = r3;
-
-} // Transformation::flip
 
 // ----------------------------------------------------------------------
 
@@ -47,7 +8,7 @@ BoundingBall* Layout::minimum_bounding_ball() const
     std::vector<size_t> min(nd), max(nd);
     min_max_points(min, max);
 
-    Point min_point(nd), max_point(nd);
+    Coordinates min_point(nd), max_point(nd);
     for (size_t dim = 0; dim < nd; ++dim) {
         min_point[dim] = (*this)[min[dim]][dim];
         max_point[dim] = (*this)[max[dim]][dim];
@@ -106,7 +67,7 @@ void Layout::transform(const Transformation& aTransformation)
 
 // ----------------------------------------------------------------------
 
-void BoundingBall::extend(const Point& aPoint)
+void BoundingBall::extend(const Coordinates& aPoint)
 {
     const double distance2_to_center = distance2FromCenter(aPoint);
     if (distance2_to_center > radius2()) {

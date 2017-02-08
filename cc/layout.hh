@@ -3,18 +3,19 @@
 #include <iostream>
 
 #include "acmacs-base/stream.hh"
+#include "acmacs-base/transformation.hh"
 #include "vector.hh"
 
 // ----------------------------------------------------------------------
 
-using Point = Vector;
+using Coordinates = Vector;
 
 class BoundingBall
 {
  public:
     inline BoundingBall() = default;
       // aP1 and aP2 are opposite corners of some area, draw a minimal circle through them
-    inline BoundingBall(const Point& aP1, const Point& aP2)
+    inline BoundingBall(const Coordinates& aP1, const Coordinates& aP2)
         : mCenter(aP1.size()), mDiameter(0)
         {
             Vector v{aP1};
@@ -48,7 +49,7 @@ class BoundingBall
         }
 
       // Extends bounding ball (change center and diameter) to make sure the bounding ball includes the passed point
-    void extend(const Point& aPoint);
+    void extend(const Coordinates& aPoint);
 
       // Extends bounding ball to make sure it includes all points of the second boundig ball
     void extend(const BoundingBall& aBoundingBall);
@@ -63,7 +64,7 @@ class BoundingBall
     double mDiameter;
 
       // Returns distance^2 from the ball center to point
-    inline double distance2FromCenter(const Point& aPoint) const
+    inline double distance2FromCenter(const Coordinates& aPoint) const
         {
             Vector v(aPoint);
             v.subtract(mCenter);
@@ -81,17 +82,7 @@ inline std::ostream& operator << (std::ostream& out, const BoundingBall& a) { re
 
 // ----------------------------------------------------------------------
 
-class Transformation : public std::vector<double>
-{
- public:
-    inline Transformation() : std::vector<double>{{1, 0, 0, 1}} {}
-    void rotate(double aAngle);
-    void flip(double aX, double aY); // reflect about a line specified with vector [aX, aY]
-};
-
-// ----------------------------------------------------------------------
-
-class Layout : public std::vector<Point>
+class Layout : public std::vector<Coordinates>
 {
  public:
     inline Layout() = default;
