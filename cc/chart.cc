@@ -249,59 +249,6 @@ AntigenSerumMatch Serum::match_passage(const AntigenSerum& aNother) const
 
 // ----------------------------------------------------------------------
 
-// bool Antigen::match_seqdb(const seqdb::Seqdb& aSeqdb, bool aVerbose) const
-// {
-//     bool matched = false;
-//     const seqdb::SeqdbEntrySeq* entry = aSeqdb.find_hi_name(full_name());
-//     if (!entry)
-//         entry = aSeqdb.find_hi_name(full_name_for_seqdb_matching());
-//     if (entry) {
-//         mSeqdbEntrySeq = *entry;
-//         matched = true;
-//     }
-//     else if (aVerbose) {
-//         std::cerr << "warning:0: match_seqdb failed for \"" << full_name() << "\"" << std::endl;
-//     }
-//     return matched;
-
-// } // Antigen::match_seqdb
-
-// // ----------------------------------------------------------------------
-
-// size_t Antigens::match_seqdb(const seqdb::Seqdb& aSeqdb, bool aVerbose) const
-// {
-//     size_t matched = 0;
-//     for (const auto& antigen: *this) {
-//         if (antigen.match_seqdb(aSeqdb, aVerbose))
-//             ++matched;
-//     }
-//     return matched;
-
-// } // Antigens::match_seqdb
-
-// // ----------------------------------------------------------------------
-
-// void Antigens::clades(CladeData& aCladeData) const // must be called after match_seqdb
-// {
-//     for (auto ag = begin(); ag != end(); ++ag) {
-//         const auto entry_seq = ag->seqdb_entry_seq();
-//         if (entry_seq) {
-//             const size_t index = static_cast<size_t>(ag - begin());
-//             if (!entry_seq.seq().clades().empty()) {
-//                 for (const auto& clade: entry_seq.seq().clades())
-//                     aCladeData[clade].push_back(index);
-//             }
-//             else {
-//                   // no clades but sequenced (for B/Vic)
-//                 aCladeData[""].push_back(index);
-//             }
-//         }
-//     }
-
-// } // Antigens::clades
-
-// ----------------------------------------------------------------------
-
 void Antigens::find_by_name(std::string aName, std::vector<size_t>& aAntigenIndices) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {

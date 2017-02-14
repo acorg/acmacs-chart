@@ -136,15 +136,11 @@ class Antigen : public AntigenSerum
     virtual AntigenSerumMatch match(const Serum& aSerum) const;
 
     // const hidb::AntigenSerumData<hidb::Antigen>& find_in_hidb(const hidb::HiDb& aHiDb) const;
-    // bool match_seqdb(const seqdb::Seqdb& aSeqdb, bool aVerbose = false) const;
-    // const seqdb::SeqdbEntrySeq& seqdb_entry_seq() const { return mSeqdbEntrySeq; }
 
  private:
     std::string mDate; // "D"
     std::vector<std::string> mLabId; // "l"
     std::vector<std::string> mClades; // "c"
-
-    // mutable seqdb::SeqdbEntrySeq mSeqdbEntrySeq; // not stored
 
     // const hidb::AntigenSerumData<hidb::Antigen>& find_in_suggestions(std::string aName, const hidb::AntigenRefs& aSuggestions) const;
 
@@ -202,9 +198,6 @@ class Antigens : public std::vector<Antigen>
     void find_by_name(std::string aName, std::vector<size_t>& aAntigenIndices) const;
     void continents(ContinentData& aContinentData, const LocDb& aLocDb) const;
     void country(std::string aCountry, std::vector<size_t>& aAntigenIndices, const LocDb& aLocDb) const;
-
-    // size_t match_seqdb(const seqdb::Seqdb& aSeqdb, bool aVerbose = false) const;
-    // void clades(CladeData& aCladeData) const; // must be called after match_seqdb
 
 }; // class Antigens
 
