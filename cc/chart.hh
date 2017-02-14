@@ -135,14 +135,10 @@ class Antigen : public AntigenSerum
     virtual AntigenSerumMatch match(const Antigen& aAntigen) const;
     virtual AntigenSerumMatch match(const Serum& aSerum) const;
 
-    // const hidb::AntigenSerumData<hidb::Antigen>& find_in_hidb(const hidb::HiDb& aHiDb) const;
-
  private:
     std::string mDate; // "D"
     std::vector<std::string> mLabId; // "l"
     std::vector<std::string> mClades; // "c"
-
-    // const hidb::AntigenSerumData<hidb::Antigen>& find_in_suggestions(std::string aName, const hidb::AntigenRefs& aSuggestions) const;
 
 }; // class Antigen
 
@@ -170,8 +166,6 @@ class Serum : public AntigenSerum
     using AntigenSerum::match;
     virtual AntigenSerumMatch match(const Serum& aSerum) const;
     virtual AntigenSerumMatch match(const Antigen& aAntigen) const;
-
-    // const hidb::AntigenSerumData<hidb::Serum>& find_in_hidb(const hidb::HiDb& aHiDb) const;
 
  protected:
     virtual AntigenSerumMatch match_passage(const AntigenSerum& aNother) const;
@@ -425,8 +419,6 @@ class Chart
 
     inline const ChartPlotSpec& plot_spec() const { return mPlotSpec; }
     inline ChartPlotSpec& plot_spec() { return mPlotSpec; }
-
-    // Vaccines* vaccines(std::string aName, const hidb::HiDb& aHiDb) const;
 
     inline IndexGenerator antigen_indices() const { return {number_of_antigens(), [](size_t) { return true; } }; }
     inline IndexGenerator reference_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].reference(); } }; }

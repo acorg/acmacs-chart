@@ -156,99 +156,6 @@ AntigenSerumMatch Serum::match_passage(const AntigenSerum& aNother) const
 
 // ----------------------------------------------------------------------
 
-// std::string AntigenSerum::passage_without_date() const
-// {
-//     if (mPassage.size() > 13 && mPassage[mPassage.size() - 1] == ')' && mPassage[mPassage.size() - 12] == '(' && mPassage[mPassage.size() - 13] == ' ' && mPassage[mPassage.size() - 4] == '-' && mPassage[mPassage.size() - 7] == '-')
-//         return std::string(mPassage, 0, mPassage.size() - 13);
-//     else
-//         return mPassage;
-
-// } // AntigenSerum::passage_without_date
-
-// ----------------------------------------------------------------------
-
-// const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_hidb(const hidb::HiDb& aHiDb) const
-// {
-//     const std::string name = full_name();
-//     try {
-//         const auto& found = aHiDb.find_antigen_exactly(name);
-//           // std::cerr << "find_in_hidb: " << full_name() << " --> " << found.most_recent_table().table_id() << " tables:" << found.number_of_tables() << std::endl;
-//         return found;
-//     }
-//     catch (hidb::HiDb::NotFound& err) {
-//         if (passage() == "X?") {
-//             try {
-//                 return aHiDb.find_antigen_exactly(full_name_without_passage());
-//             }
-//             catch (hidb::HiDb::NotFound&) {
-//             }
-//         }
-//         else if (!err.suggestions().empty()) {
-//             return find_in_suggestions(name, err.suggestions());
-//         }
-//         else {
-//             // std::cerr << "ERROR: not found and no suggestions for " << name << std::endl
-//             //           << hidb::report(aHiDb.find_antigens(name), "  ") << std::endl;
-//         }
-//         throw;
-//     }
-
-// } // Antigen::find_in_hidb
-
-// ----------------------------------------------------------------------
-
-// const hidb::AntigenSerumData<hidb::Antigen>& Antigen::find_in_suggestions(std::string aName, const hidb::AntigenRefs& aSuggestions) const
-// {
-//     const std::regex wrongly_converted{" (SECM|VIR)(-)"};
-//     std::smatch m;
-
-//     if (aName.find(" DISTINCT") != std::string::npos) { // DISTINCT antigens are not stored in hidb
-//         throw hidb::HiDb::NotFound(aName);
-//     }
-//     else if (std::regex_search(aName, m, wrongly_converted)) {
-//         // std::cerr << "SECM Suggestions for " << aName << std::endl
-//         //           << hidb::report(aSuggestions, "  ") << std::endl;
-//         std::string name = aName;   // to avoid aName changing
-//         name[static_cast<size_t>(m[2].first - aName.begin())] = '0';
-//         for (const auto& e: aSuggestions) {
-//             if (e->data().full_name() == name)
-//                 return *e;
-//         }
-//     }
-//     else if (aName[2] == ' ') {
-//           // some cdc names were incorrectly used before, e.g. "CO CO-9-2718" was used as "CO 9-2718"
-//         std::string fixed = aName.substr(0, 3) + aName.substr(0, 2) + "-" + aName.substr(3);
-//         // std::cerr << "FIXED: " << fixed << std::endl; // << report(*fk, "  ") << std::endl;
-//         const auto found = std::find_if(aSuggestions.begin(), aSuggestions.end(), [&fixed](const auto& e) -> bool { return e->data().full_name() == fixed; });
-//         if (found != aSuggestions.end())
-//             return **found;
-//     }
-
-//     // std::cerr << "Suggestions for " << aName << std::endl
-//     //           << hidb::report(aSuggestions, "  "); // << std::endl;
-//     throw hidb::HiDb::NotFound(aName, aSuggestions);
-
-// } // Antigen::find_in_suggestions
-
-// // ----------------------------------------------------------------------
-
-// const hidb::AntigenSerumData<hidb::Serum>& Serum::find_in_hidb(const hidb::HiDb& aHiDb) const
-// {
-//     try {
-//         const auto& found = aHiDb.find_serum_exactly(full_name());
-//           // std::cerr << "find_in_hidb: " << full_name() << " --> " << found.most_recent_table().table_id() << " tables:" << found.number_of_tables() << std::endl;
-//         return found;
-//     }
-//     catch (hidb::HiDb::NotFound& err) {
-//         std::cerr << "ERROR: not found " << err.what() << std::endl;
-//         std::cerr << hidb::report(aHiDb.find_sera(full_name()), "  ") << std::endl;
-//         throw;
-//     }
-
-// } // Serum::find_in_hidb
-
-// ----------------------------------------------------------------------
-
 void Antigens::find_by_name(std::string aName, std::vector<size_t>& aAntigenIndices) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {
@@ -392,39 +299,6 @@ void Chart::find_homologous_antigen_for_sera()
     }
 
 } // Chart::find_homologous_antigen_for_sera
-
-// ----------------------------------------------------------------------
-
-// Vaccines* Chart::vaccines(std::string aName, const hidb::HiDb& aHiDb) const
-// {
-//     Vaccines* result = new Vaccines();
-//     std::vector<size_t> by_name;
-//     antigens().find_by_name(aName, by_name);
-//     for (size_t ag_no: by_name) {
-//           // std::cerr << ag->full_name() << std::endl;
-//         try {
-//             const Antigen& ag = antigens()[ag_no];
-//             const auto& data = ag.find_in_hidb(aHiDb);
-//             std::vector<Vaccines::HomologousSerum> homologous_sera;
-//             for (const auto* sd: aHiDb.find_homologous_sera(data)) {
-//                 const size_t sr_no = sera().find_by_name_for_exact_matching(sd->data().name_for_exact_matching());
-//                   // std::cerr << "   " << sd->data().name_for_exact_matching() << " " << (serum ? "Y" : "N") << std::endl;
-//                 if (sr_no != static_cast<size_t>(-1))
-//                     homologous_sera.emplace_back(sr_no, &sera()[sr_no], sd, aHiDb.charts()[sd->most_recent_table().table_id()].chart_info().date());
-//             }
-//             result->add(ag_no, ag, &data, std::move(homologous_sera), aHiDb.charts()[data.most_recent_table().table_id()].chart_info().date());
-//         }
-//         catch (hidb::HiDb::NotFound&) {
-//         }
-//     }
-//     result->sort();
-//     result->report();
-//     return result;
-
-// } // Chart::vaccines
-
-// ----------------------------------------------------------------------
-
 
 // ----------------------------------------------------------------------
 /// Local Variables:
