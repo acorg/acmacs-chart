@@ -233,6 +233,29 @@ const std::string ChartInfo::date() const
 
 // ----------------------------------------------------------------------
 
+const std::string ChartInfo::make_name() const
+{
+    std::string n = name();
+    if (n.empty())
+        n = string::join({lab(), virus_type(), assay(), rbc(), date()});
+    return n;
+
+} // ChartInfo::make_name
+
+// ----------------------------------------------------------------------
+
+const std::string Chart::make_name() const
+{
+    const ChartInfo& info = chart_info();
+    std::string n = info.name();
+    if (n.empty())
+        n = string::join({info.lab(), info.virus_type(), lineage(), info.assay(), info.rbc(), info.date()});
+    return n;
+
+} // Chart::make_name
+
+// ----------------------------------------------------------------------
+
 std::string Chart::lineage() const
 {
     std::set<std::string> lineages;

@@ -286,7 +286,7 @@ class ChartInfo
     inline const std::string assay() const { return merge_text_fields(&ChartInfo::mAssay); }
     const std::string date() const;
     inline const std::string lab() const { return merge_text_fields(&ChartInfo::mLab); }
-    inline const std::string rbc() const { return merge_text_fields(&ChartInfo::mRbc); }
+    inline const std::string rbc() const { const std::string ass = assay(); return ass.empty() || ass == "HI" ? merge_text_fields(&ChartInfo::mRbc) : std::string(); }
     inline const std::string name() const { return merge_text_fields(&ChartInfo::mName); }
     inline const std::string subset() const { return merge_text_fields(&ChartInfo::mSubset); }
     inline TableType type() const { return mType; }
@@ -300,6 +300,8 @@ class ChartInfo
             }
             return "?";         // to keep gcc happy
         }
+
+    const std::string make_name() const;
 
     inline void virus(const char* str, size_t length) { mVirus.assign(str, length); }
     inline void virus_type(const char* str, size_t length) { mVirusType.assign(str, length); }
@@ -395,6 +397,7 @@ class Chart
     inline size_t number_of_sera() const { return mSera.size(); }
     inline size_t number_of_points() const { return number_of_antigens() + number_of_sera(); }
     std::string lineage() const;
+    const std::string make_name() const;
 
     inline const ChartInfo& chart_info() const { return mInfo; }
     inline ChartInfo& chart_info() { return mInfo; }
