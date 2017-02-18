@@ -176,6 +176,42 @@ size_t Sera::find_by_name_for_exact_matching(std::string aFullName) const
 
 // ----------------------------------------------------------------------
 
+template <typename AgSr> static void find_by_name_matching_ag_sr(const std::vector<AgSr>& aAgSr, std::string aName, std::vector<size_t>& aIndices)
+{
+    using Score = AntigenSerumMatchScore<AgSr>;
+
+    std::vector<std::pair<size_t, string_match::score_t>> index_score;
+    string_match::score_t score_threshold = 0;
+    for (auto ag = aAgSr.begin(); ag != aAgSr.end(); ++ag) {
+        Score score{aName, *ag, score_threshold};
+        score_threshold = std::max(score.name_score(), score_threshold);
+        if (score.full_name_score())
+            index_score.emplace_back(static_cast<size_t>(ag - aAgSr.begin()), score.full_name_score());
+    }
+    std::sort(index_score.begin(), index_score.end(), [](const auto& a, const auto& b) -> bool { return a.second > b.second; });
+    for (const auto& is: index_score) {
+        if (is.second < index_score.front().second)
+            break;
+        aIndices.push_back(is.first);
+    }
+}
+
+void Antigens::find_by_name_matching(std::string aName, std::vector<size_t>& aAntigenIndices) const
+{
+    find_by_name_matching_ag_sr(*this, aName, aAntigenIndices);
+
+} // Antigens::find_by_name_matching
+
+// ----------------------------------------------------------------------
+
+void Sera::find_by_name_matching(std::string aName, std::vector<size_t>& aSeraIndices) const
+{
+    find_by_name_matching_ag_sr(*this, aName, aSeraIndices);
+
+} // Sera::find_by_name_matching
+
+// ----------------------------------------------------------------------
+
 void Antigens::continents(ContinentData& aContinentData, const LocDb& aLocDb) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {

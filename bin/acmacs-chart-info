@@ -22,6 +22,17 @@ def main(args):
     print("virus_type", virus_type, chart.chart_info().date())
     if args.list_names:
         list_names(chart)
+    elif args.find_by_name_matching:
+        find_by_name_matching(chart, args.find_by_name_matching)
+
+# ----------------------------------------------------------------------
+
+def find_by_name_matching(chart, name):
+    ag_no_w = len(str(chart.number_of_antigens()))
+    indices = chart.antigens().find_by_name_matching(name)
+    for ag_no in indices:
+        ag = chart.antigen(ag_no)
+        print(f"AG {ag_no:{ag_no_w}d} {ag.name()} {ag.reassortant()} {ag.passage()} {ag.annotations() or ''} [{ag.date()}] {ag.lab_id()}")
 
 # ----------------------------------------------------------------------
 
@@ -83,6 +94,7 @@ try:
     parser.add_argument('input', nargs=1, help='Chart file.')
     parser.add_argument('-n', '--names', action='store_true', dest='list_names', default=False, help='List antigen and serum names in chart.')
     # parser.add_argument('--not-found-names', action='store_true', dest='not_found_names', default=False, help='Report names not found in hidb.')
+    parser.add_argument('--find', action='store', dest='find_by_name_matching', default=None, help='List antigens matching passed name with optional passage or passage type (EGG, CELL).')
 
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel, format="%(levelname)s %(asctime)s: %(message)s")

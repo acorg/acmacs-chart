@@ -80,9 +80,11 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
 
     py::class_<Antigens>(m, "Antigens")
             .def("continents", [](const Antigens& antigens, const LocDb& aLocDb) { Antigens::ContinentData data; antigens.continents(data, aLocDb); return data; })
+            .def("find_by_name_matching", [](const Antigens& antigens, std::string aName) { std::vector<size_t> indices; antigens.find_by_name_matching(aName, indices); return indices; })
             ;
 
     py::class_<Sera>(m, "Sera")
+            .def("find_by_name_matching", [](const Sera& sera, std::string aName) { std::vector<size_t> indices; sera.find_by_name_matching(aName, indices); return indices; })
             ;
 
       // ----------------------------------------------------------------------
