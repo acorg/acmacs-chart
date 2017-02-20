@@ -21,30 +21,57 @@ def main(args):
     virus_type = chart.chart_info().virus_type()
     print("virus_type", virus_type, chart.chart_info().date())
     if args.list_names:
-        list_names(chart)
+        list_names(chart, args.name_type)
     elif args.find_by_name_matching:
-        find_by_name_matching(chart, args.find_by_name_matching)
+        find_by_name_matching(chart, args.find_by_name_matching, args.name_type)
 
 # ----------------------------------------------------------------------
 
-def find_by_name_matching(chart, name):
+def report_antigen(ag_no_w, ag_no, ag, name_type, locdb):
+    if name_type == "abbreviated":
+        print(f"AG {ag_no:{ag_no_w}d} {ag.abbreviated_name(locdb)} [{ag.date()}] {ag.lab_id()}")
+    elif name_type == "abbreviated_with_passage_type":
+        print(f"AG {ag_no:{ag_no_w}d} {ag.abbreviated_name_with_passage_type(locdb)} [{ag.date()}] {ag.lab_id()}")
+    else:
+        print(f"AG {ag_no:{ag_no_w}d} {ag.full_name()} [{ag.date()}] {ag.lab_id()}")
+
+# ----------------------------------------------------------------------
+
+def report_serum(sr_no_w, sr_no, sr, name_type, locdb):
+    if name_type in ["abbreviated", "abbreviated_with_passage_type"]:
+        print(f"SR {sr_no:{sr_no_w}d} {sr.abbreviated_name(locdb)} {sr.serum_id()} {sr.passage()}")
+    else:
+        print(f"SR {sr_no:{sr_no_w}d} {sr.full_name()} {sr.serum_id()} {sr.passage()}")
+
+# ----------------------------------------------------------------------
+
+def get_locdb(name_type):
+    if name_type in ["abbreviated", "abbreviated_with_passage_type"]:
+        import acmacs_chart.locdb_access
+        locdb = acmacs_chart.locdb_access.get_locdb()
+    else:
+        locdb = None
+    return locdb
+
+# ----------------------------------------------------------------------
+
+def find_by_name_matching(chart, name, name_type):
     ag_no_w = len(str(chart.number_of_antigens()))
+    locdb = get_locdb(name_type)
     indices = chart.antigens().find_by_name_matching(name)
     for ag_no in indices:
-        ag = chart.antigen(ag_no)
-        print(f"AG {ag_no:{ag_no_w}d} {ag.name()} {ag.reassortant()} {ag.passage()} {ag.annotations() or ''} [{ag.date()}] {ag.lab_id()}")
+        report_antigen(ag_no_w=ag_no_w, ag_no=ag_no, ag=chart.antigen(ag_no), name_type=name_type, locdb=locdb)
 
 # ----------------------------------------------------------------------
 
-def list_names(chart):
+def list_names(chart, name_type):
     ag_no_w = len(str(chart.number_of_antigens()))
+    locdb = get_locdb(name_type)
     for ag_no in range(chart.number_of_antigens()):
-        ag = chart.antigen(ag_no)
-        print(f"AG {ag_no:{ag_no_w}d} {ag.name()} {ag.reassortant()} {ag.passage()} {ag.annotations() or ''} [{ag.date()}] {ag.lab_id()}")
+        report_antigen(ag_no_w=ag_no_w, ag_no=ag_no, ag=chart.antigen(ag_no), name_type=name_type, locdb=locdb)
     print()
     for sr_no in range(chart.number_of_sera()):
-        sr = chart.serum(sr_no)
-        print(f"SR {sr_no:{ag_no_w}d} {sr.name()} {sr.reassortant()} {sr.serum_id()} {sr.passage()} {sr.annotations() or ''}")
+        report_serum(sr_no_w=ag_no_w, sr_no=sr_no, sr=chart.serum(sr_no), name_type=name_type, locdb=locdb)
 
     # for ag_no in range(chart.number_of_antigens()):
     #     ag = chart.antigen(ag_no)
@@ -93,6 +120,7 @@ try:
 
     parser.add_argument('input', nargs=1, help='Chart file.')
     parser.add_argument('-n', '--names', action='store_true', dest='list_names', default=False, help='List antigen and serum names in chart.')
+    parser.add_argument('--name-type', action='store', dest='name_type', default="full", help='full, abbreviated, abbreviated_with_passage_type.')
     # parser.add_argument('--not-found-names', action='store_true', dest='not_found_names', default=False, help='Report names not found in hidb.')
     parser.add_argument('--find', action='store', dest='find_by_name_matching', default=None, help='List antigens matching passed name with optional passage or passage type (EGG, CELL).')
 

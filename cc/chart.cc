@@ -19,6 +19,24 @@ AntigenSerum::~AntigenSerum()
 
 // ----------------------------------------------------------------------
 
+std::string AntigenSerum::name_abbreviated(const LocDb& aLocDb) const
+{
+    std::string virus_type, host, location, isolation, year, passage;
+    virus_name::split(name(), virus_type, host, location, isolation, year, passage);
+    return string::join("/", {aLocDb.abbreviation(location), isolation, year.substr(2)});
+
+} // AntigenSerum::name_abbreviated
+
+// ----------------------------------------------------------------------
+
+std::string AntigenSerum::location_abbreviated(const LocDb& aLocDb) const
+{
+    return aLocDb.abbreviation(virus_name::location(name()));
+
+} // AntigenSerum::location_abbreviated
+
+// ----------------------------------------------------------------------
+
 AntigenSerumMatch AntigenSerum::match(const AntigenSerum& aNother) const
 {
       // fields not used for matching

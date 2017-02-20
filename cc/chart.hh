@@ -59,6 +59,7 @@ class AntigenSerum
 
     virtual std::string full_name() const = 0;
     virtual std::string full_name_without_passage() const = 0;
+    virtual std::string abbreviated_name(const LocDb& aLocDb) const = 0;
 
     inline const std::string name() const { return mName; }
     inline std::string& name() { return mName; }
@@ -82,6 +83,9 @@ class AntigenSerum
     inline bool has_semantic(char c) const { return mSemanticAttributes.find(c) != std::string::npos; }
     inline const std::string semantic() const { return mSemanticAttributes; }
     inline void semantic(const char* str, size_t length) { mSemanticAttributes.assign(str, length); }
+    std::string passage_type() const { return is_egg() ? "egg" : "cell"; }
+    std::string name_abbreviated(const LocDb& aLocDb) const;
+    std::string location_abbreviated(const LocDb& aLocDb) const;
 
     virtual AntigenSerumMatch match(const AntigenSerum& aNother) const;
 
@@ -119,6 +123,8 @@ class Antigen : public AntigenSerum
     virtual inline std::string full_name() const { return string::join({name(), reassortant(), annotations().join(), passage()}); }
     virtual inline std::string full_name_without_passage() const { return string::join({name(), reassortant(), annotations().join()}); }
     virtual inline std::string full_name_for_seqdb_matching() const { return string::join({name(), reassortant(), passage(), annotations().join()}); } // annotations may part of the passage in seqdb (NIMR ISOLATE 1)
+    virtual inline std::string abbreviated_name(const LocDb& aLocDb) const { return string::join({name_abbreviated(aLocDb), reassortant(), annotations().join()}); }
+    virtual inline std::string abbreviated_name_with_passage_type(const LocDb& aLocDb) const { return string::join("-", {name_abbreviated(aLocDb), reassortant(), annotations().join(), passage_type()}); }
 
     // inline void name(const char* str, size_t length) { AntigenSerum::name(str, length); }
 
@@ -150,6 +156,7 @@ class Serum : public AntigenSerum
     inline Serum() : mHomologous(-1) {}
     virtual inline std::string full_name() const { return string::join({name(), reassortant(), serum_id(), annotations().join()}); } // serum_id comes before annotations, see hidb chart.cc Serum::variant_id
     virtual inline std::string full_name_without_passage() const { return full_name(); }
+    virtual inline std::string abbreviated_name(const LocDb& aLocDb) const { return string::join({name_abbreviated(aLocDb), reassortant(), annotations().join()}); }
 
     inline const std::string serum_id() const { return mSerumId; }
     inline std::string& serum_id() { return mSerumId; }
