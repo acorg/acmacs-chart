@@ -21,9 +21,14 @@ AntigenSerum::~AntigenSerum()
 
 std::string AntigenSerum::name_abbreviated(const LocDb& aLocDb) const
 {
-    std::string virus_type, host, location, isolation, year, passage;
-    virus_name::split(name(), virus_type, host, location, isolation, year, passage);
-    return string::join("/", {aLocDb.abbreviation(location), isolation, year.substr(2)});
+    try {
+        std::string virus_type, host, location, isolation, year, passage;
+        virus_name::split(name(), virus_type, host, location, isolation, year, passage);
+        return string::join("/", {aLocDb.abbreviation(location), isolation, year.substr(2)});
+    }
+    catch (virus_name::Unrecognized&) {
+        return name();
+    }
 
 } // AntigenSerum::name_abbreviated
 
