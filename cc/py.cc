@@ -88,6 +88,9 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("reference_indices", [](const Antigens& antigens) { std::vector<size_t> indices; antigens.reference_indices(indices); return indices; })
             .def("test_indices", [](const Antigens& antigens) { std::vector<size_t> indices; antigens.test_indices(indices); return indices; })
             .def("date_range_indices", [](const Antigens& antigens, std::string first_date, std::string after_last_date) { std::vector<size_t> indices; antigens.date_range_indices(first_date, after_last_date, indices); return indices; }, py::arg("first") = std::string(), py::arg("after_last") = std::string())
+            .def("egg_indices", [](const Antigens& antigens) { std::vector<size_t> indices; antigens.egg_indices(indices); return indices; })
+            .def("cell_indices", [](const Antigens& antigens) { std::vector<size_t> indices; antigens.cell_indices(indices); return indices; })
+            .def("reassortant_indices", [](const Antigens& antigens) { std::vector<size_t> indices; antigens.reassortant_indices(indices); return indices; })
             ;
 
     py::class_<Sera>(m, "Sera")

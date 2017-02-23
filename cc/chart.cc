@@ -294,6 +294,39 @@ void Antigens::date_range_indices(std::string first_date, std::string after_last
 
 // ----------------------------------------------------------------------
 
+void Antigens::egg_indices(std::vector<size_t>& aAntigenIndices) const
+{
+    for (auto a = begin(); a != end(); ++a) {
+        if (a->is_egg())
+            aAntigenIndices.push_back(static_cast<size_t>(a - begin()));
+    }
+
+} // Antigens::egg_indices
+
+// ----------------------------------------------------------------------
+
+void Antigens::cell_indices(std::vector<size_t>& aAntigenIndices) const
+{
+    for (auto a = begin(); a != end(); ++a) {
+        if (!a->is_egg())
+            aAntigenIndices.push_back(static_cast<size_t>(a - begin()));
+    }
+
+} // Antigens::cell_indices
+
+// ----------------------------------------------------------------------
+
+void Antigens::reassortant_indices(std::vector<size_t>& aAntigenIndices) const
+{
+    for (auto a = begin(); a != end(); ++a) {
+        if (a->is_reassortant())
+            aAntigenIndices.push_back(static_cast<size_t>(a - begin()));
+    }
+
+} // Antigens::reassortant_indices
+
+// ----------------------------------------------------------------------
+
 std::string ChartInfo::merge_text_fields(std::string ChartInfo::* aMember) const
 {
     std::string result = this->*aMember;

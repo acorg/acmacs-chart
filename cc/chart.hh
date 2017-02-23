@@ -203,6 +203,9 @@ class Antigens : public std::vector<Antigen>
     void reference_indices(std::vector<size_t>& aAntigenIndices) const;
     void test_indices(std::vector<size_t>& aAntigenIndices) const;
     void date_range_indices(std::string first_date, std::string after_last_date, std::vector<size_t>& aAntigenIndices) const;
+    void egg_indices(std::vector<size_t>& aAntigenIndices) const;
+    void cell_indices(std::vector<size_t>& aAntigenIndices) const;
+    void reassortant_indices(std::vector<size_t>& aAntigenIndices) const;
 
 }; // class Antigens
 
