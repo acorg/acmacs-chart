@@ -200,6 +200,9 @@ class Antigens : public std::vector<Antigen>
     void find_by_name_matching(std::string aName, std::vector<size_t>& aAntigenIndices) const;
     void continents(ContinentData& aContinentData, const LocDb& aLocDb) const;
     void country(std::string aCountry, std::vector<size_t>& aAntigenIndices, const LocDb& aLocDb) const;
+    void reference_indices(std::vector<size_t>& aAntigenIndices) const;
+    void test_indices(std::vector<size_t>& aAntigenIndices) const;
+    void date_range_indices(std::string first_date, std::string after_last_date, std::vector<size_t>& aAntigenIndices) const;
 
 }; // class Antigens
 

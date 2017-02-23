@@ -260,6 +260,40 @@ void Antigens::country(std::string aCountry, std::vector<size_t>& aAntigenIndice
 
 // ----------------------------------------------------------------------
 
+void Antigens::reference_indices(std::vector<size_t>& aAntigenIndices) const
+{
+    for (auto a = begin(); a != end(); ++a) {
+        if (a->reference())
+            aAntigenIndices.push_back(static_cast<size_t>(a - begin()));
+    }
+
+} // Antigens::reference_indices
+
+// ----------------------------------------------------------------------
+
+void Antigens::test_indices(std::vector<size_t>& aAntigenIndices) const
+{
+    for (auto a = begin(); a != end(); ++a) {
+        if (!a->reference())
+            aAntigenIndices.push_back(static_cast<size_t>(a - begin()));
+    }
+
+} // Antigens::test_indices
+
+// ----------------------------------------------------------------------
+
+void Antigens::date_range_indices(std::string first_date, std::string after_last_date, std::vector<size_t>& aAntigenIndices) const
+{
+    for (auto a = begin(); a != end(); ++a) {
+        const std::string date = a->date();
+        if (!date.empty() && (first_date.empty() || date >= first_date) && (after_last_date.empty() || date < after_last_date))
+            aAntigenIndices.push_back(static_cast<size_t>(a - begin()));
+    }
+
+} // Antigens::date_range_indices
+
+// ----------------------------------------------------------------------
+
 std::string ChartInfo::merge_text_fields(std::string ChartInfo::* aMember) const
 {
     std::string result = this->*aMember;
