@@ -192,6 +192,7 @@ class Antigens : public std::vector<Antigen>
 {
  public:
     using ContinentData = std::map<std::string, std::vector<size_t>>; // continent name to the list of antigen indices
+    using CountryData = std::map<std::string, std::vector<size_t>>; // country name to the list of antigen indices
     using CladeData = std::map<std::string, std::vector<size_t>>; // clade name to the list of antigen indices
 
     inline Antigens() {}
@@ -199,6 +200,7 @@ class Antigens : public std::vector<Antigen>
     void find_by_name(std::string aName, std::vector<size_t>& aAntigenIndices) const;
     void find_by_name_matching(std::string aName, std::vector<size_t>& aAntigenIndices) const;
     void continents(ContinentData& aContinentData, const LocDb& aLocDb) const;
+    void countries(CountryData& aCountries, const LocDb& aLocDb) const;
     void country(std::string aCountry, std::vector<size_t>& aAntigenIndices, const LocDb& aLocDb) const;
     void reference_indices(std::vector<size_t>& aAntigenIndices) const;
     void test_indices(std::vector<size_t>& aAntigenIndices) const;

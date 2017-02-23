@@ -247,6 +247,18 @@ void Antigens::continents(ContinentData& aContinentData, const LocDb& aLocDb) co
 
 // ----------------------------------------------------------------------
 
+void Antigens::countries(CountryData& aCountries, const LocDb& aLocDb) const
+{
+    for (auto ag = begin(); ag != end(); ++ag) {
+        const std::string location = virus_name::location(ag->name());
+        const std::string country = aLocDb.country(location);
+        aCountries[country].push_back(static_cast<size_t>(ag - begin()));
+    }
+
+} // Antigens::countries
+
+// ----------------------------------------------------------------------
+
 void Antigens::country(std::string aCountry, std::vector<size_t>& aAntigenIndices, const LocDb& aLocDb) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {
