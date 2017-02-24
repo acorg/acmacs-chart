@@ -24,6 +24,8 @@ def main(args):
         list_names(chart, args.name_type)
     elif args.find_by_name_matching:
         find_by_name_matching(chart, args.find_by_name_matching, args.name_type)
+    elif args.homologous_for_sera:
+        list_homologous_for_sera(chart)
 
 # ----------------------------------------------------------------------
 
@@ -61,6 +63,20 @@ def find_by_name_matching(chart, name, name_type):
     indices = chart.antigens().find_by_name_matching(name)
     for ag_no in indices:
         report_antigen(ag_no_w=ag_no_w, ag_no=ag_no, ag=chart.antigen(ag_no), name_type=name_type, locdb=locdb)
+
+# ----------------------------------------------------------------------
+
+def list_homologous_for_sera(chart):
+    chart.find_homologous_antigen_for_sera()
+    for sr_no in range(chart.number_of_sera()):
+        sr = chart.serum(sr_no)
+        print(f"SR {sr_no:3d} {sr.full_name()} {sr.serum_id()} {sr.passage()}")
+        ag_no = sr.homologous()
+        if ag_no >= 0:
+            ag = chart.antigen(ag_no)
+            print(f"    AG {ag_no:4d} {ag.full_name()} [{ag.date()}] {ag.lab_id()}")
+        else:
+            print("    no homologous")
 
 # ----------------------------------------------------------------------
 
@@ -123,6 +139,7 @@ try:
     parser.add_argument('--name-type', action='store', dest='name_type', default="full", help='full, abbreviated, abbreviated_with_passage_type.')
     # parser.add_argument('--not-found-names', action='store_true', dest='not_found_names', default=False, help='Report names not found in hidb.')
     parser.add_argument('--find', action='store', dest='find_by_name_matching', default=None, help='List antigens matching passed name with optional passage or passage type (EGG, CELL).')
+    parser.add_argument('--homologous-for-sera', action='store_true', dest='homologous_for_sera', default=False, help='List sera and their homologous antigens.')
 
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel, format="%(levelname)s %(asctime)s: %(message)s")

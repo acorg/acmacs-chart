@@ -127,7 +127,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("make_name", &Chart::make_name)
             // .def("vaccines", &Chart::vaccines, py::arg("name"), py::arg("hidb"))
             // .def("table_id", &Chart::table_id)
-            // .def("find_homologous_antigen_for_sera", &Chart::find_homologous_antigen_for_sera)
+            .def("find_homologous_antigen_for_sera", &Chart::find_homologous_antigen_for_sera)
             .def("chart_info", py::overload_cast<>(&Chart::chart_info, py::const_), py::return_value_policy::reference)
         ;
 
