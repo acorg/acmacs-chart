@@ -71,10 +71,11 @@ def list_homologous_for_sera(chart):
     for sr_no in range(chart.number_of_sera()):
         sr = chart.serum(sr_no)
         print(f"SR {sr_no:3d} {sr.full_name()} {sr.serum_id()} {sr.passage()}")
-        ag_no = sr.homologous()
-        if ag_no >= 0:
-            ag = chart.antigen(ag_no)
-            print(f"    AG {ag_no:4d} {ag.full_name()} [{ag.date()}] {ag.lab_id()}")
+        ags = sr.homologous()
+        if ags:
+            for ag_no in ags:
+                ag = chart.antigen(ag_no)
+                print(f"    AG {ag_no:4d} {ag.full_name()} [{ag.date()}] {ag.lab_id()}")
         else:
             print("    no homologous")
 

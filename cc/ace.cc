@@ -320,7 +320,7 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
                   << jsw::if_not_empty("R", aSerum.reassortant())
                   << jsw::if_not_empty("S", aSerum.semantic())
                   << jsw::if_not_empty("a", aSerum.annotations())
-                  << jsw::if_non_negative("h", aSerum.homologous())
+                  << jsw::if_not_empty("h", aSerum.homologous())
                   << jsw::if_not_empty("s", aSerum.serum_species())
                   << jsw::end_object;
 }

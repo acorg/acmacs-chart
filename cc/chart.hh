@@ -153,7 +153,7 @@ class Antigen : public AntigenSerum
 class Serum : public AntigenSerum
 {
  public:
-    inline Serum() : mHomologous(-1) {}
+    inline Serum() = default;
     virtual inline std::string full_name() const { return string::join({name(), reassortant(), serum_id(), annotations().join()}); } // serum_id comes before annotations, see hidb chart.cc Serum::variant_id
     virtual inline std::string full_name_without_passage() const { return full_name(); }
     virtual inline std::string abbreviated_name(const LocDb& aLocDb) const { return string::join({name_abbreviated(aLocDb), reassortant(), annotations().join()}); }
@@ -165,10 +165,17 @@ class Serum : public AntigenSerum
     inline std::string& serum_species() { return mSerumSpecies; }
     inline void serum_species(const char* str, size_t length) { mSerumSpecies.assign(str, length); }
 
-    template <typename No> inline void set_homologous(No ag_no) { mHomologous = static_cast<decltype(mHomologous)>(ag_no); }
-    inline bool has_homologous() const { return mHomologous >= 0; }
-    inline int homologous() const { return mHomologous; }
-    inline void homologous(int aHomologous) { mHomologous = aHomologous; }
+    inline void add_homologous(size_t ag_no)
+        {
+            auto found = std::find(mHomologous.begin(), mHomologous.end(), ag_no);
+            if (found == mHomologous.end())
+                mHomologous.push_back(ag_no);
+        }
+
+    template <typename No> inline void add_homologous(No ag_no) { add_homologous(static_cast<size_t>(ag_no)); }
+    inline bool has_homologous() const { return !mHomologous.empty(); }
+    inline const std::vector<size_t>& homologous() const { return mHomologous; }
+    inline std::vector<size_t>& homologous() { return mHomologous; }
 
     using AntigenSerum::match;
     virtual AntigenSerumMatch match(const Serum& aSerum) const;
@@ -179,7 +186,7 @@ class Serum : public AntigenSerum
 
  private:
     std::string mSerumId; // "I"
-    int mHomologous; // "h"
+    std::vector<size_t> mHomologous; // "h"
     std::string mSerumSpecies; // "s"
 
 }; // class Serum
@@ -229,7 +236,6 @@ class Sera : public std::vector<Serum>
 class Projection
 {
  public:
-      // inline Serum(Chart& aChart) : AntigenSerum(aChart), mHomologous(-1) {}
     inline Projection() : mStress(-1), mDodgyTiterIsRegular(false), mStressDiffToStop(1e-10) {}
 
     inline void comment(const char* str, size_t length) { mComment.assign(str, length); }
