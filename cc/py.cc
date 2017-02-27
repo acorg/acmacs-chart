@@ -3,6 +3,7 @@
 
 #include "chart.hh"
 #include "ace.hh"
+#include "lispmds.hh"
 
 // ----------------------------------------------------------------------
 
@@ -134,6 +135,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
     m.def("import_chart", &import_chart, py::arg("data"), py::doc("Imports chart from a buffer or file in the ace format."));
     m.def("import_chart", [](py::bytes data) { return import_chart(data); }, py::arg("data"), py::doc("Imports chart from a buffer or file in the ace format."));
     m.def("export_chart", &export_chart, py::arg("filename"), py::arg("chart"), py::doc("Exports chart into a file in the ace format."));
+    m.def("export_chart_lispmds", &export_chart_lispmds, py::arg("filename"), py::arg("chart"), py::doc("Exports chart into a file in the lispmds save format."));
 
     return m.ptr();
 }

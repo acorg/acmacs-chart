@@ -394,6 +394,25 @@ const std::string Chart::make_name() const
 
 // ----------------------------------------------------------------------
 
+std::string ChartTiters::get(size_t ag_no, size_t sr_no) const
+{
+    std::string result = "*";
+    if (!mList.empty()) {
+        result = mList[ag_no][sr_no];
+    }
+    else if (!mDict.empty()) {
+        const auto& ag = mDict[ag_no];
+        const std::string sr_no_s = std::to_string(sr_no);
+        auto entry = std::find_if(ag.begin(), ag.end(), [&sr_no_s](const auto& e) -> bool { return e.first == sr_no_s; });
+        if (entry != ag.end())
+            result = entry->second;
+    }
+    return result;
+
+} // ChartTiters::get
+
+// ----------------------------------------------------------------------
+
 std::string Chart::lineage() const
 {
     std::set<std::string> lineages;
@@ -463,6 +482,39 @@ void Chart::find_homologous_antigen_for_sera()
     }
 
 } // Chart::find_homologous_antigen_for_sera
+
+// ----------------------------------------------------------------------
+
+void Chart::compute_column_bases(std::string aMinimumColumnBasis, std::vector<double>& aColumnBases) const
+{
+    const int min_col_basis = aMinimumColumnBasis == "none" || aMinimumColumnBasis == "auto" ? 0 : std::stoi(aMinimumColumnBasis);
+    for (size_t sr_no = 0; sr_no < number_of_sera(); ++sr_no) {
+        int max_titer = 0;
+        for (size_t ag_no = 0; ag_no < number_of_antigens(); ++ag_no) {
+            const std::string titer = titers().get(ag_no, sr_no);
+            if (!titer.empty() && titer[0] != '*') {
+                int value;
+                if ((titer[0] == '>' || titer[0] == '<') && titer.size() > 1) {
+                    value = std::stoi(titer.substr(1));
+                    if (titer[0] == '>')
+                        value *= 2;
+                }
+                else {
+                    value = std::stoi(titer);
+                }
+                if (value > max_titer)
+                    max_titer = value;
+            }
+        }
+        if (max_titer < min_col_basis)
+            max_titer = min_col_basis;
+        aColumnBases.push_back(std::log2(max_titer / 10.0));
+    }
+
+} // Chart::compute_column_bases
+
+// ----------------------------------------------------------------------
+
 
 // ----------------------------------------------------------------------
 /// Local Variables:

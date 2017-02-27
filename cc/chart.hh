@@ -293,7 +293,7 @@ class Projection
     std::vector<size_t> mDisconnected;              // "D": [] list of indices of disconnected points (antigen/serum attribute for stress evaluation)
     std::vector<size_t> mUnmovableInLastDimension;  // "u": [] list of indices of points unmovable in the last dimension (antigen/serum attribute for stress evaluation)
 
-}; // class Serum
+}; // class Projection
 
 // ----------------------------------------------------------------------
 
@@ -397,6 +397,8 @@ class ChartTiters
     inline const Dict& dict() const { return mDict; }
     inline const Layers& layers() const { return mLayers; }
 
+    std::string get(size_t ag_no, size_t sr_no) const;
+
  private:
     List mList;                 // "l"
     Dict mDict;                 // "d"
@@ -438,10 +440,12 @@ class Chart
 
     inline const auto& column_bases() const { return mColumnBases; }
     inline auto& column_bases() { return mColumnBases; }
+    void compute_column_bases(std::string aMinimumColumnBasis, std::vector<double>& aColumnBases) const;
 
     inline std::vector<Projection>& projections() { return mProjections; }
     inline const std::vector<Projection>& projections() const { return mProjections; }
     inline Projection& projection(size_t aProjectionNo) { return mProjections[aProjectionNo]; }
+    inline const Projection& projection(size_t aProjectionNo) const { return mProjections[aProjectionNo]; }
 
     inline const ChartPlotSpec& plot_spec() const { return mPlotSpec; }
     inline ChartPlotSpec& plot_spec() { return mPlotSpec; }
