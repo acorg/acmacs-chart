@@ -1,13 +1,15 @@
 #pragma once
 
 #include <string>
-
-#include "point-style.hh"
+#include <vector>
 
 // ----------------------------------------------------------------------
 
 class Chart;
+class PointStyle;
+
 void export_chart_lispmds(std::string aFilename, const Chart& aChart);
+void export_chart_lispmds(std::string aFilename, const Chart& aChart, const std::vector<PointStyle>& aPointStyles);
 
 // ----------------------------------------------------------------------
 /// Local Variables:

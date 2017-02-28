@@ -6,15 +6,16 @@
 
 #include "lispmds.hh"
 #include "chart.hh"
+#include "point-style.hh"
 
 // ----------------------------------------------------------------------
 
-static std::string make_lispmds(const Chart& aChart);
+static std::string make_lispmds(const Chart& aChart, const std::vector<PointStyle>& aPointStyles);
 static std::string table(const Chart& aChart);
 static std::string reference_antigens(const Chart& aChart);
 static std::string projections(const Chart& aChart);
 static std::string layout(const Projection& aProjection, const Chart& aChart);
-static std::string plot_spec(const Chart& aChart);
+static std::string plot_spec(const Chart& aChart, const std::vector<PointStyle>& aPointStyles);
 static std::string transformation(const Chart& aChart);
 static std::string acmacs_b1_data(const Chart& aChart);
 static std::string encode(std::string aSource);
@@ -25,13 +26,22 @@ static std::string double_to_string_lisp(double aValue);
 
 void export_chart_lispmds(std::string aFilename, const Chart& aChart)
 {
-    acmacs_base::write_file(aFilename, make_lispmds(aChart));
+    std::vector<PointStyle> point_styles;
+    acmacs_base::write_file(aFilename, make_lispmds(aChart, point_styles));
 
 } // export_chart_lispmds
 
 // ----------------------------------------------------------------------
 
-std::string make_lispmds(const Chart& aChart)
+void export_chart_lispmds(std::string aFilename, const Chart& aChart, const std::vector<PointStyle>& aPointStyles)
+{
+    acmacs_base::write_file(aFilename, make_lispmds(aChart, aPointStyles));
+
+} // export_chart_lispmds
+
+// ----------------------------------------------------------------------
+
+std::string make_lispmds(const Chart& aChart, const std::vector<PointStyle>& aPointStyles)
 {
     std::string output = ";; MDS configuration file (version 0.5). -*- Lisp -*-\n;; Created by acmacsd/acmacs-chart at ";
     output += time_format("%Y-%m-%d %H:%M %Z\n");
@@ -50,7 +60,7 @@ std::string make_lispmds(const Chart& aChart)
     output += projections(aChart);
     output += "    :MOVEABLE-COORDS 'ALL\n    :UNMOVEABLE-COORDS 'NIL\n";
     output += transformation(aChart);
-    output += plot_spec(aChart);
+    output += plot_spec(aChart, aPointStyles);
     output += acmacs_b1_data(aChart);
     output += ")\n";
 
@@ -188,9 +198,19 @@ std::string layout(const Projection& aProjection, const Chart& aChart)
 
 // ----------------------------------------------------------------------
 
-std::string plot_spec(const Chart& aChart)
+std::string plot_spec(const Chart& aChart, const std::vector<PointStyle>& aPointStyles)
 {
     std::string output;
+    if (!aPointStyles.empty()) {
+        const auto& antigens = aChart.antigens();
+        const auto& sera = aChart.sera();
+        output += "    :PLOT-SPEC '(\n";
+        for (size_t ag_no = 0; ag_no < antigens.size(); ++ag_no) {
+            output += "        (" + encode(antigens[ag_no].full_name());
+            output += ")\n";
+        }
+        output += "    )\n";
+    }
     return output;
 
 } // plot_spec
