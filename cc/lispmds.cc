@@ -10,7 +10,12 @@
 // ----------------------------------------------------------------------
 
 static std::string make_lispmds(const Chart& aChart);
+static std::string table(const Chart& aChart);
+static std::string reference_antigens(const Chart& aChart);
+static std::string projections(const Chart& aChart);
 static std::string layout(const Projection& aProjection, const Chart& aChart);
+static std::string plot_spec(const Chart& aChart);
+static std::string transformation(const Chart& aChart);
 static std::string acmacs_b1_data(const Chart& aChart);
 static std::string encode(std::string aSource);
 static std::string convert_titer(std::string aSource);
@@ -39,11 +44,29 @@ std::string make_lispmds(const Chart& aChart)
     }
     output += "\n";
 
+    output += "(MAKE-MASTER-MDS-WINDOW\n";
+    output += table(aChart);
+    output += reference_antigens(aChart);
+    output += projections(aChart);
+    output += "    :MOVEABLE-COORDS 'ALL\n    :UNMOVEABLE-COORDS 'NIL\n";
+    output += transformation(aChart);
+    output += plot_spec(aChart);
+    output += acmacs_b1_data(aChart);
+    output += ")\n";
+
+    return output;
+
+} // make_lispmds
+
+// ----------------------------------------------------------------------
+
+std::string table(const Chart& aChart)
+{
     const auto& antigens = aChart.antigens();
     const auto& sera = aChart.sera();
-    const auto& projections = aChart.projections();
 
-    output += "(MAKE-MASTER-MDS-WINDOW\n    (HI-IN '(\n";
+    std::string output;
+    output += "    (HI-IN '(\n";
     for (const auto& antigen: antigens)
         output += "             " + encode(antigen.full_name()) + "\n";
     output += "            )\n            '(\n";
@@ -65,7 +88,16 @@ std::string make_lispmds(const Chart& aChart)
     output += "            )\n";
     output += "            '" + encode(aChart.make_name()) + "\n";
     output += "            )\n";
+    return output;
 
+} // table
+
+// ----------------------------------------------------------------------
+
+std::string reference_antigens(const Chart& aChart)
+{
+    std::string output;
+    const auto& antigens = aChart.antigens();
     std::vector<size_t> reference_antigens;
     antigens.reference_indices(reference_antigens);
     if (!reference_antigens.empty()) {
@@ -74,12 +106,23 @@ std::string make_lispmds(const Chart& aChart)
             output += "        " + encode(antigens[index].full_name()) + "\n";
         output += "    )\n";
     }
+    return output;
+
+} // reference_antigens
+
+// ----------------------------------------------------------------------
+
+std::string projections(const Chart& aChart)
+{
+    std::string output;
+    const auto& projections = aChart.projections();
     if (!projections.empty()) {
+        const size_t number_of_dimentions = projections[0].number_of_dimentions();
+        output += "    :MDS-DIMENSIONS '" + std::to_string(number_of_dimentions) + "\n";
         output += "    :STARTING-COORDSS '(\n";
         output += layout(projections[0], aChart);
 
         output += "    :BATCH-RUNS '(\n";
-        const size_t number_of_dimentions = projections[0].number_of_dimentions();
         for (const auto& projection: projections) {
             if (projection.number_of_dimentions() == number_of_dimentions) {
                 output += "    ((\n";
@@ -89,18 +132,9 @@ std::string make_lispmds(const Chart& aChart)
         }
         output += "    )\n";
     }
-    output += acmacs_b1_data(aChart);
-      // :MINIMUM-COLUMN-BASIS '"off"
-      // :PLOT-SPEC '(
-      // :BATCH-RUNS 'NIL
-      // :MDS-DIMENSIONS '2
-    output += "    :MOVEABLE-COORDS 'ALL\n    :UNMOVEABLE-COORDS 'NIL\n";
-      // :CANVAS-COORD-TRANSFORMATIONS '(
-    output += ")\n";
-
     return output;
 
-} // make_lispmds
+} // projections
 
 // ----------------------------------------------------------------------
 
@@ -151,6 +185,45 @@ std::string layout(const Projection& aProjection, const Chart& aChart)
     return output;
 
 } // layout
+
+// ----------------------------------------------------------------------
+
+std::string plot_spec(const Chart& aChart)
+{
+    std::string output;
+    return output;
+
+} // plot_spec
+
+// ----------------------------------------------------------------------
+
+std::string transformation(const Chart& aChart)
+{
+    std::string output;
+    output += R"(    :CANVAS-COORD-TRANSFORMATIONS '(
+        :CANVAS-WIDTH 530 :CANVAS-HEIGHT 450
+        :CANVAS-X-COORD-TRANSLATION 150 :CANVAS-Y-COORD-TRANSLATION 150
+        :CANVAS-X-COORD-SCALE 150 :CANVAS-Y-COORD-SCALE 150
+)";
+    if (!aChart.projections().empty()) {
+        const auto& transformation = aChart.projection(0).transformation();
+        output += "        :CANVAS-BASIS-VECTOR-0 (" + double_to_string_lisp(transformation[0]) + " " + double_to_string_lisp(- transformation[2]) + ")\n";
+        output += "        :CANVAS-BASIS-VECTOR-1 (" + double_to_string_lisp(transformation[1]) + " " + double_to_string_lisp(- transformation[3]) + ")\n";
+    }
+    else {
+        output += "        :CANVAS-BASIS-VECTOR-0 (1.0 0.0)\n";
+        output += "        :CANVAS-BASIS-VECTOR-1 (0.0 1.0)\n";
+    }
+    output += R"(        :FIRST-DIMENSION 0 :SECOND-DIMENSION 1
+        :BASIS-VECTOR-POINT-INDICES NIL :BASIS-VECTOR-POINT-INDICES-BACKUP NIL
+        :BASIS-VECTOR-X-COORD-TRANSLATION 0 :BASIS-VECTOR-Y-COORD-TRANSLATION 0
+        :BASIS-VECTOR-X-COORD-SCALE 1 :BASIS-VECTOR-Y-COORD-SCALE 1
+        :TRANSLATE-TO-FIT-MDS-WINDOW T :SCALE-TO-FIT-MDS-WINDOW T
+    )
+)";
+    return output;
+
+} // transformation
 
 // ----------------------------------------------------------------------
 
