@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "point-style.hh"
+
 // ----------------------------------------------------------------------
 
 class Chart;
