@@ -277,6 +277,15 @@ class Projection
     inline std::vector<size_t>& unmovable_in_last_dimension() { return mUnmovableInLastDimension; }
     inline const std::vector<size_t>& unmovable_in_last_dimension() const { return mUnmovableInLastDimension; }
 
+    inline size_t number_of_dimentions() const
+        {
+            for (const auto& point: mLayout) {
+                if (!point.empty())
+                    return point.size();
+            }
+            throw std::runtime_error("Internal: cannot find number_of_dimentions of projection");
+        }
+
  private:
     std::string mComment;                           // "c"
     Layout mLayout;       // "l": [[]] layout, list of lists of doubles, if point is disconnected: emtpy list or ?[NaN, NaN]
