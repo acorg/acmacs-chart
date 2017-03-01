@@ -206,7 +206,12 @@ std::string plot_spec(const Chart& aChart, const std::vector<PointStyle>& aPoint
         const auto& sera = aChart.sera();
         output += "    :PLOT-SPEC '(\n";
         for (size_t ag_no = 0; ag_no < antigens.size(); ++ag_no) {
-            output += "        (" + encode(antigens[ag_no].full_name());
+            const std::string encoded_name = encode(antigens[ag_no].full_name());
+            const PointStyle& style = aPointStyles[ag_no];
+            const std::string co = style.fill_raw().alphaI() ? std::string("{}") : style.fill_hex();
+            const std::string oc = style.outline_raw().alphaI() ? std::string("{}") : style.outline_hex();
+                // wn = ':WN "{}" '.format(wn_s) display_name
+            output += "        (" + encoded_name + " :CO \"" + co + "\" :OC \"" + oc + "\" :DS " + double_to_string_lisp(style.size().value()) + " :NC \"black\" :SH \"CIRCLE\" :NM \"" + encoded_name + "-AG\"";
             output += ")\n";
         }
         output += "    )\n";
