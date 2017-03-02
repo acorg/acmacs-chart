@@ -368,8 +368,8 @@ std::string double_to_string_lisp(double aValue)
     auto e_pos = result.find('e');
     if (e_pos != std::string::npos)
         result[e_pos] = 'd';
-    else
-        result += "d0";
+    // else
+    //     result += "d0";
     return result;
 
 } // double_to_string_lisp
