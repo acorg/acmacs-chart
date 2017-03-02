@@ -211,7 +211,7 @@ std::string plot_spec(const Chart& aChart, const std::vector<PointStyle>& aPoint
             const PointStyle& style = aPointStyles[ag_no];
             const std::string co = style.fill_raw().alphaI() ? std::string("{}") : style.fill_hex();
             const std::string oc = style.outline_raw().alphaI() ? std::string("{}") : style.outline_hex();
-            output += "        (" + encoded_name + " :CO \"" + co + "\" :OC \"" + oc + "\" :DS "
+            output += "        (" + encoded_name + "-AG :CO \"" + co + "\" :OC \"" + oc + "\" :DS "
                     + double_to_string_lisp(style.size().value()) + " :NC \"black\" :SH \"CIRCLE\" :NM \"" + encoded_name
                     + "-AG\" :WN \"" + full_name + "\")\n";
         }
@@ -221,7 +221,7 @@ std::string plot_spec(const Chart& aChart, const std::vector<PointStyle>& aPoint
             const PointStyle& style = aPointStyles[antigens.size() + sr_no];
             const std::string co = style.fill_raw().alphaI() ? std::string("{}") : style.fill_hex();
             const std::string oc = style.outline_raw().alphaI() ? std::string("{}") : style.outline_hex();
-            output += "        (" + encoded_name + " :CO \"" + co + "\" :OC \"" + oc + "\" :DS "
+            output += "        (" + encoded_name + "-SR :CO \"" + co + "\" :OC \"" + oc + "\" :DS "
                     + double_to_string_lisp(style.size().value()) + " :NC \"black\" :SH \"RECTANGLE\" :NM \"" + encoded_name
                     + "-SR\" :WN \"" + full_name + "\")\n";
         }
@@ -243,8 +243,8 @@ std::string transformation(const Chart& aChart)
 )";
     if (!aChart.projections().empty()) {
         const auto& transformation = aChart.projection(0).transformation();
-        output += "        :CANVAS-BASIS-VECTOR-0 (" + double_to_string_lisp(transformation[0]) + " " + double_to_string_lisp(- transformation[2]) + ")\n";
-        output += "        :CANVAS-BASIS-VECTOR-1 (" + double_to_string_lisp(transformation[1]) + " " + double_to_string_lisp(- transformation[3]) + ")\n";
+        output += "        :CANVAS-BASIS-VECTOR-0 (" + double_to_string_lisp(transformation[0]) + " " + double_to_string_lisp(transformation[2]) + ")\n";
+        output += "        :CANVAS-BASIS-VECTOR-1 (" + double_to_string_lisp(transformation[1]) + " " + double_to_string_lisp(transformation[3]) + ")\n";
     }
     else {
         output += "        :CANVAS-BASIS-VECTOR-0 (1.0 0.0)\n";
