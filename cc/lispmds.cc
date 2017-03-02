@@ -10,13 +10,13 @@
 
 // ----------------------------------------------------------------------
 
-static std::string make_lispmds(const Chart& aChart, const std::vector<PointStyle>& aPointStyles);
+static std::string make_lispmds(const Chart& aChart, const std::vector<PointStyle>& aPointStyles, const Transformation* aTransformation);
 static std::string table(const Chart& aChart);
 static std::string reference_antigens(const Chart& aChart);
 static std::string projections(const Chart& aChart);
 static std::string layout(const Projection& aProjection, const Chart& aChart);
 static std::string plot_spec(const Chart& aChart, const std::vector<PointStyle>& aPointStyles);
-static std::string transformation(const Chart& aChart);
+static std::string transformation(const Chart& aChart, const Transformation* aTransformation);
 static std::string acmacs_b1_data(const Chart& aChart);
 static std::string encode(std::string aSource);
 static std::string convert_titer(std::string aSource);
@@ -27,21 +27,21 @@ static std::string double_to_string_lisp(double aValue);
 void export_chart_lispmds(std::string aFilename, const Chart& aChart)
 {
     std::vector<PointStyle> point_styles;
-    acmacs_base::write_file(aFilename, make_lispmds(aChart, point_styles));
+    acmacs_base::write_file(aFilename, make_lispmds(aChart, point_styles, nullptr));
 
 } // export_chart_lispmds
 
 // ----------------------------------------------------------------------
 
-void export_chart_lispmds(std::string aFilename, const Chart& aChart, const std::vector<PointStyle>& aPointStyles)
+void export_chart_lispmds(std::string aFilename, const Chart& aChart, const std::vector<PointStyle>& aPointStyles, const Transformation& aTransformation)
 {
-    acmacs_base::write_file(aFilename, make_lispmds(aChart, aPointStyles));
+    acmacs_base::write_file(aFilename, make_lispmds(aChart, aPointStyles, &aTransformation));
 
 } // export_chart_lispmds
 
 // ----------------------------------------------------------------------
 
-std::string make_lispmds(const Chart& aChart, const std::vector<PointStyle>& aPointStyles)
+std::string make_lispmds(const Chart& aChart, const std::vector<PointStyle>& aPointStyles, const Transformation* aTransformation)
 {
     std::string output = ";; MDS configuration file (version 0.5). -*- Lisp -*-\n;; Created by acmacsd/acmacs-chart at ";
     output += time_format("%Y-%m-%d %H:%M %Z\n");
@@ -59,7 +59,7 @@ std::string make_lispmds(const Chart& aChart, const std::vector<PointStyle>& aPo
     output += reference_antigens(aChart);
     output += projections(aChart);
     output += "    :MOVEABLE-COORDS 'ALL\n    :UNMOVEABLE-COORDS 'NIL\n";
-    output += transformation(aChart);
+    output += transformation(aChart, aTransformation);
     output += plot_spec(aChart, aPointStyles);
     output += acmacs_b1_data(aChart);
     output += ")\n";
@@ -233,7 +233,7 @@ std::string plot_spec(const Chart& aChart, const std::vector<PointStyle>& aPoint
 
 // ----------------------------------------------------------------------
 
-std::string transformation(const Chart& aChart)
+std::string transformation(const Chart& aChart, const Transformation* aTransformation)
 {
     std::string output;
     output += R"(    :CANVAS-COORD-TRANSFORMATIONS '(
@@ -242,7 +242,7 @@ std::string transformation(const Chart& aChart)
         :CANVAS-X-COORD-SCALE 150 :CANVAS-Y-COORD-SCALE 150
 )";
     if (!aChart.projections().empty()) {
-        const auto& transformation = aChart.projection(0).transformation();
+        const auto& transformation = aTransformation ? *aTransformation : aChart.projection(0).transformation();
         output += "        :CANVAS-BASIS-VECTOR-0 (" + double_to_string_lisp(transformation[0]) + " " + double_to_string_lisp(transformation[2]) + ")\n";
         output += "        :CANVAS-BASIS-VECTOR-1 (" + double_to_string_lisp(transformation[1]) + " " + double_to_string_lisp(transformation[3]) + ")\n";
     }

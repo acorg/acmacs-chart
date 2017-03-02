@@ -117,6 +117,9 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("make_name", &ChartInfo::make_name)
             ;
 
+    py::class_<Transformation>(m, "Transformation")
+            ;
+
     py::class_<Chart>(m, "Chart")
             .def("number_of_antigens", &Chart::number_of_antigens)
             .def("number_of_sera", &Chart::number_of_sera)
