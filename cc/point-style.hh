@@ -3,7 +3,8 @@
 #include <string>
 #include <limits>
 
-#include "acmacs-draw/surface.hh"
+#include "acmacs-base/size-scale.hh"
+#include "acmacs-base/color.hh"
 #include "acmacs-chart/layout.hh"
 
 // ----------------------------------------------------------------------
