@@ -515,6 +515,15 @@ void Chart::compute_column_bases(std::string aMinimumColumnBasis, std::vector<do
 
 // ----------------------------------------------------------------------
 
+double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aProjectionNo) const
+{
+      //const auto& layout = projection(aProjectionNo).layout();
+    return -1;
+
+} // Chart::serum_circle_radius
+
+// ----------------------------------------------------------------------
+
 
 // ----------------------------------------------------------------------
 /// Local Variables:

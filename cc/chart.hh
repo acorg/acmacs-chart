@@ -469,6 +469,9 @@ class Chart
     void find_homologous_antigen_for_sera();
     inline void find_homologous_antigen_for_sera_const() const { const_cast<Chart*>(this)->find_homologous_antigen_for_sera(); }
 
+      // Negative radius means calculation failed (e.g. no homologous titer)
+    double serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aProjectionNo) const;
+
     // inline bool operator < (const Chart& aNother) const { return table_id() < aNother.table_id(); }
 
  private:
