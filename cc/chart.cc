@@ -1,6 +1,7 @@
 #include <set>
 
 #include "acmacs-base/virus-name.hh"
+#include "acmacs-base/range.hh"
 #include "locationdb/locdb.hh"
 
 #include "chart.hh"
@@ -511,7 +512,7 @@ class TiterDistance
     inline TiterDistance(Titer aTiter, double aColumnBase, double aDistance)
         : titer(aTiter), similarity(aTiter.is_dont_care() ? 0.0 : (aTiter.similarity() + (aTiter.is_more_than() ? 1.0 : 0.0))),
           final_similarity(std::min(aColumnBase, similarity)), distance(aDistance) {}
-    inline TiterDistance() : similarity(0), final_similarity(0), distance(0) {}
+    inline TiterDistance() : similarity(0), final_similarity(0), distance(1e99) {}
 
     Titer titer;
     double similarity;
@@ -519,19 +520,41 @@ class TiterDistance
     double distance;
 };
 
+class SerumCircleRadiusCalculationError : public std::runtime_error { public: using std::runtime_error::runtime_error; };
+
 double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aProjectionNo) const
 {
-    const auto& layout = projection(aProjectionNo).layout();
-    const double cb = column_basis(aProjectionNo, aSerumNo);
-    std::vector<TiterDistance> titers_and_distances(number_of_antigens());
-    for (size_t ag_no = 0; ag_no < number_of_antigens(); ++ag_no) {
-        const Titer titer = titers().get(ag_no, aSerumNo);
-        if (!titer.is_dont_care()) {
-              // TODO: antigensSeraTitersMultipliers (acmacs/plot/serum_circle.py:113)
-            titers_and_distances[ag_no] = TiterDistance(titer, cb, layout.distance(ag_no, aSerumNo + number_of_antigens()));
+    try {
+        const auto& layout = projection(aProjectionNo).layout();
+        const double cb = column_basis(aProjectionNo, aSerumNo);
+        std::vector<TiterDistance> titers_and_distances(number_of_antigens());
+        size_t max_titer_for_serum_ag_no = 0;
+        for (size_t ag_no = 0; ag_no < number_of_antigens(); ++ag_no) {
+            const Titer titer = titers().get(ag_no, aSerumNo);
+            if (!titer.is_dont_care()) {
+                  // TODO: antigensSeraTitersMultipliers (acmacs/plot/serum_circle.py:113)
+                titers_and_distances[ag_no] = TiterDistance(titer, cb, layout.distance(ag_no, aSerumNo + number_of_antigens()));
+                if (max_titer_for_serum_ag_no != ag_no && titers_and_distances[max_titer_for_serum_ag_no].final_similarity < titers_and_distances[ag_no].final_similarity)
+                    max_titer_for_serum_ag_no = ag_no;
+            }
+            else if (ag_no == aAntigenNo)
+                throw SerumCircleRadiusCalculationError("no homologous titer");
         }
+        const double protection_boundary_titer = titers_and_distances[aAntigenNo].final_similarity - 2.0;
+        if (protection_boundary_titer < 1.0)
+            throw SerumCircleRadiusCalculationError("titer is too low, protects everything");
+
+        std::vector<size_t> antigens_by_distances(Range<size_t>::begin(number_of_antigens()), Range<size_t>::end());
+        std::sort(antigens_by_distances.begin(), antigens_by_distances.end(), [&titers_and_distances](size_t a, size_t b) -> bool { return titers_and_distances[a].distance < titers_and_distances[b].distance; });
+
+        double radius = -1;
+
+        return radius;
     }
-    return -1;
+    catch (SerumCircleRadiusCalculationError& err) {
+        std::cerr << "WARNING: " << "Cannot calculate serum projection radius for sr " << aSerumNo << " ag " << aAntigenNo << ": " << err.what() << std::endl;
+        return -1;
+    }
 
 } // Chart::serum_circle_radius
 
