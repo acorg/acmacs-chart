@@ -67,6 +67,13 @@ void Layout::transform(const Transformation& aTransformation)
 
 // ----------------------------------------------------------------------
 
+double Layout::distance(size_t p1, size_t p2) const
+{
+
+} // Layout::distance
+
+// ----------------------------------------------------------------------
+
 void BoundingBall::extend(const Coordinates& aPoint)
 {
     const double distance2_to_center = distance2FromCenter(aPoint);

@@ -387,7 +387,38 @@ class ChartInfo
 
 }; // class ChartInfo
 
-// // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+
+class Titer : public std::string
+{
+ public:
+    inline Titer() = default;
+
+    inline bool is_regular() const { return !empty() && std::isdigit(front()); }
+    inline bool is_more_than() const { return !empty() && front() == '>'; }
+    inline bool is_less_than() const { return !empty() && front() == '<'; }
+    inline bool is_dont_care() const { return empty() || front() == '*'; }
+
+    inline size_t value() const
+        {
+            if (empty() || front() == '*')
+                return 0;
+            else if (!std::isdigit(front()))
+                return std::stoul(substr(1));
+            else
+                return std::stoul(*this);
+        }
+
+    inline double similarity() const
+        {
+            return std::log2(value() / 10.0);
+        }
+
+ private:
+    friend class ChartTiters;
+    inline Titer(std::string source) : std::string(source) {}
+
+}; // class Titer
 
 class ChartTiters
 {
@@ -406,7 +437,7 @@ class ChartTiters
     inline const Dict& dict() const { return mDict; }
     inline const Layers& layers() const { return mLayers; }
 
-    std::string get(size_t ag_no, size_t sr_no) const;
+    Titer get(size_t ag_no, size_t sr_no) const;
 
  private:
     List mList;                 // "l"
@@ -450,6 +481,33 @@ class Chart
     inline const auto& column_bases() const { return mColumnBases; }
     inline auto& column_bases() { return mColumnBases; }
     void compute_column_bases(std::string aMinimumColumnBasis, std::vector<double>& aColumnBases) const;
+    inline void column_bases(std::string aMinimumColumnBasis, std::vector<double>& aColumnBases) const
+        {
+            if (mColumnBases.empty()) {
+                compute_column_bases(aMinimumColumnBasis, aColumnBases);
+            }
+            else {
+                aColumnBases.resize(mColumnBases.size());
+                std::copy(mColumnBases.begin(), mColumnBases.end(), aColumnBases.begin());
+            }
+        }
+    inline void column_bases(size_t aProjectionNo, std::vector<double>& aColumnBases) const
+        {
+            const auto& p = projection(aProjectionNo);
+            if (p.column_bases().empty()) {
+                column_bases(p.minimum_column_basis(), aColumnBases);
+            }
+            else {
+                aColumnBases.resize(p.column_bases().size());
+                std::copy(p.column_bases().begin(), p.column_bases().end(), aColumnBases.begin());
+            }
+        }
+    inline double column_basis(size_t aProjectionNo, size_t aSerumNo) const
+        {
+            std::vector<double> cb;
+            column_bases(aProjectionNo, cb);
+            return cb[aSerumNo];
+        }
 
     inline std::vector<Projection>& projections() { return mProjections; }
     inline const std::vector<Projection>& projections() const { return mProjections; }

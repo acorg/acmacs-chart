@@ -394,7 +394,7 @@ const std::string Chart::make_name() const
 
 // ----------------------------------------------------------------------
 
-std::string ChartTiters::get(size_t ag_no, size_t sr_no) const
+Titer ChartTiters::get(size_t ag_no, size_t sr_no) const
 {
     std::string result = "*";
     if (!mList.empty()) {
@@ -515,9 +515,33 @@ void Chart::compute_column_bases(std::string aMinimumColumnBasis, std::vector<do
 
 // ----------------------------------------------------------------------
 
+class TiterDistance
+{
+ public:
+    inline TiterDistance(Titer aTiter, double aDistance)
+        : titer(aTiter), similarity(aTiter.is_dont_care() ? 0.0 : (aTiter.similarity() + (aTiter.is_more_than() ? 1.0 : 0.0))), distance(aDistance) {}
+    inline TiterDistance() : similarity(0), distance(0) {}
+
+    Titer titer;
+    double similarity;
+    double distance;
+};
+
 double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aProjectionNo) const
 {
-      //const auto& layout = projection(aProjectionNo).layout();
+    const auto& layout = projection(aProjectionNo).layout();
+    const double cb = column_basis(aProjectionNo, aSerumNo);
+    std::vector<TiterDistance> titers_and_distances;
+    for (size_t ag_no = 0; ag_no < number_of_antigens(); ++ag_no) {
+        const Titer titer = titers().get(ag_no, aSerumNo);
+        if (!titer.is_dont_care()) {
+              // TODO: antigensSeraTitersMultipliers (acmacs/plot/serum_circle.py:113)
+            titers_and_distances.emplace_back(titer, layout.distance(ag_no, aSerumNo + number_of_antigens()));
+        }
+        else {
+            titers_and_distances.emplace_back();
+        }
+    }
     return -1;
 
 } // Chart::serum_circle_radius
