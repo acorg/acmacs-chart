@@ -100,7 +100,11 @@ class Layout : public std::vector<Coordinates>
             throw std::runtime_error("getting number_of_dimensions for empty layout");
         }
 
-    double distance(size_t p1, size_t p2) const;
+    inline double distance(size_t p1, size_t p2) const
+        {
+            return at(p1).distance(at(p2));
+        }
+
 
  private:
     void min_max_points(std::vector<size_t>& aMin, std::vector<size_t>& aMax) const;

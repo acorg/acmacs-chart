@@ -485,45 +485,37 @@ void Chart::find_homologous_antigen_for_sera()
 
 // ----------------------------------------------------------------------
 
-void Chart::compute_column_bases(std::string aMinimumColumnBasis, std::vector<double>& aColumnBases) const
+double Chart::compute_column_basis(MinimumColumnBasis aMinimumColumnBasis, size_t aSerumNo) const
 {
-    const int min_col_basis = aMinimumColumnBasis == "none" || aMinimumColumnBasis == "auto" ? 0 : std::stoi(aMinimumColumnBasis);
-    for (size_t sr_no = 0; sr_no < number_of_sera(); ++sr_no) {
-        int max_titer = 0;
-        for (size_t ag_no = 0; ag_no < number_of_antigens(); ++ag_no) {
-            const std::string titer = titers().get(ag_no, sr_no);
-            if (!titer.empty() && titer[0] != '*') {
-                int value;
-                if ((titer[0] == '>' || titer[0] == '<') && titer.size() > 1) {
-                    value = std::stoi(titer.substr(1));
-                    if (titer[0] == '>')
-                        value *= 2;
-                }
-                else {
-                    value = std::stoi(titer);
-                }
-                if (value > max_titer)
-                    max_titer = value;
-            }
+    size_t max_titer = 0;
+    for (size_t ag_no = 0; ag_no < number_of_antigens(); ++ag_no) {
+        const Titer titer = titers().get(ag_no, aSerumNo);
+        if (!titer.is_dont_care()) {
+            size_t value = titer.value();
+            if (titer.is_more_than())
+                value *= 2;
+            if (value > max_titer)
+                max_titer = value;
         }
-        if (max_titer < min_col_basis)
-            max_titer = min_col_basis;
-        aColumnBases.push_back(std::log2(max_titer / 10.0));
     }
+    max_titer = std::max(max_titer, static_cast<size_t>(aMinimumColumnBasis));
+    return std::log2(max_titer / 10.0);
 
-} // Chart::compute_column_bases
+} // Chart::compute_column_basis
 
 // ----------------------------------------------------------------------
 
 class TiterDistance
 {
  public:
-    inline TiterDistance(Titer aTiter, double aDistance)
-        : titer(aTiter), similarity(aTiter.is_dont_care() ? 0.0 : (aTiter.similarity() + (aTiter.is_more_than() ? 1.0 : 0.0))), distance(aDistance) {}
-    inline TiterDistance() : similarity(0), distance(0) {}
+    inline TiterDistance(Titer aTiter, double aColumnBase, double aDistance)
+        : titer(aTiter), similarity(aTiter.is_dont_care() ? 0.0 : (aTiter.similarity() + (aTiter.is_more_than() ? 1.0 : 0.0))),
+          final_similarity(std::min(aColumnBase, similarity)), distance(aDistance) {}
+    inline TiterDistance() : similarity(0), final_similarity(0), distance(0) {}
 
     Titer titer;
     double similarity;
+    double final_similarity;
     double distance;
 };
 
@@ -531,15 +523,12 @@ double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aPr
 {
     const auto& layout = projection(aProjectionNo).layout();
     const double cb = column_basis(aProjectionNo, aSerumNo);
-    std::vector<TiterDistance> titers_and_distances;
+    std::vector<TiterDistance> titers_and_distances(number_of_antigens());
     for (size_t ag_no = 0; ag_no < number_of_antigens(); ++ag_no) {
         const Titer titer = titers().get(ag_no, aSerumNo);
         if (!titer.is_dont_care()) {
               // TODO: antigensSeraTitersMultipliers (acmacs/plot/serum_circle.py:113)
-            titers_and_distances.emplace_back(titer, layout.distance(ag_no, aSerumNo + number_of_antigens()));
-        }
-        else {
-            titers_and_distances.emplace_back();
+            titers_and_distances[ag_no] = TiterDistance(titer, cb, layout.distance(ag_no, aSerumNo + number_of_antigens()));
         }
     }
     return -1;

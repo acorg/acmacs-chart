@@ -233,6 +233,19 @@ class Sera : public std::vector<Serum>
 
 // ----------------------------------------------------------------------
 
+class MinimumColumnBasis : public std::string
+{
+ public:
+    inline MinimumColumnBasis() : mCached(static_cast<size_t>(-1)) {}
+    inline operator size_t() const { if (mCached == static_cast<size_t>(-1)) mCached = *this == "none" || *this == "auto" ? 0 : std::stoul(*this); return mCached; }
+
+ private:
+    mutable size_t mCached;
+
+}; // class MinimumColumnBasis
+
+// ----------------------------------------------------------------------
+
 class Projection
 {
  public:
@@ -248,7 +261,7 @@ class Projection
     inline double stress() const { return mStress; }
 
     inline void minimum_column_basis(const char* str, size_t length) { mMinimumColumnBasis.assign(str, length); }
-    inline std::string minimum_column_basis() const { return mMinimumColumnBasis; }
+    inline const MinimumColumnBasis& minimum_column_basis() const { return mMinimumColumnBasis; }
 
     inline std::vector<double>& column_bases() { return mColumnBases; }
     inline const std::vector<double>& column_bases() const { return mColumnBases; }
@@ -291,7 +304,7 @@ class Projection
     Layout mLayout;       // "l": [[]] layout, list of lists of doubles, if point is disconnected: emtpy list or ?[NaN, NaN]
       // size_t mNumberOfIterations;                // "i"
     double mStress;                                 // "s"
-    std::string mMinimumColumnBasis;                // "m": "1280", "none" (default)
+    MinimumColumnBasis mMinimumColumnBasis;         // "m": "1280", "none" (default)
     std::vector<double> mColumnBases;               // "C"
     Transformation mTransformation;                 // "t": [1.0, 0.0, 0.0, 1.0]
     std::vector<double> mGradientMultipliers;       // "g": [] double for each point
@@ -480,8 +493,14 @@ class Chart
 
     inline const auto& column_bases() const { return mColumnBases; }
     inline auto& column_bases() { return mColumnBases; }
-    void compute_column_bases(std::string aMinimumColumnBasis, std::vector<double>& aColumnBases) const;
-    inline void column_bases(std::string aMinimumColumnBasis, std::vector<double>& aColumnBases) const
+    double compute_column_basis(MinimumColumnBasis aMinimumColumnBasis, size_t aSerumNo) const;
+    inline void compute_column_bases(MinimumColumnBasis aMinimumColumnBasis, std::vector<double>& aColumnBases) const
+        {
+            aColumnBases.resize(number_of_sera());
+            for (size_t sr_no = 0; sr_no < number_of_sera(); ++sr_no)
+                aColumnBases[sr_no] = compute_column_basis(aMinimumColumnBasis, sr_no);
+        }
+    inline void column_bases(MinimumColumnBasis aMinimumColumnBasis, std::vector<double>& aColumnBases) const
         {
             if (mColumnBases.empty()) {
                 compute_column_bases(aMinimumColumnBasis, aColumnBases);
@@ -489,6 +508,15 @@ class Chart
             else {
                 aColumnBases.resize(mColumnBases.size());
                 std::copy(mColumnBases.begin(), mColumnBases.end(), aColumnBases.begin());
+            }
+        }
+    inline double column_basis(MinimumColumnBasis aMinimumColumnBasis, size_t aSerumNo) const
+        {
+            if (mColumnBases.empty()) {
+                return compute_column_basis(aMinimumColumnBasis, aSerumNo);
+            }
+            else {
+                return mColumnBases.at(aSerumNo);
             }
         }
     inline void column_bases(size_t aProjectionNo, std::vector<double>& aColumnBases) const
@@ -504,9 +532,15 @@ class Chart
         }
     inline double column_basis(size_t aProjectionNo, size_t aSerumNo) const
         {
-            std::vector<double> cb;
-            column_bases(aProjectionNo, cb);
-            return cb[aSerumNo];
+            double result = 0.0;
+            const auto& p = projection(aProjectionNo);
+            if (p.column_bases().empty()) {
+                result = column_basis(p.minimum_column_basis(), aSerumNo);
+            }
+            else {
+                result = p.column_bases().at(aSerumNo);
+            }
+            return result;
         }
 
     inline std::vector<Projection>& projections() { return mProjections; }
