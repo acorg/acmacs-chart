@@ -1,0 +1,43 @@
+#! /usr/bin/env python3
+# -*- Python -*-
+
+import sys, os, traceback, pprint
+if sys.version_info.major != 3: raise RuntimeError("Run script with python3")
+from pathlib import Path
+sys.path[:0] = [str(Path(os.environ["ACMACSD_ROOT"]).resolve().joinpath("py"))]
+import logging; module_logger = logging.getLogger(__name__)
+
+import acmacs_chart
+from acmacs_base.timeit import timeit
+
+# ----------------------------------------------------------------------
+
+def main(args):
+    with timeit("Reading chart from " + args.chart[0]):
+        chart = acmacs_chart.import_chart(args.chart[0])
+    radius = chart.serum_circle_radius(antigen_no=args.antigen_no[0], serum_no=args.serum_no[0])
+    print("RADIUS:", radius)
+
+# ----------------------------------------------------------------------
+
+try:
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('-d', '--debug', action='store_const', dest='loglevel', const=logging.DEBUG, default=logging.INFO, help='Enable debugging output.')
+
+    parser.add_argument('chart', nargs=1)
+    parser.add_argument('serum_no', type=int, nargs=1)
+    parser.add_argument('antigen_no', type=int, nargs=1)
+
+    args = parser.parse_args()
+    logging.basicConfig(level=args.loglevel, format="%(levelname)s %(asctime)s: %(message)s")
+    exit_code = main(args)
+except Exception as err:
+    logging.error('{}\n{}'.format(err, traceback.format_exc()))
+    exit_code = 1
+exit(exit_code)
+
+# ======================================================================
+### Local Variables:
+### eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
+### End:

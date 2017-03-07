@@ -513,6 +513,7 @@ class TiterDistance
         : titer(aTiter), similarity(aTiter.is_dont_care() ? 0.0 : (aTiter.similarity() + (aTiter.is_more_than() ? 1.0 : 0.0))),
           final_similarity(std::min(aColumnBase, similarity)), distance(aDistance) {}
     inline TiterDistance() : similarity(0), final_similarity(0), distance(1e99) {}
+    inline operator bool() const { return !titer.is_dont_care(); }
 
     Titer titer;
     double similarity;
@@ -544,12 +545,45 @@ double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aPr
         if (protection_boundary_titer < 1.0)
             throw SerumCircleRadiusCalculationError("titer is too low, protects everything");
 
+          // sort antigen indices by antigen distance from serum, closest first
         std::vector<size_t> antigens_by_distances(Range<size_t>::begin(number_of_antigens()), Range<size_t>::end());
         std::sort(antigens_by_distances.begin(), antigens_by_distances.end(), [&titers_and_distances](size_t a, size_t b) -> bool { return titers_and_distances[a].distance < titers_and_distances[b].distance; });
 
-        double radius = -1;
-
-        return radius;
+        constexpr const size_t None = static_cast<size_t>(-1);
+        size_t best_sum = None;
+        size_t previous = None;
+        double sum_radii = 0;
+        size_t num_radii = 0;
+        for (size_t ag_no: antigens_by_distances) {
+            if (!titers_and_distances[ag_no])
+                break;
+            const double radius = previous == None ? titers_and_distances[ag_no].distance : (titers_and_distances[ag_no].distance + titers_and_distances[previous].distance) / 2.0;
+            size_t protected_outside = 0, not_protected_inside = 0; // , protected_inside = 0, not_protected_outside = 0;
+            for (const auto& protection_data: titers_and_distances) {
+                if (protection_data) {
+                    const bool inside = protection_data.distance <= radius;
+                    const bool protectd = protection_data.titer.is_regular() ? protection_data.final_similarity >= protection_boundary_titer : protection_data.final_similarity > protection_boundary_titer;
+                    if (protectd && !inside)
+                        ++protected_outside;
+                    else if (!protectd && inside)
+                        ++not_protected_inside;
+                }
+            }
+            const size_t summa = protected_outside + not_protected_inside;
+            if (best_sum == None || best_sum >= summa) { // if sums are the same, choose the smaller radius (found earlier)
+                if (best_sum == summa) {
+                    sum_radii += radius;
+                    ++num_radii;
+                }
+                else {
+                    sum_radii = radius;
+                    num_radii = 1;
+                    best_sum = summa;
+                }
+            }
+            std::cerr << "AG " << ag_no << " radius:" << radius << " protected_outside:" << protected_outside << " not_protected_inside:" << not_protected_inside << " best_sum:" << best_sum << std::endl;
+        }
+        return sum_radii / num_radii;
     }
     catch (SerumCircleRadiusCalculationError& err) {
         std::cerr << "WARNING: " << "Cannot calculate serum projection radius for sr " << aSerumNo << " ag " << aAntigenNo << ": " << err.what() << std::endl;
