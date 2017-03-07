@@ -15,7 +15,7 @@ from acmacs_base.timeit import timeit
 def main(args):
     with timeit("Reading chart from " + args.chart[0]):
         chart = acmacs_chart.import_chart(args.chart[0])
-    radius = chart.serum_circle_radius(antigen_no=args.antigen_no[0], serum_no=args.serum_no[0])
+    radius = chart.serum_circle_radius(antigen_no=args.antigen_no[0], serum_no=args.serum_no[0], verbose=args.loglevel==logging.DEBUG)
     print("RADIUS:", radius)
 
 # ----------------------------------------------------------------------

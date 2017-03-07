@@ -523,7 +523,7 @@ class TiterDistance
 
 class SerumCircleRadiusCalculationError : public std::runtime_error { public: using std::runtime_error::runtime_error; };
 
-double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aProjectionNo) const
+double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aProjectionNo, bool aVerbose) const
 {
     try {
         const auto& layout = projection(aProjectionNo).layout();
@@ -548,6 +548,7 @@ double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aPr
           // sort antigen indices by antigen distance from serum, closest first
         std::vector<size_t> antigens_by_distances(Range<size_t>::begin(number_of_antigens()), Range<size_t>::end());
         std::sort(antigens_by_distances.begin(), antigens_by_distances.end(), [&titers_and_distances](size_t a, size_t b) -> bool { return titers_and_distances[a].distance < titers_and_distances[b].distance; });
+        // std::cerr << "antigens_by_distances " << antigens_by_distances << std::endl;
 
         constexpr const size_t None = static_cast<size_t>(-1);
         size_t best_sum = None;
@@ -572,16 +573,22 @@ double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aPr
             const size_t summa = protected_outside + not_protected_inside;
             if (best_sum == None || best_sum >= summa) { // if sums are the same, choose the smaller radius (found earlier)
                 if (best_sum == summa) {
+                    if (aVerbose)
+                        std::cerr << "AG " << ag_no << " radius:" << radius << " distance:" << titers_and_distances[ag_no].distance << " prev:" << previous << " protected_outside:" << protected_outside << " not_protected_inside:" << not_protected_inside << " best_sum:" << best_sum << std::endl;
                     sum_radii += radius;
                     ++num_radii;
                 }
                 else {
+                    if (aVerbose)
+                        std::cerr << "======================================================================" << std::endl
+                                  << "AG " << ag_no << " radius:" << radius << " distance:" << titers_and_distances[ag_no].distance << " prev:" << previous << " protected_outside:" << protected_outside << " not_protected_inside:" << not_protected_inside << " best_sum:" << best_sum << std::endl;
                     sum_radii = radius;
                     num_radii = 1;
                     best_sum = summa;
                 }
             }
-            std::cerr << "AG " << ag_no << " radius:" << radius << " protected_outside:" << protected_outside << " not_protected_inside:" << not_protected_inside << " best_sum:" << best_sum << std::endl;
+              // std::cerr << "AG " << ag_no << " radius:" << radius << " protected_outside:" << protected_outside << " not_protected_inside:" << not_protected_inside << " best_sum:" << best_sum << std::endl;
+            previous = ag_no;
         }
         return sum_radii / num_radii;
     }
