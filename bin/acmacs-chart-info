@@ -40,7 +40,7 @@ def report_serum(sr_no_w, sr_no, sr, name_type, locdb):
     if name_type in ["abbreviated", "abbreviated_with_passage_type"]:
         print(f"SR {sr_no:{sr_no_w}d} {sr.abbreviated_name(locdb)} {sr.serum_id()} {sr.passage()}")
     else:
-        print(f"SR {sr_no:{sr_no_w}d} {sr.full_name()} {sr.serum_id()} {sr.passage()}")
+        print(f"SR {sr_no:{sr_no_w}d} {sr.full_name()} {sr.passage()}")
 
 # ----------------------------------------------------------------------
 
