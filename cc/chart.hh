@@ -563,6 +563,9 @@ class Chart
 
       // Negative radius means calculation failed (e.g. no homologous titer)
     double serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aProjectionNo, bool aVerbose = false) const;
+      // aWithin4Fold: indices of antigens within 4fold from homologous titer
+      // aOutside4Fold: indices of antigens with titers against aSerumNo outside 4fold distance from homologous titer
+    void serum_coverage(size_t aAntigenNo, size_t aSerumNo, std::vector<size_t>& aWithin4Fold, std::vector<size_t>& aOutside4Fold) const;
 
     // inline bool operator < (const Chart& aNother) const { return table_id() < aNother.table_id(); }
 
