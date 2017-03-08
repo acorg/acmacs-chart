@@ -38,6 +38,7 @@ class PointStyle
     inline PointStyle(enum Empty)
         : mShown(Shown::NoChange), mShape(Shape::NoChange), mFill(ColorNoChange), mOutline(ColorNoChange),
           mSize(Pixels::make_empty()), mOutlineWidth(Pixels::make_empty()), mAspect(AspectNoChange), mRotation(RotationNoChange) {}
+    inline PointStyle(const PointStyle& aPS) = default;
 
     inline PointStyle& operator = (const PointStyle& aPS)
         {
