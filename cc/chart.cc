@@ -604,28 +604,25 @@ double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aPr
 void Chart::serum_coverage(size_t aAntigenNo, size_t aSerumNo, std::vector<size_t>& aWithin4Fold, std::vector<size_t>& aOutside4Fold) const
 {
     const Titer homologous_titer = titers().get(aAntigenNo, aSerumNo);
-    if (homologous_titer.is_regular()) {
-        const double titer_threshold = homologous_titer.similarity() - 2;
-        if (titer_threshold <= 0)
-            throw std::runtime_error("serum_coverage: homologous titer is too low: " + homologous_titer);
-        for (size_t ag_no = 0; ag_no < number_of_antigens(); ++ag_no) {
-            const Titer titer = titers().get(ag_no, aSerumNo);
-            double value = -1;
-            if (titer.is_more_than())
-                value = titer.similarity() + 1;
-            else if (!titer.is_dont_care())
-                value = titer.similarity();
-            if (value >= titer_threshold)
-                aWithin4Fold.push_back(ag_no);
-            else if (value >= 0 && value < titer_threshold)
-                aOutside4Fold.push_back(ag_no);
-        }
-        if (aWithin4Fold.empty())
-            throw std::runtime_error("serum_coverage: no antigens within 4fold from homologous titer (for serum coverage)"); // BUG? at least homologous antigen must be there!
+    if (!homologous_titer.is_regular())
+        throw std::runtime_error("serum_coverage: cannot handle non-regular homologous titer: " + homologous_titer);
+    const double titer_threshold = homologous_titer.similarity() - 2;
+    if (titer_threshold <= 0)
+        throw std::runtime_error("serum_coverage: homologous titer is too low: " + homologous_titer);
+    for (size_t ag_no = 0; ag_no < number_of_antigens(); ++ag_no) {
+        const Titer titer = titers().get(ag_no, aSerumNo);
+        double value = -1;
+        if (titer.is_more_than())
+            value = titer.similarity() + 1;
+        else if (!titer.is_dont_care())
+            value = titer.similarity();
+        if (value >= titer_threshold)
+            aWithin4Fold.push_back(ag_no);
+        else if (value >= 0 && value < titer_threshold)
+            aOutside4Fold.push_back(ag_no);
     }
-    else {
-        std::cerr << "ERROR: serum_coverage: cannot handle non-regular homologous titer: " << homologous_titer << std::endl;
-    }
+    if (aWithin4Fold.empty())
+        throw std::runtime_error("serum_coverage: no antigens within 4fold from homologous titer (for serum coverage)"); // BUG? at least homologous antigen must be there!
 
 } // Chart::serum_coverage
 
