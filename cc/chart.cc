@@ -239,9 +239,13 @@ void Sera::find_by_name_matching(std::string aName, std::vector<size_t>& aSeraIn
 void Antigens::continents(ContinentData& aContinentData, const LocDb& aLocDb) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {
-        const std::string location = virus_name::location(ag->name());
-        const std::string continent = aLocDb.continent(location);
-        aContinentData[continent].push_back(static_cast<size_t>(ag - begin()));
+        try {
+            const std::string location = virus_name::location(ag->name());
+            const std::string continent = aLocDb.continent(location);
+            aContinentData[continent].push_back(static_cast<size_t>(ag - begin()));
+        }
+        catch (virus_name::Unrecognized&) {
+        }
     }
 
 } // Antigens::continents
@@ -251,9 +255,13 @@ void Antigens::continents(ContinentData& aContinentData, const LocDb& aLocDb) co
 void Antigens::countries(CountryData& aCountries, const LocDb& aLocDb) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {
-        const std::string location = virus_name::location(ag->name());
-        const std::string country = aLocDb.country(location);
-        aCountries[country].push_back(static_cast<size_t>(ag - begin()));
+        try {
+            const std::string location = virus_name::location(ag->name());
+            const std::string country = aLocDb.country(location);
+            aCountries[country].push_back(static_cast<size_t>(ag - begin()));
+        }
+        catch (virus_name::Unrecognized&) {
+        }
     }
 
 } // Antigens::countries
@@ -263,10 +271,14 @@ void Antigens::countries(CountryData& aCountries, const LocDb& aLocDb) const
 void Antigens::country(std::string aCountry, std::vector<size_t>& aAntigenIndices, const LocDb& aLocDb) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {
-        const std::string location = virus_name::location(ag->name());
-        const std::string country = aLocDb.country(location);
-        if (country == aCountry)
-            aAntigenIndices.push_back(static_cast<size_t>(ag - begin()));
+        try {
+            const std::string location = virus_name::location(ag->name());
+            const std::string country = aLocDb.country(location);
+            if (country == aCountry)
+                aAntigenIndices.push_back(static_cast<size_t>(ag - begin()));
+        }
+        catch (virus_name::Unrecognized&) {
+        }
     }
 
 } // Antigens::country

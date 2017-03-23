@@ -78,11 +78,6 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             // .def("find_in_hidb", &Serum::find_in_hidb, py::arg("hidb"), py::return_value_policy::reference)
             ;
 
-    py::class_<LocDb>(m, "LocDb")
-            .def(py::init<>())
-            .def("import_from", &LocDb::importFrom, py::arg("filename"))
-            ;
-
     py::class_<Antigens>(m, "Antigens")
             .def("continents", [](const Antigens& antigens, const LocDb& aLocDb) { Antigens::ContinentData data; antigens.continents(data, aLocDb); return data; })
             .def("countries", [](const Antigens& antigens, const LocDb& aLocDb) { Antigens::CountryData data; antigens.countries(data, aLocDb); return data; })
