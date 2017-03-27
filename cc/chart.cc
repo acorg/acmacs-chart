@@ -218,7 +218,7 @@ template <typename AgSr> static void find_by_name_matching_ag_sr(const std::vect
             break;
         aIndices.push_back(is.first);
         if (aVerbose)
-            std::cerr << "find_by_name_matching index:" << is.first << " score:" << is.second << std::endl;
+            std::cerr << "DEBUG: find_by_name_matching index:" << is.first << " score:" << is.second << std::endl;
     }
 }
 
