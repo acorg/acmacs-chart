@@ -205,7 +205,7 @@ class Antigens : public std::vector<Antigen>
     inline Antigens() {}
 
     void find_by_name(std::string aName, std::vector<size_t>& aAntigenIndices) const;
-    void find_by_name_matching(std::string aName, std::vector<size_t>& aAntigenIndices) const;
+    void find_by_name_matching(std::string aName, std::vector<size_t>& aAntigenIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
     void continents(ContinentData& aContinentData, const LocDb& aLocDb) const;
     void countries(CountryData& aCountries, const LocDb& aLocDb) const;
     void country(std::string aCountry, std::vector<size_t>& aAntigenIndices, const LocDb& aLocDb) const;
@@ -227,7 +227,7 @@ class Sera : public std::vector<Serum>
 
       // returns -1 if not found
     size_t find_by_name_for_exact_matching(std::string aFullName) const;
-    void find_by_name_matching(std::string aName, std::vector<size_t>& aSeraIndices) const;
+    void find_by_name_matching(std::string aName, std::vector<size_t>& aSeraIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
 
 }; // class Sera
 

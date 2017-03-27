@@ -82,17 +82,19 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("continents", [](const Antigens& antigens, const LocDb& aLocDb) { Antigens::ContinentData data; antigens.continents(data, aLocDb); return data; })
             .def("countries", [](const Antigens& antigens, const LocDb& aLocDb) { Antigens::CountryData data; antigens.countries(data, aLocDb); return data; })
             .def("country", [](const Antigens& antigens, std::string aCountry, const LocDb& aLocDb) { std::vector<size_t> indices; antigens.country(aCountry, indices, aLocDb); return indices; })
-            .def("find_by_name_matching", [](const Antigens& antigens, std::string aName) { std::vector<size_t> indices; antigens.find_by_name_matching(aName, indices); return indices; })
+            .def("find_by_name_matching", [](const Antigens& antigens, std::string aName, string_match::score_t aScoreThreshold, bool aVerbose) { std::vector<size_t> indices; antigens.find_by_name_matching(aName, indices, aScoreThreshold, aVerbose); return indices; }, py::arg("name"), py::arg("score_threshold") = 0, py::arg("verbose") = false)
             .def("reference_indices", [](const Antigens& antigens) { std::vector<size_t> indices; antigens.reference_indices(indices); return indices; })
             .def("test_indices", [](const Antigens& antigens) { std::vector<size_t> indices; antigens.test_indices(indices); return indices; })
             .def("date_range_indices", [](const Antigens& antigens, std::string first_date, std::string after_last_date) { std::vector<size_t> indices; antigens.date_range_indices(first_date, after_last_date, indices); return indices; }, py::arg("first") = std::string(), py::arg("after_last") = std::string())
             .def("egg_indices", [](const Antigens& antigens) { std::vector<size_t> indices; antigens.egg_indices(indices); return indices; })
             .def("cell_indices", [](const Antigens& antigens) { std::vector<size_t> indices; antigens.cell_indices(indices); return indices; })
             .def("reassortant_indices", [](const Antigens& antigens) { std::vector<size_t> indices; antigens.reassortant_indices(indices); return indices; })
+            .def("__getitem__", [](const Antigens& antigens, int aIndex) -> const Antigen& { if (aIndex >= 0) return antigens[static_cast<size_t>(aIndex)]; else return antigens[static_cast<size_t>(static_cast<int>(antigens.size()) + aIndex)]; })
             ;
 
     py::class_<Sera>(m, "Sera")
-            .def("find_by_name_matching", [](const Sera& sera, std::string aName) { std::vector<size_t> indices; sera.find_by_name_matching(aName, indices); return indices; })
+            .def("find_by_name_matching", [](const Sera& sera, std::string aName, string_match::score_t aScoreThreshold, bool aVerbose) { std::vector<size_t> indices; sera.find_by_name_matching(aName, indices, aScoreThreshold, aVerbose); return indices; }, py::arg("name"), py::arg("score_threshold") = 0, py::arg("verbose") = false)
+            .def("__getitem__", [](const Sera& sera, int aIndex) -> const Serum& { if (aIndex >= 0) return sera[static_cast<size_t>(aIndex)]; else return sera[static_cast<size_t>(static_cast<int>(sera.size()) + aIndex)]; })
             ;
 
       // ----------------------------------------------------------------------
@@ -136,6 +138,8 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
     m.def("import_chart", [](py::bytes data) { return import_chart(data); }, py::arg("data"), py::doc("Imports chart from a buffer or file in the ace format."));
     m.def("export_chart", &export_chart, py::arg("filename"), py::arg("chart"), py::doc("Exports chart into a file in the ace format."));
     m.def("export_chart_lispmds", py::overload_cast<std::string, const Chart&>(&export_chart_lispmds), py::arg("filename"), py::arg("chart"), py::doc("Exports chart into a file in the lispmds save format."));
+
+    m.def("virus_name_match_threshold", &virus_name::match_threshold, py::arg("name"), py::doc("Extracts virus name without passage, reassortant, extra, etc. and calculates match threshold (to use with antigens.find_by_name_matching), match threshold is a square of virus name length."));
 
     return m.ptr();
 }

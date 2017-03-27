@@ -200,12 +200,12 @@ size_t Sera::find_by_name_for_exact_matching(std::string aFullName) const
 
 // ----------------------------------------------------------------------
 
-template <typename AgSr> static void find_by_name_matching_ag_sr(const std::vector<AgSr>& aAgSr, std::string aName, std::vector<size_t>& aIndices)
+template <typename AgSr> static void find_by_name_matching_ag_sr(const std::vector<AgSr>& aAgSr, std::string aName, std::vector<size_t>& aIndices, string_match::score_t aScoreThreshold, bool aVerbose)
 {
     using Score = AntigenSerumMatchScore<AgSr>;
 
     std::vector<std::pair<size_t, string_match::score_t>> index_score;
-    string_match::score_t score_threshold = 0;
+    string_match::score_t score_threshold = aScoreThreshold;
     for (auto ag = aAgSr.begin(); ag != aAgSr.end(); ++ag) {
         Score score{aName, *ag, score_threshold};
         score_threshold = std::max(score.name_score(), score_threshold);
@@ -217,20 +217,22 @@ template <typename AgSr> static void find_by_name_matching_ag_sr(const std::vect
         if (is.second < index_score.front().second)
             break;
         aIndices.push_back(is.first);
+        if (aVerbose)
+            std::cerr << "find_by_name_matching index:" << is.first << " score:" << is.second << std::endl;
     }
 }
 
-void Antigens::find_by_name_matching(std::string aName, std::vector<size_t>& aAntigenIndices) const
+void Antigens::find_by_name_matching(std::string aName, std::vector<size_t>& aAntigenIndices, string_match::score_t aScoreThreshold, bool aVerbose) const
 {
-    find_by_name_matching_ag_sr(*this, aName, aAntigenIndices);
+    find_by_name_matching_ag_sr(*this, aName, aAntigenIndices, aScoreThreshold, aVerbose);
 
 } // Antigens::find_by_name_matching
 
 // ----------------------------------------------------------------------
 
-void Sera::find_by_name_matching(std::string aName, std::vector<size_t>& aSeraIndices) const
+void Sera::find_by_name_matching(std::string aName, std::vector<size_t>& aSeraIndices, string_match::score_t aScoreThreshold, bool aVerbose) const
 {
-    find_by_name_matching_ag_sr(*this, aName, aSeraIndices);
+    find_by_name_matching_ag_sr(*this, aName, aSeraIndices, aScoreThreshold, aVerbose);
 
 } // Sera::find_by_name_matching
 
