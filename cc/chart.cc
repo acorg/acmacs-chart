@@ -248,6 +248,8 @@ void Antigens::continents(ContinentData& aContinentData, const LocDb& aLocDb) co
         }
         catch (virus_name::Unrecognized&) {
         }
+        catch (LocationNotFound&) {
+        }
     }
 
 } // Antigens::continents
@@ -263,6 +265,8 @@ void Antigens::countries(CountryData& aCountries, const LocDb& aLocDb) const
             aCountries[country].push_back(static_cast<size_t>(ag - begin()));
         }
         catch (virus_name::Unrecognized&) {
+        }
+        catch (LocationNotFound&) {
         }
     }
 
@@ -280,6 +284,8 @@ void Antigens::country(std::string aCountry, std::vector<size_t>& aAntigenIndice
                 aAntigenIndices.push_back(static_cast<size_t>(ag - begin()));
         }
         catch (virus_name::Unrecognized&) {
+        }
+        catch (LocationNotFound&) {
         }
     }
 
