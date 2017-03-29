@@ -117,6 +117,15 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
     py::class_<Transformation>(m, "Transformation")
             ;
 
+    py::class_<Titer>(m, "Titer")
+            .def("__str__", [](const Titer& aTiter) -> std::string { return aTiter; })
+            ;
+
+    py::class_<ChartTiters>(m, "ChartTiters")
+            .def("get", &ChartTiters::get, py::arg("ag_no"), py::arg("sr_no"))
+            .def("max_for_serum", &ChartTiters::max_for_serum, py::arg("sr_no"))
+            ;
+
     py::class_<Chart>(m, "Chart")
             .def("number_of_antigens", &Chart::number_of_antigens)
             .def("number_of_sera", &Chart::number_of_sera)
@@ -130,6 +139,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             // .def("table_id", &Chart::table_id)
             .def("find_homologous_antigen_for_sera", &Chart::find_homologous_antigen_for_sera)
             .def("chart_info", py::overload_cast<>(&Chart::chart_info, py::const_), py::return_value_policy::reference)
+            .def("titers", py::overload_cast<>(&Chart::titers, py::const_), py::return_value_policy::reference)
             .def("serum_circle_radius", &Chart::serum_circle_radius, py::arg("antigen_no"), py::arg("serum_no"), py::arg("projection_no") = 0, py::arg("verbose") = false)
             .def("serum_coverage", [](const Chart& aChart, size_t aAntigenNo, size_t aSerumNo) -> std::vector<std::vector<size_t>> { std::vector<size_t> within, outside; aChart.serum_coverage(aAntigenNo, aSerumNo, within, outside); return {within, outside}; } , py::arg("antigen_no"), py::arg("serum_no"))
         ;

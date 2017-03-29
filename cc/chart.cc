@@ -200,7 +200,7 @@ size_t Sera::find_by_name_for_exact_matching(std::string aFullName) const
 
 // ----------------------------------------------------------------------
 
-template <typename AgSr> static void find_by_name_matching_ag_sr(const std::vector<AgSr>& aAgSr, std::string aName, std::vector<size_t>& aIndices, string_match::score_t aScoreThreshold, bool aVerbose)
+template <typename AgSr> static void find_by_name_matching_ag_sr(const std::vector<AgSr>& aAgSr, std::string aName, std::vector<size_t>& aIndices, string_match::score_t aScoreThreshold, bool /*aVerbose*/)
 {
     using Score = AntigenSerumMatchScore<AgSr>;
 
@@ -217,8 +217,8 @@ template <typename AgSr> static void find_by_name_matching_ag_sr(const std::vect
         if (is.second < index_score.front().second)
             break;
         aIndices.push_back(is.first);
-        if (aVerbose)
-            std::cerr << "DEBUG: find_by_name_matching index:" << is.first << " score:" << is.second << std::endl;
+        // if (aVerbose)
+        //     std::cerr << "DEBUG: find_by_name_matching index:" << is.first << " score:" << is.second << std::endl;
     }
 }
 
@@ -435,6 +435,20 @@ Titer ChartTiters::get(size_t ag_no, size_t sr_no) const
     return result;
 
 } // ChartTiters::get
+
+// ----------------------------------------------------------------------
+
+Titer ChartTiters::max_for_serum(size_t sr_no) const
+{
+    Titer result;
+    for (size_t ag_no = 0; ag_no < number_of_antigens(); ++ag_no) {
+        const Titer titer = get(ag_no, sr_no);
+        if (titer.value() > result.value())
+            result = titer;
+    }
+    return result;
+
+} // ChartTiters::max_for_serum
 
 // ----------------------------------------------------------------------
 

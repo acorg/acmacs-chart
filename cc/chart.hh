@@ -450,7 +450,9 @@ class ChartTiters
     inline const Dict& dict() const { return mDict; }
     inline const Layers& layers() const { return mLayers; }
 
+    inline size_t number_of_antigens() const { return !mList.empty() ? mList.size() : mDict.size(); }
     Titer get(size_t ag_no, size_t sr_no) const;
+    Titer max_for_serum(size_t sr_no) const;
 
  private:
     List mList;                 // "l"
