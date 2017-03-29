@@ -238,17 +238,19 @@ void Sera::find_by_name_matching(std::string aName, std::vector<size_t>& aSeraIn
 
 // ----------------------------------------------------------------------
 
-void Antigens::continents(ContinentData& aContinentData, const LocDb& aLocDb) const
+void Antigens::continents(ContinentData& aContinentData, const LocDb& aLocDb, bool aExcludeReference) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {
-        try {
-            const std::string location = virus_name::location(ag->name());
-            const std::string continent = aLocDb.continent(location);
-            aContinentData[continent].push_back(static_cast<size_t>(ag - begin()));
-        }
-        catch (virus_name::Unrecognized&) {
-        }
-        catch (LocationNotFound&) {
+        if (!aExcludeReference || !ag->reference()) {
+            try {
+                const std::string location = virus_name::location(ag->name());
+                const std::string continent = aLocDb.continent(location);
+                aContinentData[continent].push_back(static_cast<size_t>(ag - begin()));
+            }
+            catch (virus_name::Unrecognized&) {
+            }
+            catch (LocationNotFound&) {
+            }
         }
     }
 
@@ -256,17 +258,19 @@ void Antigens::continents(ContinentData& aContinentData, const LocDb& aLocDb) co
 
 // ----------------------------------------------------------------------
 
-void Antigens::countries(CountryData& aCountries, const LocDb& aLocDb) const
+void Antigens::countries(CountryData& aCountries, const LocDb& aLocDb, bool aExcludeReference) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {
-        try {
-            const std::string location = virus_name::location(ag->name());
-            const std::string country = aLocDb.country(location);
-            aCountries[country].push_back(static_cast<size_t>(ag - begin()));
-        }
-        catch (virus_name::Unrecognized&) {
-        }
-        catch (LocationNotFound&) {
+        if (!aExcludeReference || !ag->reference()) {
+            try {
+                const std::string location = virus_name::location(ag->name());
+                const std::string country = aLocDb.country(location);
+                aCountries[country].push_back(static_cast<size_t>(ag - begin()));
+            }
+            catch (virus_name::Unrecognized&) {
+            }
+            catch (LocationNotFound&) {
+            }
         }
     }
 

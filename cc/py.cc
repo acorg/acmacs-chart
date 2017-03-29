@@ -79,7 +79,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             ;
 
     py::class_<Antigens>(m, "Antigens")
-            .def("continents", [](const Antigens& antigens, const LocDb& aLocDb) { Antigens::ContinentData data; antigens.continents(data, aLocDb); return data; })
+            .def("continents", [](const Antigens& antigens, const LocDb& aLocDb, bool aExcludeReference) { Antigens::ContinentData data; antigens.continents(data, aLocDb, aExcludeReference); return data; }, py::arg("locdb"), py::arg("exclude_reference") = true)
             .def("countries", [](const Antigens& antigens, const LocDb& aLocDb) { Antigens::CountryData data; antigens.countries(data, aLocDb); return data; })
             .def("country", [](const Antigens& antigens, std::string aCountry, const LocDb& aLocDb) { std::vector<size_t> indices; antigens.country(aCountry, indices, aLocDb); return indices; })
             .def("find_by_name_matching", [](const Antigens& antigens, std::string aName, string_match::score_t aScoreThreshold, bool aVerbose) { std::vector<size_t> indices; antigens.find_by_name_matching(aName, indices, aScoreThreshold, aVerbose); return indices; }, py::arg("name"), py::arg("score_threshold") = 0, py::arg("verbose") = false)
