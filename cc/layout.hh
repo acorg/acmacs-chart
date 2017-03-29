@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <limits>
 
 #include "acmacs-base/stream.hh"
 #include "acmacs-base/transformation.hh"
@@ -100,7 +101,7 @@ class Layout : public std::vector<Coordinates>
             throw std::runtime_error("getting number_of_dimensions for empty layout");
         }
 
-    inline double distance(size_t p1, size_t p2, double no_distance = 1e99) const
+    inline double distance(size_t p1, size_t p2, double no_distance = std::numeric_limits<double>::quiet_NaN()) const
         {
             const Coordinates& c1 = operator[](p1);
             const Coordinates& c2 = operator[](p2);

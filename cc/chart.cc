@@ -1,4 +1,6 @@
 #include <set>
+#include <limits>
+#include <cmath>
 
 #include "acmacs-base/virus-name.hh"
 #include "acmacs-base/range.hh"
@@ -550,7 +552,7 @@ class TiterDistance
     inline TiterDistance(Titer aTiter, double aColumnBase, double aDistance)
         : titer(aTiter), similarity(aTiter.is_dont_care() ? 0.0 : (aTiter.similarity() + (aTiter.is_more_than() ? 1.0 : 0.0))),
           final_similarity(std::min(aColumnBase, similarity)), distance(aDistance) {}
-    inline TiterDistance() : similarity(0), final_similarity(0), distance(1e99) {}
+    inline TiterDistance() : similarity(0), final_similarity(0), distance(std::numeric_limits<double>::quiet_NaN()) {}
     inline operator bool() const { return !titer.is_dont_care(); }
 
     Titer titer;
@@ -563,6 +565,7 @@ class SerumCircleRadiusCalculationError : public std::runtime_error { public: us
 
 double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aProjectionNo, bool aVerbose) const
 {
+    // if (aVerbose) std::cerr << "INFO: serum_circle_radius" << std::endl;
     try {
         const auto& layout = projection(aProjectionNo).layout();
         const double cb = column_basis(aProjectionNo, aSerumNo);
@@ -582,6 +585,7 @@ double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aPr
         const double protection_boundary_titer = titers_and_distances[aAntigenNo].final_similarity - 2.0;
         if (protection_boundary_titer < 1.0)
             throw SerumCircleRadiusCalculationError("titer is too low, protects everything");
+        // if (aVerbose) std::cerr << "INFO: serum_circle_radius protection_boundary_titer: " << protection_boundary_titer << std::endl;
 
           // sort antigen indices by antigen distance from serum, closest first
         std::vector<size_t> antigens_by_distances(Range<size_t>::begin(number_of_antigens()), Range<size_t>::end());
@@ -596,37 +600,39 @@ double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aPr
         for (size_t ag_no: antigens_by_distances) {
             if (!titers_and_distances[ag_no])
                 break;
-            const double radius = previous == None ? titers_and_distances[ag_no].distance : (titers_and_distances[ag_no].distance + titers_and_distances[previous].distance) / 2.0;
-            size_t protected_outside = 0, not_protected_inside = 0; // , protected_inside = 0, not_protected_outside = 0;
-            for (const auto& protection_data: titers_and_distances) {
-                if (protection_data) {
-                    const bool inside = protection_data.distance <= radius;
-                    const bool protectd = protection_data.titer.is_regular() ? protection_data.final_similarity >= protection_boundary_titer : protection_data.final_similarity > protection_boundary_titer;
-                    if (protectd && !inside)
-                        ++protected_outside;
-                    else if (!protectd && inside)
-                        ++not_protected_inside;
+            if (!std::isnan(titers_and_distances[ag_no].distance)) {
+                const double radius = previous == None ? titers_and_distances[ag_no].distance : (titers_and_distances[ag_no].distance + titers_and_distances[previous].distance) / 2.0;
+                size_t protected_outside = 0, not_protected_inside = 0; // , protected_inside = 0, not_protected_outside = 0;
+                for (const auto& protection_data: titers_and_distances) {
+                    if (protection_data) {
+                        const bool inside = protection_data.distance <= radius;
+                        const bool protectd = protection_data.titer.is_regular() ? protection_data.final_similarity >= protection_boundary_titer : protection_data.final_similarity > protection_boundary_titer;
+                        if (protectd && !inside)
+                            ++protected_outside;
+                        else if (!protectd && inside)
+                            ++not_protected_inside;
+                    }
                 }
+                const size_t summa = protected_outside + not_protected_inside;
+                if (best_sum == None || best_sum >= summa) { // if sums are the same, choose the smaller radius (found earlier)
+                    if (best_sum == summa) {
+                        if (aVerbose)
+                            std::cerr << "DEBUG: AG " << ag_no << " radius:" << radius << " distance:" << titers_and_distances[ag_no].distance << " prev:" << previous << " protected_outside:" << protected_outside << " not_protected_inside:" << not_protected_inside << " best_sum:" << best_sum << std::endl;
+                        sum_radii += radius;
+                        ++num_radii;
+                    }
+                    else {
+                        if (aVerbose)
+                            std::cerr << "======================================================================" << std::endl
+                                      << "DEBUG: AG " << ag_no << " radius:" << radius << " distance:" << titers_and_distances[ag_no].distance << " prev:" << previous << " protected_outside:" << protected_outside << " not_protected_inside:" << not_protected_inside << " best_sum:" << best_sum << std::endl;
+                        sum_radii = radius;
+                        num_radii = 1;
+                        best_sum = summa;
+                    }
+                }
+                  // std::cerr << "AG " << ag_no << " radius:" << radius << " protected_outside:" << protected_outside << " not_protected_inside:" << not_protected_inside << " best_sum:" << best_sum << std::endl;
+                previous = ag_no;
             }
-            const size_t summa = protected_outside + not_protected_inside;
-            if (best_sum == None || best_sum >= summa) { // if sums are the same, choose the smaller radius (found earlier)
-                if (best_sum == summa) {
-                    if (aVerbose)
-                        std::cerr << "AG " << ag_no << " radius:" << radius << " distance:" << titers_and_distances[ag_no].distance << " prev:" << previous << " protected_outside:" << protected_outside << " not_protected_inside:" << not_protected_inside << " best_sum:" << best_sum << std::endl;
-                    sum_radii += radius;
-                    ++num_radii;
-                }
-                else {
-                    if (aVerbose)
-                        std::cerr << "======================================================================" << std::endl
-                                  << "AG " << ag_no << " radius:" << radius << " distance:" << titers_and_distances[ag_no].distance << " prev:" << previous << " protected_outside:" << protected_outside << " not_protected_inside:" << not_protected_inside << " best_sum:" << best_sum << std::endl;
-                    sum_radii = radius;
-                    num_radii = 1;
-                    best_sum = summa;
-                }
-            }
-              // std::cerr << "AG " << ag_no << " radius:" << radius << " protected_outside:" << protected_outside << " not_protected_inside:" << not_protected_inside << " best_sum:" << best_sum << std::endl;
-            previous = ag_no;
         }
         return sum_radii / num_radii;
     }
