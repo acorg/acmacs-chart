@@ -206,6 +206,7 @@ class Antigens : public std::vector<Antigen>
 
     void find_by_name(std::string aName, std::vector<size_t>& aAntigenIndices) const;
     void find_by_name_matching(std::string aName, std::vector<size_t>& aAntigenIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
+    size_t find_by_name_for_exact_matching(std::string aFullName) const; // returns size_t(-1) if not found
     void continents(ContinentData& aContinentData, const LocDb& aLocDb, bool aExcludeReference = true) const;
     void countries(CountryData& aCountries, const LocDb& aLocDb, bool aExcludeReference = true) const;
     void country(std::string aCountry, std::vector<size_t>& aAntigenIndices, const LocDb& aLocDb) const;
@@ -559,6 +560,15 @@ class Chart
     inline IndexGenerator egg_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].is_egg(); } }; }
     inline IndexGenerator reassortant_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].is_reassortant(); } }; }
     inline IndexGenerator serum_indices() const { return {number_of_antigens(), number_of_points(), [](size_t) { return true; } }; }
+
+    inline IndexGenerator antigens_not_found_in(const Chart& aNother) const
+        {
+            auto filter = [this,&aNother](size_t aIndex) -> bool {
+                const size_t found = aNother.antigens().find_by_name_for_exact_matching(this->antigens()[aIndex].full_name());
+                return found == static_cast<size_t>(-1);
+            };
+            return {number_of_antigens(), filter};
+        }
 
     void find_homologous_antigen_for_sera();
     inline void find_homologous_antigen_for_sera_const() const { const_cast<Chart*>(this)->find_homologous_antigen_for_sera(); }

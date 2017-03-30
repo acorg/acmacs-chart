@@ -193,6 +193,15 @@ void Antigens::find_by_name(std::string aName, std::vector<size_t>& aAntigenIndi
 
 // ----------------------------------------------------------------------
 
+size_t Antigens::find_by_name_for_exact_matching(std::string aFullName) const
+{
+    auto found = std::find_if(begin(), end(), [&aFullName](const auto& e) -> bool { return e.full_name() == aFullName; });
+    return found == end() ? static_cast<size_t>(-1) : static_cast<size_t>(found - begin());
+
+} // Antigens::find_by_name_for_exact_matching
+
+// ----------------------------------------------------------------------
+
 size_t Sera::find_by_name_for_exact_matching(std::string aFullName) const
 {
     auto found = std::find_if(begin(), end(), [&aFullName](const auto& e) -> bool { return e.full_name() == aFullName; });

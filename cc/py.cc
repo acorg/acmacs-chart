@@ -142,6 +142,7 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
             .def("titers", py::overload_cast<>(&Chart::titers, py::const_), py::return_value_policy::reference)
             .def("serum_circle_radius", &Chart::serum_circle_radius, py::arg("antigen_no"), py::arg("serum_no"), py::arg("projection_no") = 0, py::arg("verbose") = false)
             .def("serum_coverage", [](const Chart& aChart, size_t aAntigenNo, size_t aSerumNo) -> std::vector<std::vector<size_t>> { std::vector<size_t> within, outside; aChart.serum_coverage(aAntigenNo, aSerumNo, within, outside); return {within, outside}; } , py::arg("antigen_no"), py::arg("serum_no"))
+            .def("antigens_not_found_in", [](const Chart& aChart, const Chart& aNother) -> std::vector<size_t> { auto gen = aChart.antigens_not_found_in(aNother); return {gen.begin(), gen.end()}; }, py::arg("another_chart"))
         ;
 
     m.def("import_chart", &import_chart, py::arg("data"), py::doc("Imports chart from a buffer or file in the ace format."));
