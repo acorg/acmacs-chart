@@ -17,6 +17,8 @@ template <typename RW> jsw::writer<RW>& operator <<(jsw::writer<RW>&, const std:
 
 // ----------------------------------------------------------------------
 
+class AceChartReadError : public std::runtime_error { public: using std::runtime_error::runtime_error; };
+
 Chart* import_chart(std::string data);
 void export_chart(std::string aFilename, const Chart& aChart);
 

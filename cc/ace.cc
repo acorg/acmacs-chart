@@ -28,7 +28,7 @@ class Ace
         {
             mVersion.assign(str, length);
             if (mVersion != ACE_DUMP_VERSION)
-                throw std::runtime_error("Unsupported data version: \"" + mVersion + "\"");
+                throw AceChartReadError("Unsupported data version: \"" + mVersion + "\"");
         }
     inline std::string version() const { return mVersion; }
 
@@ -283,11 +283,19 @@ Chart* import_chart(std::string buffer)
     Chart* chart = nullptr;
     if (buffer[0] == '{') {
         chart = new Chart{};
-        Ace ace(*chart);
-        jsi::import(buffer, ace, ace_data);
+        try {
+            Ace ace(*chart);
+            jsi::import(buffer, ace, ace_data);
+        }
+        catch (AceChartReadError&) {
+            throw;
+        }
+        catch (std::exception& err) {
+            throw AceChartReadError(err.what());
+        }
     }
     else
-        throw std::runtime_error("cannot import chart: unrecognized source format");
+        throw AceChartReadError("cannot import chart: unrecognized source format");
     return chart;
 
 } // import_chart
