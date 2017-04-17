@@ -418,12 +418,16 @@ const std::string ChartInfo::make_name() const
 
 // ----------------------------------------------------------------------
 
-const std::string Chart::make_name() const
+const std::string Chart::make_name(size_t aProjectionNo) const
 {
     const ChartInfo& info = chart_info();
     std::string n = info.name();
     if (n.empty())
         n = string::join({info.lab(), info.virus_type(), lineage(), info.assay(), info.rbc(), info.date()});
+    if (aProjectionNo != static_cast<size_t>(-1) && aProjectionNo < projections().size()) {
+        n += " >=" + projection(aProjectionNo).minimum_column_basis();
+        n += " " + std::to_string(projection(aProjectionNo).stress());
+    }
     return n;
 
 } // Chart::make_name

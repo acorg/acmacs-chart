@@ -478,7 +478,7 @@ class Chart
     inline size_t number_of_sera() const { return mSera.size(); }
     inline size_t number_of_points() const { return number_of_antigens() + number_of_sera(); }
     std::string lineage() const;
-    const std::string make_name() const;
+    const std::string make_name(size_t aProjectionNo = static_cast<size_t>(-1)) const;
 
     inline const ChartInfo& chart_info() const { return mInfo; }
     inline ChartInfo& chart_info() { return mInfo; }
