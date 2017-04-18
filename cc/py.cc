@@ -4,6 +4,7 @@
 #include "chart.hh"
 #include "ace.hh"
 #include "lispmds.hh"
+#include "vaccines.hh"
 
 // ----------------------------------------------------------------------
 
@@ -149,6 +150,22 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
     m.def("import_chart", [](py::bytes data) { return import_chart(data); }, py::arg("data"), py::doc("Imports chart from a buffer or file in the ace format."));
     m.def("export_chart", &export_chart, py::arg("filename"), py::arg("chart"), py::doc("Exports chart into a file in the ace format."));
     m.def("export_chart_lispmds", py::overload_cast<std::string, const Chart&>(&export_chart_lispmds), py::arg("filename"), py::arg("chart"), py::doc("Exports chart into a file in the lispmds save format."));
+
+      // ----------------------------------------------------------------------
+      // Vaccines
+      // ----------------------------------------------------------------------
+
+    py::class_<Vaccine>(m, "Vaccine")
+            .def_property_readonly("name", [](const Vaccine& aVaccine) -> std::string { return aVaccine.name; })
+            .def_property_readonly("type", &Vaccine::type_as_string)
+            ;
+
+    m.def("vaccines", py::overload_cast<std::string, std::string>(&vaccines), py::arg("subtype"), py::arg("lineage") = "", py::return_value_policy::reference);
+    m.def("vaccines", py::overload_cast<const Chart&>(&vaccines), py::arg("chart"), py::return_value_policy::reference);
+
+      // ----------------------------------------------------------------------
+      //
+      // ----------------------------------------------------------------------
 
     m.def("virus_name_match_threshold", &virus_name::match_threshold, py::arg("name"), py::doc("Extracts virus name without passage, reassortant, extra, etc. and calculates match threshold (to use with antigens.find_by_name_matching), match threshold is a square of virus name length."));
 
