@@ -66,6 +66,7 @@ class PointStyle
     inline PointStyle& show(Shown aShown = Shown::Shown) { mShown = aShown; return *this; }
     inline PointStyle& hide() { mShown = Shown::Hidden; return *this; }
     inline PointStyle& shape(Shape aShape) { mShape = aShape; return *this; }
+    inline PointStyle& shape(std::string aShape) { if (aShape == "circle") shape(Shape::Circle); else if (aShape == "box") shape(Shape::Box); else if (aShape == "triangle") shape(Shape::Triangle); else throw std::runtime_error("Unrecognized point style shape: " + aShape); return *this; }
     inline PointStyle& fill(Color c) { mFill = c; return *this; }
     inline PointStyle& outline(Color c) { mOutline = c; return *this; }
     inline PointStyle& size(Pixels aSize) { mSize = aSize; return *this; }
