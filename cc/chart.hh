@@ -373,14 +373,14 @@ class ChartInfo
             }
         }
 
-    inline std::string& virus() { return mVirus; }
-    inline std::string& virus_type() { return mVirusType; }
-    inline std::string& assay() { return mAssay; }
-    inline std::string& date() { return mDate; }
-    inline std::string& lab() { return mLab; }
-    inline std::string& rbc() { return mRbc; }
-    inline std::string& name() { return mName; }
-    inline std::string& subset() { return mSubset; }
+    inline std::string& virus_ref() { return mVirus; }
+    inline std::string& virus_type_ref() { return mVirusType; }
+    inline std::string& assay_ref() { return mAssay; }
+    inline std::string& date_ref() { return mDate; }
+    inline std::string& lab_ref() { return mLab; }
+    inline std::string& rbc_ref() { return mRbc; }
+    inline std::string& name_ref() { return mName; }
+    inline std::string& subset_ref() { return mSubset; }
 
     inline auto& sources() { return mSources; }
     inline const auto& sources() const { return mSources; }
