@@ -39,6 +39,7 @@ std::string AntigenSerum::name_abbreviated(const LocDb& aLocDb) const
 
 std::string AntigenSerum::location_abbreviated(const LocDb& aLocDb) const
 {
+      // std::cerr << "DEBUG: location_abbreviated: \"" << name() << "\" -> \"" << virus_name::location(name()) << "\" -> \"" << aLocDb.abbreviation(virus_name::location(name())) << '"' << std::endl;
     return aLocDb.abbreviation(virus_name::location(name()));
 
 } // AntigenSerum::location_abbreviated

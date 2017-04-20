@@ -125,6 +125,7 @@ class Antigen : public AntigenSerum
     virtual inline std::string full_name_for_seqdb_matching() const { return string::join({name(), reassortant(), passage(), annotations().join()}); } // annotations may part of the passage in seqdb (NIMR ISOLATE 1)
     virtual inline std::string abbreviated_name(const LocDb& aLocDb) const { return string::join({name_abbreviated(aLocDb), reassortant(), annotations().join()}); }
     virtual inline std::string abbreviated_name_with_passage_type(const LocDb& aLocDb) const { return string::join("-", {name_abbreviated(aLocDb), reassortant(), annotations().join(), passage_type()}); }
+    virtual inline std::string abbreviated_location_with_passage_type(const LocDb& aLocDb) const { return string::join("-", {location_abbreviated(aLocDb), passage_type()}); }
 
     // inline void name(const char* str, size_t length) { AntigenSerum::name(str, length); }
 
