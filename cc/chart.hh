@@ -486,10 +486,12 @@ class Chart
 
     inline const Antigens& antigens() const { return mAntigens; }
     inline Antigens& antigens() { return mAntigens; }
+    inline const Antigen& antigen(size_t ag_no) const { return mAntigens[ag_no]; }
     inline Antigen& antigen(size_t ag_no) { return mAntigens[ag_no]; }
 
     inline const Sera& sera() const { return mSera; }
     inline Sera& sera() { return mSera; }
+    inline const Serum& serum(size_t sr_no) const { return mSera[sr_no]; }
     inline Serum& serum(size_t sr_no) { return mSera[sr_no]; }
 
     inline const ChartTiters& titers() const { return mTiters; }
