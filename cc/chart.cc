@@ -575,11 +575,20 @@ class TiterDistance
     double distance;
 };
 
+inline std::ostream& operator << (std::ostream& out, const TiterDistance& td)
+{
+    if (td)
+        return out << "t:" << td.titer << " s:" << td.similarity << " f:" << td.final_similarity << " d:" << td.distance << std::endl;
+    else
+        return out << "dont-care" << std::endl;
+}
+
 class SerumCircleRadiusCalculationError : public std::runtime_error { public: using std::runtime_error::runtime_error; };
 
 double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aProjectionNo, bool aVerbose) const
 {
-    // if (aVerbose) std::cerr << "INFO: serum_circle_radius" << std::endl;
+    if (aVerbose)
+        std::cerr << "DEBUG: serum_circle_radius for [sr:" << aSerumNo << ' ' << serum(aSerumNo).full_name() << "] [ag:" << aAntigenNo << ' ' << antigen(aAntigenNo).full_name() << ']' << std::endl;
     try {
         const auto& layout = projection(aProjectionNo).layout();
         const double cb = column_basis(aProjectionNo, aSerumNo);
@@ -599,12 +608,22 @@ double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aPr
         const double protection_boundary_titer = titers_and_distances[aAntigenNo].final_similarity - 2.0;
         if (protection_boundary_titer < 1.0)
             throw SerumCircleRadiusCalculationError("titer is too low, protects everything");
-        // if (aVerbose) std::cerr << "INFO: serum_circle_radius protection_boundary_titer: " << protection_boundary_titer << std::endl;
+        // if (aVerbose) std::cerr << "DEBUG: titers_and_distances: " << titers_and_distances << std::endl;
+        if (aVerbose) std::cerr << "DEBUG: serum_circle_radius protection_boundary_titer: " << protection_boundary_titer << std::endl;
 
           // sort antigen indices by antigen distance from serum, closest first
+        auto antigens_by_distances_sorting = [&titers_and_distances](size_t a, size_t b) -> bool {
+            const auto& aa = titers_and_distances[a];
+            if (aa) {
+                const auto& bb = titers_and_distances[b];
+                return bb ? aa.distance < bb.distance : true;
+            }
+            else
+                return false;
+        };
         std::vector<size_t> antigens_by_distances(Range<size_t>::begin(number_of_antigens()), Range<size_t>::end());
-        std::sort(antigens_by_distances.begin(), antigens_by_distances.end(), [&titers_and_distances](size_t a, size_t b) -> bool { return titers_and_distances[a].distance < titers_and_distances[b].distance; });
-        // std::cerr << "antigens_by_distances " << antigens_by_distances << std::endl;
+        std::sort(antigens_by_distances.begin(), antigens_by_distances.end(), antigens_by_distances_sorting);
+          //if (aVerbose) std::cerr << "DEBUG: antigens_by_distances " << antigens_by_distances << std::endl;
 
         constexpr const size_t None = static_cast<size_t>(-1);
         size_t best_sum = None;
@@ -631,14 +650,14 @@ double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aPr
                 if (best_sum == None || best_sum >= summa) { // if sums are the same, choose the smaller radius (found earlier)
                     if (best_sum == summa) {
                         if (aVerbose)
-                            std::cerr << "DEBUG: AG " << ag_no << " radius:" << radius << " distance:" << titers_and_distances[ag_no].distance << " prev:" << previous << " protected_outside:" << protected_outside << " not_protected_inside:" << not_protected_inside << " best_sum:" << best_sum << std::endl;
+                            std::cerr << "DEBUG: AG " << ag_no << " radius:" << radius << " distance:" << titers_and_distances[ag_no].distance << " prev:" << static_cast<int>(previous) << " protected_outside:" << protected_outside << " not_protected_inside:" << not_protected_inside << " best_sum:" << best_sum << std::endl;
                         sum_radii += radius;
                         ++num_radii;
                     }
                     else {
                         if (aVerbose)
                             std::cerr << "======================================================================" << std::endl
-                                      << "DEBUG: AG " << ag_no << " radius:" << radius << " distance:" << titers_and_distances[ag_no].distance << " prev:" << previous << " protected_outside:" << protected_outside << " not_protected_inside:" << not_protected_inside << " best_sum:" << best_sum << std::endl;
+                                      << "DEBUG: AG " << ag_no << " radius:" << radius << " distance:" << titers_and_distances[ag_no].distance << " prev:" << static_cast<int>(previous) << " protected_outside:" << protected_outside << " not_protected_inside:" << not_protected_inside << " best_sum:" << best_sum << std::endl;
                         sum_radii = radius;
                         num_radii = 1;
                         best_sum = summa;
