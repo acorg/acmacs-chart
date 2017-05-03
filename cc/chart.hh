@@ -442,6 +442,7 @@ class Titer : public std::string
         }
 
     inline bool operator<(const Titer& aNother) const { return value_for_sorting() < aNother.value_for_sorting(); }
+    inline bool operator==(const Titer& aNother) const { return static_cast<const std::string&>(*this) == static_cast<const std::string&>(aNother) || (is_dont_care() && aNother.is_dont_care()); }
 
  private:
     friend class ChartTiters;
