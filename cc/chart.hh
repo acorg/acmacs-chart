@@ -429,6 +429,20 @@ class Titer : public std::string
             return std::log2(value() / 10.0);
         }
 
+    inline size_t value_for_sorting() const
+        {
+            if (empty() || front() == '*')
+                return 0;
+            else if (front() == '<')
+                return std::stoul(substr(1)) - 1;
+            else if (front() == '>')
+                return std::stoul(substr(1)) + 1;
+            else
+                return std::stoul(*this);
+        }
+
+    inline bool operator<(const Titer& aNother) const { return value_for_sorting() < aNother.value_for_sorting(); }
+
  private:
     friend class ChartTiters;
     inline Titer(std::string source) : std::string(source) {}
