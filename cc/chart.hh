@@ -430,6 +430,16 @@ class Titer : public std::string
             return std::log2(value() / 10.0);
         }
 
+    inline double similarity_with_thresholded() const
+        {
+            double result = similarity();
+            if (is_more_than())
+                ++result;
+            else if (is_less_than())
+                --result;
+            return result;
+        }
+
     inline size_t value_for_sorting() const
         {
             if (empty() || front() == '*')
