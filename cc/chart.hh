@@ -407,7 +407,8 @@ class ChartInfo
 class Titer : public std::string
 {
  public:
-    inline Titer() = default;
+    inline Titer() : std::string() {}
+    inline Titer(const char* s) : std::string(s) {}
 
     inline bool is_regular() const { return !empty() && std::isdigit(front()); }
     inline bool is_more_than() const { return !empty() && front() == '>'; }
