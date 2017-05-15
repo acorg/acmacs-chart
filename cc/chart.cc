@@ -250,6 +250,17 @@ void Sera::find_by_name_matching(std::string aName, std::vector<size_t>& aSeraIn
 
 // ----------------------------------------------------------------------
 
+void Antigens::find_by_lab_id(std::string aLabId, std::vector<size_t>& aAntigenIndices) const
+{
+    for (auto ag = begin(); ag != end(); ++ag) {
+        if (ag->has_lab_id(aLabId))
+            aAntigenIndices.push_back(static_cast<size_t>(ag - begin()));
+    }
+
+} // Antigens::find_by_lab_id
+
+// ----------------------------------------------------------------------
+
 void Antigens::continents(ContinentData& aContinentData, const LocDb& aLocDb, bool aExcludeReference) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {
