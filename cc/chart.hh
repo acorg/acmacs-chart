@@ -410,6 +410,7 @@ class Titer : public std::string
  public:
     inline Titer() : std::string() {}
     inline Titer(const char* s) : std::string(s) {}
+    inline Titer(std::string source) : std::string(source) {}
 
     inline bool is_regular() const { return !empty() && std::isdigit(front()); }
     inline bool is_more_than() const { return !empty() && front() == '>'; }
@@ -455,10 +456,6 @@ class Titer : public std::string
 
     inline bool operator<(const Titer& aNother) const { return value_for_sorting() < aNother.value_for_sorting(); }
     inline bool operator==(const Titer& aNother) const { return static_cast<const std::string&>(*this) == static_cast<const std::string&>(aNother) || (is_dont_care() && aNother.is_dont_care()); }
-
- private:
-    friend class ChartTiters;
-    inline Titer(std::string source) : std::string(source) {}
 
 }; // class Titer
 
