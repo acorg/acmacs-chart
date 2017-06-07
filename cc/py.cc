@@ -42,9 +42,9 @@
 
 // ----------------------------------------------------------------------
 
-PYBIND11_PLUGIN(acmacs_chart_backend)
+PYBIND11_MODULE(acmacs_chart_backend, m)
 {
-    py::module m("acmacs_chart_backend", "Acmacs chart access plugin");
+    m.doc() = "Acmacs chart access plugin";
 
       // ----------------------------------------------------------------------
       // Antigen, Serum
@@ -157,8 +157,6 @@ PYBIND11_PLUGIN(acmacs_chart_backend)
       // ----------------------------------------------------------------------
 
     m.def("virus_name_match_threshold", &virus_name::match_threshold, py::arg("name"), py::doc("Extracts virus name without passage, reassortant, extra, etc. and calculates match threshold (to use with antigens.find_by_name_matching), match threshold is a square of virus name length."));
-
-    return m.ptr();
 }
 
 // ----------------------------------------------------------------------
