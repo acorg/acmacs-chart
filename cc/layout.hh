@@ -3,6 +3,8 @@
 #include <iostream>
 #include <limits>
 
+#include "acmacs-base/config.hh"
+
 #include "acmacs-base/stream.hh"
 #include "acmacs-base/transformation.hh"
 #include "vector.hh"
@@ -98,7 +100,7 @@ class Layout : public std::vector<Coordinates>
                 if (num_dims)
                     return num_dims;
             }
-            throw std::runtime_error("getting number_of_dimensions for empty layout");
+            THROW(std::runtime_error("getting number_of_dimensions for empty layout"), 0);
         }
 
     inline double distance(size_t p1, size_t p2, double no_distance = std::numeric_limits<double>::quiet_NaN()) const

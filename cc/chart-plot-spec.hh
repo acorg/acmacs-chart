@@ -86,7 +86,7 @@ class LabelStyle
                 return Slant::Italic;
             if (s == "oblique")
                 return Slant::Oblique;
-            throw std::runtime_error("Unrecognized font slant: " + s);
+            THROW(std::runtime_error("Unrecognized font slant: " + s), Slant::Normal);
         }
 
     inline Weight weight_from_string(const char* str, size_t length) const
@@ -96,7 +96,7 @@ class LabelStyle
                 return Weight::Normal;
             if (s == "bold")
                 return Weight::Bold;
-            throw std::runtime_error("Unrecognized font weight: " + s);
+            THROW(std::runtime_error("Unrecognized font weight: " + s), Weight::Normal);
         }
 
 }; // class LabelStyle
@@ -173,7 +173,7 @@ class ChartPlotSpecStyle
               case 't':
                   return Triangle;
             }
-            throw std::runtime_error("Unrecognized point shape: " + std::string(str, length));
+            THROW(std::runtime_error("Unrecognized point shape: " + std::string(str, length)), Circle);
         }
 
 }; // class ChartPlotSpecStyle

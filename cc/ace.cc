@@ -156,7 +156,7 @@ class TiterDictStorer : public jsi::StorerBase
     inline virtual Base* StartArray()
         {
             if (mStarted)
-                throw Base::Failure(typeid(*this).name() + std::string(": unexpected StartArray event"));
+                return jsi::storers::_i::failure(typeid(*this).name() + std::string(": unexpected StartArray event"));
             mTarget.clear(); // erase all old elements
             mStarted = true;
             return nullptr;
@@ -164,13 +164,13 @@ class TiterDictStorer : public jsi::StorerBase
 
     inline virtual Base* EndArray()
         {
-            throw Base::Pop();
+            return jsi::storers::_i::pop();
         }
 
     inline virtual Base* StartObject()
         {
             if (!mStarted)
-                throw Base::Failure(typeid(*this).name() + std::string(": unexpected StartObject event"));
+                return jsi::storers::_i::failure(typeid(*this).name() + std::string(": unexpected StartObject event"));
             mTarget.emplace_back(); // add row
             return nullptr;
         }
@@ -189,7 +189,7 @@ class TiterDictStorer : public jsi::StorerBase
     inline virtual Base* String(const char* str, rapidjson::SizeType length)
         {
             if (!mTarget.back().back().second.empty())
-                throw Base::Failure(typeid(*this).name() + std::string(": unexpected String event: titer is there: ") + mTarget.back().back().second);
+                return jsi::storers::_i::failure(typeid(*this).name() + std::string(": unexpected String event: titer is there: ") + mTarget.back().back().second);
             mTarget.back().back().second.assign(str, length);
             return nullptr;
         }
@@ -226,7 +226,7 @@ class TiterLayersStorer : public jsi::StorerBase
 
     inline virtual Base* EndArray()
         {
-            throw Base::Pop();
+            return jsi::storers::_i::pop();
         }
 
  private:

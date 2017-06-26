@@ -299,7 +299,7 @@ class Projection
                 if (!point.empty())
                     return point.size();
             }
-            throw std::runtime_error("Internal: cannot find number_of_dimentions of projection");
+            THROW(std::runtime_error("Internal: cannot find number_of_dimentions of projection"), 0);
         }
 
  private:
@@ -362,7 +362,7 @@ class ChartInfo
     inline void type(const char* str, size_t length) // reading from json
         {
             if (length != 1)
-                throw std::runtime_error("ChartInfo: unrecognized table type: " + std::string(str, length));
+                THROW_OR_VOID(std::runtime_error("ChartInfo: unrecognized table type: " + std::string(str, length)));
             switch (*str) {
               case 'A':
                   mType = Antigenic;
@@ -371,7 +371,7 @@ class ChartInfo
                   mType = Genetic;
                   break;
               default:
-                  throw std::runtime_error("ChartInfo: unrecognized table type: " + std::string(str, length));
+                  THROW_OR_VOID(std::runtime_error("ChartInfo: unrecognized table type: " + std::string(str, length)));
             }
         }
 
