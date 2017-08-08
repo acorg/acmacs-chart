@@ -673,6 +673,7 @@ class Chart : public ChartBase
     inline const std::vector<Projection>& projections() const { return mProjections; }
     inline ProjectionBase& projection(size_t aProjectionNo) override { return mProjections[aProjectionNo]; }
     inline const ProjectionBase& projection(size_t aProjectionNo) const override { return mProjections[aProjectionNo]; }
+    inline size_t number_of_projections() const override { return mProjections.size(); }
 
     inline const ChartPlotSpec& plot_spec() const { return mPlotSpec; }
     inline ChartPlotSpec& plot_spec() { return mPlotSpec; }

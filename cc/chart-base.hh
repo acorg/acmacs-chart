@@ -268,6 +268,7 @@ class ChartBase
     // inline const std::vector<Projection>& projections() const { return mProjections; }
     virtual ProjectionBase& projection(size_t aProjectionNo) = 0;
     virtual const ProjectionBase& projection(size_t aProjectionNo) const = 0;
+    virtual size_t number_of_projections() const = 0;
 
     // inline const ChartPlotSpec& plot_spec() const { return mPlotSpec; }
     // inline ChartPlotSpec& plot_spec() { return mPlotSpec; }

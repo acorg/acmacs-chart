@@ -23,6 +23,22 @@ def main(args):
     with timeit("Reading json from " + args.input[0]):
         chart_raw = read_json(args.input[0])
 
+    for field_raw, field in [["N", "name"], ["D", "date"], ["L", "lineage"], ["P", "passage"], ["R", "reassortant"]]:
+        #module_logger.debug('Testing antigens: {!r} -- {!r}'.format(field_raw, field))
+        antigen_fields_raw = [antigen.get(field_raw, "") for antigen in chart_raw["c"]["a"]]
+        antigen_fields = [getattr(chart.antigen(ag_no), field)() for ag_no in range(chart.number_of_antigens())]
+        assert len(antigen_fields_raw) == chart.number_of_antigens(), "antigens size of {!r} -- {!r}".format(field_raw, field)
+        assert antigen_fields_raw == antigen_fields, "antigens: {!r} -- {!r}".format(field_raw, field)
+
+    for field_raw, field in [["N", "name"], ["L", "lineage"], ["P", "passage"], ["R", "reassortant"], ["I", "serum_id"]]:
+        #module_logger.debug('Testing sera: {!r} -- {!r}'.format(field_raw, field))
+        serum_fields_raw = [serum.get(field_raw, "") for serum in chart_raw["c"]["s"]]
+        serum_fields = [getattr(chart.serum(sr_no), field)() for sr_no in range(chart.number_of_sera())]
+        assert len(serum_fields_raw) == chart.number_of_sera(), "sera size of {!r} -- {!r}".format(field_raw, field)
+        assert serum_fields_raw == serum_fields, "sera: {!r} -- {!r}".format(field_raw, field)
+
+    assert len(chart_raw["c"].get("P", [])) == chart.number_of_projections()
+
 # ----------------------------------------------------------------------
 
 try:
