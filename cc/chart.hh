@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <string>
 #include <vector>
 #include <map>
 // #include <algorithm>
@@ -14,6 +13,7 @@
 #include "acmacs-chart/antigen-serum-match.hh"
 #include "acmacs-chart/layout.hh"
 #include "acmacs-chart/chart-plot-spec.hh"
+#include "acmacs-chart/chart-base.hh"
 
 class LocDb;
 
@@ -236,20 +236,49 @@ class Sera : public std::vector<Serum>
 
 // ----------------------------------------------------------------------
 
-class MinimumColumnBasis : public std::string
+class MinimumColumnBasis : public MinimumColumnBasisBase
 {
  public:
-    inline MinimumColumnBasis() : mCached(static_cast<size_t>(-1)) {}
-    inline operator size_t() const { if (mCached == static_cast<size_t>(-1)) mCached = *this == "none" || *this == "auto" ? 0 : std::stoul(*this); return mCached; }
+    using MinimumColumnBasisBase::MinimumColumnBasisBase;
+    inline MinimumColumnBasis(const MinimumColumnBasis& aSrc) : MinimumColumnBasisBase{aSrc}, mValue{aSrc.mValue} {}
+    inline operator size_t() const override { if (mCached == static_cast<decltype(mCached)>(-1)) mCached = mValue == "none" || mValue == "auto" ? 0 : std::stoul(mValue); return mCached; }
+    inline operator std::string() const override { return mValue; }
+    inline void assign(const char* str, size_t length) { mValue.assign(str, length); mCached = static_cast<decltype(mCached)>(-1); }
+
+    inline std::string data() const { return mValue; }
 
  private:
-    mutable size_t mCached;
+    std::string mValue;
 
 }; // class MinimumColumnBasis
 
 // ----------------------------------------------------------------------
 
-class Projection
+class ColumnBases : public ColumnBasesBase
+{
+ public:
+    using ColumnBasesBase::ColumnBasesBase;
+    inline void operator = (const ColumnBasesBase& aSrc) override { mColumnBases = dynamic_cast<const ColumnBases&>(aSrc).mColumnBases; }
+
+    inline double operator[](size_t aIndex) const override { return mColumnBases[aIndex]; }
+    inline double at(size_t aIndex) const override { return mColumnBases.at(aIndex); }
+    inline void set(size_t aIndex, double aValue) override { mColumnBases[aIndex] = aValue; }
+    inline void clear() override { mColumnBases.clear(); }
+    inline bool empty() const override { return mColumnBases.empty(); }
+    inline size_t size() const override { return mColumnBases.size(); }
+    inline void resize(size_t aNewSize) override { mColumnBases.resize(aNewSize); }
+
+    inline auto& data() { return mColumnBases; }
+    inline const auto& data() const { return mColumnBases; }
+
+ private:
+    std::vector<double> mColumnBases;
+
+}; // class ColumnBases
+
+// ----------------------------------------------------------------------
+
+class Projection : public ProjectionBase
 {
  public:
     inline Projection() : mStress(-1), mDodgyTiterIsRegular(false), mStressDiffToStop(1e-10) {}
@@ -257,20 +286,25 @@ class Projection
     inline void comment(const char* str, size_t length) { mComment.assign(str, length); }
     inline std::string comment() const { return mComment; }
 
-    inline Layout& layout() { return mLayout; }
-    inline const Layout& layout() const { return mLayout; }
+    inline LayoutBase& layout() override { return mLayout; }
+    inline const LayoutBase& layout() const override { return mLayout; }
+    inline std::vector<std::vector<double>>& layout_for_json() { return reinterpret_cast<std::vector<std::vector<double>>&>(mLayout.data()); }
+    inline const std::vector<Coordinates>& layout_for_json() const { return mLayout.data(); }
 
-    inline void stress(double aStress) { mStress = aStress; }
-    inline double stress() const { return mStress; }
+    inline void stress(double aStress) override { mStress = aStress; }
+    inline double stress() const override { return mStress; }
 
     inline void minimum_column_basis(const char* str, size_t length) { mMinimumColumnBasis.assign(str, length); }
-    inline const MinimumColumnBasis& minimum_column_basis() const { return mMinimumColumnBasis; }
+    inline const MinimumColumnBasisBase& minimum_column_basis() const override { return mMinimumColumnBasis; }
+    inline std::string minimum_column_basis_for_json() const { return mMinimumColumnBasis.data(); }
 
-    inline std::vector<double>& column_bases() { return mColumnBases; }
-    inline const std::vector<double>& column_bases() const { return mColumnBases; }
+    inline ColumnBasesBase& column_bases() override { return mColumnBases; }
+    inline const ColumnBasesBase& column_bases() const override { return mColumnBases; }
+    inline std::vector<double>& column_bases_for_json() { return mColumnBases.data(); }
+    inline const std::vector<double>& column_bases_for_json() const { return mColumnBases.data(); }
 
-    inline Transformation& transformation() { return mTransformation; }
-    inline const Transformation& transformation() const { return mTransformation; }
+    inline Transformation& transformation() override { return mTransformation; }
+    inline const Transformation& transformation() const override { return mTransformation; }
 
     inline std::vector<double>& gradient_multipliers() { return mGradientMultipliers; }
     inline const std::vector<double>& gradient_multipliers() const { return mGradientMultipliers; }
@@ -293,14 +327,14 @@ class Projection
     inline std::vector<size_t>& unmovable_in_last_dimension() { return mUnmovableInLastDimension; }
     inline const std::vector<size_t>& unmovable_in_last_dimension() const { return mUnmovableInLastDimension; }
 
-    inline size_t number_of_dimentions() const
-        {
-            for (const auto& point: mLayout) {
-                if (!point.empty())
-                    return point.size();
-            }
-            THROW(std::runtime_error("Internal: cannot find number_of_dimentions of projection"), 0);
-        }
+    // inline size_t number_of_dimensions() const
+    //     {
+    //         for (const auto& point: mLayout) {
+    //             if (!point.empty())
+    //                 return point.size();
+    //         }
+    //         THROW(std::runtime_error("Internal: cannot find number_of_dimensions of projection"), 0);
+    //     }
 
  private:
     std::string mComment;                           // "c"
@@ -308,7 +342,7 @@ class Projection
       // size_t mNumberOfIterations;                // "i"
     double mStress;                                 // "s"
     MinimumColumnBasis mMinimumColumnBasis;         // "m": "1280", "none" (default)
-    std::vector<double> mColumnBases;               // "C"
+    ColumnBases mColumnBases;                       // "C"
     Transformation mTransformation;                 // "t": [1.0, 0.0, 0.0, 1.0]
     std::vector<double> mGradientMultipliers;       // "g": [] double for each point
     std::vector<double> mTiterMultipliers;          // "f": [],  antigens_sera_titers_multipliers, double for each point
@@ -489,19 +523,20 @@ class ChartTiters
 
 // ----------------------------------------------------------------------
 
-class Chart
+class Chart : public ChartBase
 {
  public:
-    inline Chart() {}
-    inline Chart(const Chart&) = default;
-    inline Chart& operator=(const Chart&) = default;
-    ~Chart();
+    using ChartBase::ChartBase;
+    // inline Chart() {}
+    // inline Chart(const Chart&) = default;
+    // inline Chart& operator=(const Chart&) = default;
+    // ~Chart();
 
     // inline std::string virus_type() const { return mInfo.virus_type(); }
 
-    inline size_t number_of_antigens() const { return mAntigens.size(); }
-    inline size_t number_of_sera() const { return mSera.size(); }
-    inline size_t number_of_points() const { return number_of_antigens() + number_of_sera(); }
+    inline size_t number_of_antigens() const override { return mAntigens.size(); }
+    inline size_t number_of_sera() const override { return mSera.size(); }
+      // inline size_t number_of_points() const override { return number_of_antigens() + number_of_sera(); }
     std::string lineage() const;
     const std::string make_name(size_t aProjectionNo = static_cast<size_t>(-1)) const;
 
@@ -523,24 +558,27 @@ class Chart
 
     inline const auto& column_bases() const { return mColumnBases; }
     inline auto& column_bases() { return mColumnBases; }
-    double compute_column_basis(MinimumColumnBasis aMinimumColumnBasis, size_t aSerumNo) const;
-    inline void compute_column_bases(MinimumColumnBasis aMinimumColumnBasis, std::vector<double>& aColumnBases) const
+    inline std::vector<double>& column_bases_for_json() { return mColumnBases.data(); }
+    inline const std::vector<double>& column_bases_for_json() const { return mColumnBases.data(); }
+    double compute_column_basis(const MinimumColumnBasisBase& aMinimumColumnBasis, size_t aSerumNo) const;
+    inline void compute_column_bases(const MinimumColumnBasisBase& aMinimumColumnBasis, ColumnBases& aColumnBases) const
         {
             aColumnBases.resize(number_of_sera());
             for (size_t sr_no = 0; sr_no < number_of_sera(); ++sr_no)
-                aColumnBases[sr_no] = compute_column_basis(aMinimumColumnBasis, sr_no);
+                aColumnBases.set(sr_no, compute_column_basis(aMinimumColumnBasis, sr_no));
         }
-    inline void column_bases(MinimumColumnBasis aMinimumColumnBasis, std::vector<double>& aColumnBases) const
+    inline void column_bases(const MinimumColumnBasisBase& aMinimumColumnBasis, ColumnBases& aColumnBases) const
         {
             if (mColumnBases.empty()) {
                 compute_column_bases(aMinimumColumnBasis, aColumnBases);
             }
             else {
-                aColumnBases.resize(mColumnBases.size());
-                std::copy(mColumnBases.begin(), mColumnBases.end(), aColumnBases.begin());
+                aColumnBases = mColumnBases;
+                // aColumnBases.resize(mColumnBases.size());
+                // std::copy(mColumnBases.begin(), mColumnBases.end(), aColumnBases.begin());
             }
         }
-    inline double column_basis(MinimumColumnBasis aMinimumColumnBasis, size_t aSerumNo) const
+    inline double column_basis(const MinimumColumnBasisBase& aMinimumColumnBasis, size_t aSerumNo) const
         {
             if (mColumnBases.empty()) {
                 return compute_column_basis(aMinimumColumnBasis, aSerumNo);
@@ -549,15 +587,16 @@ class Chart
                 return mColumnBases.at(aSerumNo);
             }
         }
-    inline void column_bases(size_t aProjectionNo, std::vector<double>& aColumnBases) const
+    inline void column_bases(size_t aProjectionNo, ColumnBases& aColumnBases) const
         {
             const auto& p = projection(aProjectionNo);
             if (p.column_bases().empty()) {
                 column_bases(p.minimum_column_basis(), aColumnBases);
             }
             else {
-                aColumnBases.resize(p.column_bases().size());
-                std::copy(p.column_bases().begin(), p.column_bases().end(), aColumnBases.begin());
+                aColumnBases = mColumnBases;
+                // aColumnBases.resize(p.column_bases().size());
+                // std::copy(p.column_bases().begin(), p.column_bases().end(), aColumnBases.begin());
             }
         }
     inline double column_basis(size_t aProjectionNo, size_t aSerumNo) const
@@ -575,8 +614,8 @@ class Chart
 
     inline std::vector<Projection>& projections() { return mProjections; }
     inline const std::vector<Projection>& projections() const { return mProjections; }
-    inline Projection& projection(size_t aProjectionNo) { return mProjections[aProjectionNo]; }
-    inline const Projection& projection(size_t aProjectionNo) const { return mProjections[aProjectionNo]; }
+    inline ProjectionBase& projection(size_t aProjectionNo) override { return mProjections[aProjectionNo]; }
+    inline const ProjectionBase& projection(size_t aProjectionNo) const override { return mProjections[aProjectionNo]; }
 
     inline const ChartPlotSpec& plot_spec() const { return mPlotSpec; }
     inline ChartPlotSpec& plot_spec() { return mPlotSpec; }
@@ -613,7 +652,7 @@ class Chart
     Antigens mAntigens;                    // "a"
     Sera mSera;                            // "s"
     ChartTiters mTiters;                   // "t"
-    std::vector <double> mColumnBases;     // "C"
+    ColumnBases mColumnBases;              // "C"
     std::vector<Projection> mProjections;  // "P"
     ChartPlotSpec mPlotSpec;               // "p"
 

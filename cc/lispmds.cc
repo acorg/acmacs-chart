@@ -127,14 +127,14 @@ std::string projections(const Chart& aChart)
     std::string output;
     const auto& projections = aChart.projections();
     if (!projections.empty()) {
-        const size_t number_of_dimentions = projections[0].number_of_dimentions();
-        output += "    :MDS-DIMENSIONS '" + std::to_string(number_of_dimentions) + "\n";
+        const size_t number_of_dimensions = projections[0].number_of_dimensions();
+        output += "    :MDS-DIMENSIONS '" + std::to_string(number_of_dimensions) + "\n";
         output += "    :STARTING-COORDSS '(\n";
         output += layout(projections[0], aChart);
 
         output += "    :BATCH-RUNS '(\n";
         for (const auto& projection: projections) {
-            if (projection.number_of_dimentions() == number_of_dimentions) {
+            if (projection.number_of_dimensions() == number_of_dimensions) {
                 output += "    ((\n";
                 output += layout(projection, aChart);
                 output += "    " + double_to_string_lisp(projection.stress()) + " MULTIPLE-END-CONDITIONS NIL)\n";
@@ -151,10 +151,10 @@ std::string projections(const Chart& aChart)
 std::string layout(const Projection& aProjection, const Chart& aChart)
 {
     std::string output;
-    const Layout& layout = aProjection.layout();
-    for (const auto& point: layout) {
+    const auto& layout = aProjection.layout();
+    for (size_t point_no = 0; point_no < layout.number_of_points(); ++point_no) {
         output += "        (";
-        for (double coord: point) {
+        for (double coord: layout[point_no]) {
             output += " " + double_to_string_lisp(coord);
         }
         output += ")\n";
@@ -170,14 +170,14 @@ std::string layout(const Projection& aProjection, const Chart& aChart)
     output += "\n          ";
     const auto& stored_column_bases = aProjection.column_bases();
     if (!stored_column_bases.empty()) {
-        for (double cb: stored_column_bases)
-            output += " " + double_to_string_lisp(cb);
+        for (size_t sr_no = 0; sr_no < stored_column_bases.size(); ++sr_no)
+            output += " " + double_to_string_lisp(stored_column_bases[sr_no]);
     }
     else {
-        std::vector<double> column_bases;
+        ColumnBases column_bases;
         aChart.compute_column_bases(aProjection.minimum_column_basis(), column_bases);
-        for (double cb: column_bases)
-            output += " " + double_to_string_lisp(cb);
+        for (size_t sr_no = 0; sr_no < column_bases.size(); ++sr_no)
+            output += " " + double_to_string_lisp(column_bases[sr_no]);
     }
     output += "\n          ";
 

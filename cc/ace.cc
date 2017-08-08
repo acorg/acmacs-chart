@@ -88,13 +88,13 @@ static jsi::data<ChartInfo> chart_info_data = {
 // ----------------------------------------------------------------------
 
 static jsi::data<Projection> projection_data = {
-    {"C", jsi::field(&Projection::column_bases)},
+    {"C", jsi::field(&Projection::column_bases_for_json)},
     {"D", jsi::field(&Projection::disconnected)},
     {"c", jsi::field(&Projection::comment)},
     {"e", jsi::field(&Projection::stress_diff_to_stop)},
     {"f", jsi::field(&Projection::titer_multipliers)},
     {"g", jsi::field(&Projection::gradient_multipliers)},
-    {"l", jsi::field(&Projection::layout)},
+    {"l", jsi::field(&Projection::layout_for_json)},
     {"m", jsi::field(&Projection::minimum_column_basis)},
     {"s", jsi::field(&Projection::stress)},
     {"t", jsi::field<double, Projection, Projection, Transformation>(&Projection::transformation)},
@@ -255,7 +255,7 @@ inline std::shared_ptr<jsi::readers::makers::Base<Chart>> field(Sera& (Chart::*a
 }
 
 static jsi::data<Chart> chart_data = {
-    {"C", jsi::field(&Chart::column_bases)},
+    {"C", jsi::field(&Chart::column_bases_for_json)},
     {"P", jsi::field(&Chart::projections, projection_data)},
     {"a", field(&Chart::antigens, antigen_data)},
     {"i", jsi::field(&Chart::chart_info, chart_info_data)},
@@ -352,7 +352,7 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
 template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const Projection& aProjection)
 {
     return writer << jsw::start_object
-                  << jsw::if_not_empty("C", aProjection.column_bases())
+                  << jsw::if_not_empty("C", aProjection.column_bases_for_json())
                   << jsw::if_not_empty("D", aProjection.disconnected())
                   << jsw::if_not_empty("U", aProjection.unmovable())
                   << jsw::if_not_empty("c", aProjection.comment())
@@ -360,8 +360,8 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
                   << jsw::key("e") << aProjection.stress_diff_to_stop()
                   << jsw::if_not_empty("f", aProjection.titer_multipliers())
                   << jsw::if_not_empty("g", aProjection.gradient_multipliers())
-                  << jsw::key("l") << aProjection.layout()
-                  << jsw::key("m") << aProjection.minimum_column_basis()
+                  << jsw::key("l") << aProjection.layout_for_json()
+                  << jsw::key("m") << aProjection.minimum_column_basis_for_json()
                   << jsw::key("s") << aProjection.stress()
                   << jsw::if_not_empty("t", aProjection.transformation())
                   << jsw::if_not_empty("u", aProjection.unmovable_in_last_dimension())
@@ -429,7 +429,7 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
     return writer << jsw::start_object
                   << jsw::key("  version") << ACE_DUMP_VERSION
                   << jsw::key("c") << jsw::start_object
-                  << jsw::if_not_empty("C", aChart.column_bases())
+                  << jsw::if_not_empty("C", aChart.column_bases_for_json())
                   << jsw::if_not_empty("P", aChart.projections())
                   << jsw::key("a") << aChart.antigens()
                   << jsw::key("i") << aChart.chart_info()

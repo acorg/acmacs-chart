@@ -10,9 +10,9 @@
 
 // ----------------------------------------------------------------------
 
-Chart::~Chart()
-{
-}
+// Chart::~Chart()
+// {
+// }
 
 // ----------------------------------------------------------------------
 
@@ -437,7 +437,7 @@ const std::string Chart::make_name(size_t aProjectionNo) const
     if (n.empty())
         n = string::join({info.lab(), info.virus_type(), lineage(), info.assay(), info.rbc(), info.date()});
     if (aProjectionNo != static_cast<size_t>(-1) && aProjectionNo < projections().size()) {
-        n += " >=" + projection(aProjectionNo).minimum_column_basis();
+        n += " >=" + projection(aProjectionNo).minimum_column_basis().str();
         n += " " + std::to_string(projection(aProjectionNo).stress());
     }
     return n;
@@ -536,7 +536,7 @@ void Chart::find_homologous_antigen_for_sera()
                 else {
                     std::cerr << "Warning: No homologous antigen for " << serum.full_name() << std::endl;
                       // std::cerr << "    best match (of " << antigen_match.size() << "): " << mAntigens[antigen_match.front().first].full_name() << " Level:" << antigen_match.front().second << std::endl;
-                    for (const auto ag: antigen_match) {
+                    for (const auto& ag: antigen_match) {
                         if (ag.second != antigen_match.front().second)
                             break;
                         std::cerr << "    " << mAntigens[ag.first].full_name() << " Ref:" << mAntigens[ag.first].reference() << " Level:" << ag.second << std::endl;
@@ -551,7 +551,7 @@ void Chart::find_homologous_antigen_for_sera()
 
 // ----------------------------------------------------------------------
 
-double Chart::compute_column_basis(MinimumColumnBasis aMinimumColumnBasis, size_t aSerumNo) const
+double Chart::compute_column_basis(const MinimumColumnBasisBase& aMinimumColumnBasis, size_t aSerumNo) const
 {
     size_t max_titer = 0;
     for (size_t ag_no = 0; ag_no < number_of_antigens(); ++ag_no) {

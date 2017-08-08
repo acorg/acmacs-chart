@@ -7,7 +7,7 @@ MAKEFLAGS = -w
 
 # ----------------------------------------------------------------------
 
-SOURCES = chart.cc layout.cc ace.cc lispmds.cc
+SOURCES = chart-base.cc chart.cc bounding-ball.cc layout-base.cc layout.cc ace.cc lispmds.cc
 PY_SOURCES = py.cc $(SOURCES)
 BACKEND = $(DIST)/acmacs_chart_backend$(PYTHON_MODULE_SUFFIX)
 
