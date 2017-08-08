@@ -432,7 +432,7 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
                   << jsw::if_not_empty("C", aChart.column_bases_for_json())
                   << jsw::if_not_empty("P", aChart.projections())
                   << jsw::key("a") << aChart.antigens()
-                  << jsw::key("i") << aChart.chart_info()
+                  << jsw::key("i") << aChart.chart_info_for_json()
                   << jsw::if_not_empty("p", aChart.plot_spec())
                   << jsw::key("s") << aChart.sera()
                   << jsw::key("t") << aChart.titers()

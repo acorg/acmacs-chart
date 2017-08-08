@@ -223,7 +223,7 @@ class Serum : public SerumBase
 
     template <typename No> inline void add_homologous(No ag_no) { add_homologous(static_cast<size_t>(ag_no)); }
     inline bool has_homologous() const { return !mHomologous.empty(); }
-    inline const std::vector<size_t>& homologous() const { return mHomologous; }
+    inline const std::vector<size_t>& homologous() const override { return mHomologous; }
     inline std::vector<size_t>& homologous() { return mHomologous; }
 
     virtual AntigenSerumMatch match(const Serum& aSerum) const;
@@ -408,21 +408,21 @@ class Projection : public ProjectionBase
 
 // ----------------------------------------------------------------------
 
-class ChartInfo
+class ChartInfo : public ChartInfoBase
 {
  public:
     enum TableType {Antigenic, Genetic};
     inline ChartInfo() : mType(Antigenic) {}
 //     std::string table_id(std::string lineage) const;
 
-    inline const std::string virus() const { return merge_text_fields(&ChartInfo::mVirus); }
-    inline const std::string virus_type() const { return merge_text_fields(&ChartInfo::mVirusType); }
-    inline const std::string assay() const { return merge_text_fields(&ChartInfo::mAssay); }
-    const std::string date() const;
-    inline const std::string lab() const { return merge_text_fields(&ChartInfo::mLab); }
-    inline const std::string rbc() const { const std::string ass = assay(); return ass.empty() || ass == "HI" ? merge_text_fields(&ChartInfo::mRbc) : std::string(); }
-    inline const std::string name() const { return merge_text_fields(&ChartInfo::mName); }
-    inline const std::string subset() const { return merge_text_fields(&ChartInfo::mSubset); }
+    inline const std::string virus() const override { return merge_text_fields(&ChartInfo::mVirus); }
+    inline const std::string virus_type() const override { return merge_text_fields(&ChartInfo::mVirusType); }
+    inline const std::string assay() const override { return merge_text_fields(&ChartInfo::mAssay); }
+    const std::string date() const override;
+    inline const std::string lab() const override { return merge_text_fields(&ChartInfo::mLab); }
+    inline const std::string rbc() const override { const std::string ass = assay(); return ass.empty() || ass == "HI" ? merge_text_fields(&ChartInfo::mRbc) : std::string(); }
+    inline const std::string name() const override { return merge_text_fields(&ChartInfo::mName); }
+    inline const std::string subset() const override { return merge_text_fields(&ChartInfo::mSubset); }
     inline TableType type() const { return mType; }
     inline std::string type_as_string() const
         {
@@ -545,6 +545,8 @@ class Titer : public std::string
 
 }; // class Titer
 
+// ----------------------------------------------------------------------
+
 class ChartTiters
 {
  public:
@@ -592,7 +594,8 @@ class Chart : public ChartBase
     std::string lineage() const;
     const std::string make_name(size_t aProjectionNo = static_cast<size_t>(-1)) const;
 
-    inline const ChartInfo& chart_info() const { return mInfo; }
+    inline const ChartInfoBase& chart_info() const override { return mInfo; }
+    inline const ChartInfo& chart_info_for_json() const { return mInfo; }
     inline ChartInfo& chart_info() { return mInfo; }
 
     inline const Antigens& antigens() const { return mAntigens; }

@@ -22,6 +22,10 @@ AntigenSerumBase::~AntigenSerumBase()
 {
 }
 
+ChartInfoBase::~ChartInfoBase()
+{
+}
+
 // ----------------------------------------------------------------------
 /// Local Variables:
 /// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))

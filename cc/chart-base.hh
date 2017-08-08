@@ -65,6 +65,8 @@ class AntigenBase : public AntigenSerumBase
 class SerumBase : public AntigenSerumBase
 {
  public:
+    virtual const std::vector<size_t>& homologous() const = 0;
+
 }; // class SerumBase
 
 // ----------------------------------------------------------------------
@@ -156,6 +158,26 @@ class ProjectionBase
 
 // ----------------------------------------------------------------------
 
+class ChartInfoBase
+{
+ public:
+    inline ChartInfoBase() = default;
+    inline ChartInfoBase(const ChartInfoBase&) = default;
+    virtual ~ChartInfoBase();
+
+    virtual const std::string virus() const = 0;
+    virtual const std::string virus_type() const = 0;
+    virtual const std::string assay() const = 0;
+    virtual const std::string lab() const = 0;
+    virtual const std::string rbc() const = 0;
+    virtual const std::string name() const = 0;
+    virtual const std::string subset() const = 0;
+    virtual const std::string date() const = 0;
+
+}; // class ChartInfoBase
+
+// ----------------------------------------------------------------------
+
 class ChartBase
 {
  public:
@@ -172,8 +194,7 @@ class ChartBase
     // std::string lineage() const;
     // const std::string make_name(size_t aProjectionNo = static_cast<size_t>(-1)) const;
 
-    // inline const ChartInfo& chart_info() const { return mInfo; }
-    // inline ChartInfo& chart_info() { return mInfo; }
+    virtual const ChartInfoBase& chart_info() const = 0;
 
     // inline const Antigens& antigens() const { return mAntigens; }
     // inline Antigens& antigens() { return mAntigens; }
