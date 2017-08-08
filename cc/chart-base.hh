@@ -173,6 +173,7 @@ class ChartInfoBase
     virtual const std::string name() const = 0;
     virtual const std::string subset() const = 0;
     virtual const std::string date() const = 0;
+    virtual const std::string make_name() const = 0;
 
 }; // class ChartInfoBase
 

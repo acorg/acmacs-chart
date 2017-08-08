@@ -435,7 +435,7 @@ class ChartInfo : public ChartInfoBase
             return "?";         // to keep gcc happy
         }
 
-    const std::string make_name() const;
+    const std::string make_name() const override;
 
     inline void virus(const char* str, size_t length) { mVirus.assign(str, length); }
     inline void virus_type(const char* str, size_t length) { mVirusType.assign(str, length); }
