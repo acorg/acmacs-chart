@@ -164,6 +164,7 @@ class ChartInfoBase
     inline ChartInfoBase() = default;
     inline ChartInfoBase(const ChartInfoBase&) = default;
     virtual ~ChartInfoBase();
+    inline ChartInfoBase& operator=(const ChartInfoBase&) = default;
 
     virtual const std::string virus() const = 0;
     virtual const std::string virus_type() const = 0;

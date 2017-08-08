@@ -413,6 +413,8 @@ class ChartInfo : public ChartInfoBase
  public:
     enum TableType {Antigenic, Genetic};
     inline ChartInfo() : mType(Antigenic) {}
+    inline ChartInfo(const ChartInfo&) = default;
+    inline ChartInfo& operator=(const ChartInfo&) = default;
 //     std::string table_id(std::string lineage) const;
 
     inline const std::string virus() const override { return merge_text_fields(&ChartInfo::mVirus); }
