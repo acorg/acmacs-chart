@@ -11,6 +11,8 @@
 class AntigenSerumMatch
 {
  public:
+    inline AntigenSerumMatch() : mLevel(Perfect) {}
+
     enum Level : size_t { Perfect=0, SerumSpeciesMismatch=0x1, PassageMismatch=0x2, PassageWithoutDateMismatch=0x4, EggCellUnknown=0x8, EggCellMismatch=0x10,
                           Mismatch=0x20, AnnotationMismatch=0x40, ReassortantMismatch=0x80, SerumIdMismatch=0x100, NameMismatch=0x200 };
 
@@ -29,12 +31,10 @@ class AntigenSerumMatch
 
  private:
     size_t mLevel;
-    inline AntigenSerumMatch() : mLevel(Perfect) {}
 
-    friend class AntigenSerum;
-    friend class Serum;
-
+#ifdef ACMACS_TARGET_OS
     friend inline std::ostream& operator << (std::ostream& out, const AntigenSerumMatch& m) { return out << "0x" << std::hex << m.mLevel << std::dec; }
+#endif
 
 }; // class AntigenSerumMatch
 

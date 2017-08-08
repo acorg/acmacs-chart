@@ -7,15 +7,11 @@
 
 #include "acmacs-base/virus-name.hh"
 #include "acmacs-base/string.hh"
-#include "acmacs-base/range.hh"
 #include "acmacs-base/passage.hh"
 
-#include "acmacs-chart/antigen-serum-match.hh"
 #include "acmacs-chart/layout.hh"
 #include "acmacs-chart/chart-plot-spec.hh"
 #include "acmacs-chart/chart-base.hh"
-
-class LocDb;
 
 // ----------------------------------------------------------------------
 
@@ -46,103 +42,129 @@ class Annotations : public std::vector<std::string>
 
 }; // class Annotations
 
-// // ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 
-class AntigenSerum
+// class AntigenSerum : public AntigenSerumBase
+// {
+//  public:
+//     inline AntigenSerum() = default;
+//     inline AntigenSerum(const AntigenSerum&) = default;
+
+//     inline AntigenSerum& operator=(const AntigenSerum&) = default;
+
+//     // virtual std::string full_name() const = 0;
+//     // virtual std::string full_name_without_passage() const = 0;
+//     // virtual std::string abbreviated_name(const LocDb& aLocDb) const = 0;
+
+//     inline const std::string name() const override { return mName; }
+//       // inline std::string& name() { return mName; }
+//     inline void name(const char* str, size_t length) { mName.assign(str, length); }
+//     inline const std::string lineage() const override { return mLineage; }
+//       //inline std::string& lineage() { return mLineage; }
+//     inline void lineage(const char* str, size_t length) { mLineage.assign(str, length); }
+//     inline const std::string passage() const override { return mPassage; }
+//       //inline std::string& passage() { return mPassage; }
+//     inline void passage(const char* str, size_t length) { mPassage.assign(str, length); }
+//     inline bool has_passage() const override { return !mPassage.empty(); }
+//       // inline std::string passage_without_date() const { return passage::without_date(mPassage); }
+//     inline const std::string reassortant() const override { return mReassortant; }
+//       // inline std::string& reassortant() { return mReassortant; }
+//     inline void reassortant(const char* str, size_t length) { mReassortant.assign(str, length); }
+//     inline bool is_egg() const override { return passage::is_egg(mPassage) || is_reassortant(); } // reassortant is always egg (2016-10-21)
+//     inline bool is_reassortant() const override { return !mReassortant.empty(); }
+//     inline bool distinct() const override { return mAnnotations.distinct(); }
+//     inline const Annotations& annotations() const { return mAnnotations; }
+//     inline Annotations& annotations() { return mAnnotations; }
+//     inline bool has_semantic(char c) const { return mSemanticAttributes.find(c) != std::string::npos; }
+//     inline const std::string semantic() const { return mSemanticAttributes; }
+//     inline void semantic(const char* str, size_t length) { mSemanticAttributes.assign(str, length); }
+//       // inline std::string passage_type() const { return is_egg() ? "egg" : "cell"; }
+//     std::string name_abbreviated(const LocDb& aLocDb) const;
+//     std::string location_abbreviated(const LocDb& aLocDb) const;
+
+//     virtual AntigenSerumMatch match(const AntigenSerum& aNother) const;
+
+// //     virtual std::string variant_id() const = 0;
+
+// //       // returned cdc abbreviation starts with #
+// //     inline std::string location() const { return virus_name::location(mName); }
+// //     inline std::string year() const { return virus_name::year(mName); }
+
+// //     inline bool operator == (const AntigenSerum& aNother) const { return name() == aNother.name() && variant_id() == aNother.variant_id(); }
+// //     inline bool operator < (const AntigenSerum& aNother) const { return name() == aNother.name() ? variant_id() < aNother.variant_id() : name() < aNother.name(); }
+
+//  protected:
+//     virtual AntigenSerumMatch match_passage(const AntigenSerum& aNother) const;
+
+//  private:
+// //       // Chart& mChart;
+
+// }; // class AntigenSerum
+
+// ----------------------------------------------------------------------
+
+class Serum;
+
+class Antigen : public AntigenBase
 {
  public:
-    inline AntigenSerum() = default;
-    inline AntigenSerum(const AntigenSerum&) = default;
-    virtual ~AntigenSerum();
+    inline Antigen() = default;
+    virtual inline std::string full_name() const override { return string::join({name(), reassortant(), annotations().join(), passage()}); }
+    virtual inline std::string full_name_without_passage() const override { return string::join({name(), reassortant(), annotations().join()}); }
+    virtual inline std::string full_name_for_seqdb_matching() const { return string::join({name(), reassortant(), passage(), annotations().join()}); } // annotations may part of the passage in seqdb (NIMR ISOLATE 1)
+    virtual inline std::string abbreviated_name(const LocDb& aLocDb) const override { return string::join({name_abbreviated(aLocDb), reassortant(), annotations().join()}); }
+    virtual inline std::string abbreviated_name_with_passage_type(const LocDb& aLocDb) const { return string::join("-", {name_abbreviated(aLocDb), reassortant(), annotations().join(), passage_type()}); }
+    virtual inline std::string abbreviated_location_with_passage_type(const LocDb& aLocDb) const { return string::join("-", {location_abbreviated(aLocDb), passage_type()}); }
 
-    inline AntigenSerum& operator=(const AntigenSerum&) = default;
-
-    virtual std::string full_name() const = 0;
-    virtual std::string full_name_without_passage() const = 0;
-    virtual std::string abbreviated_name(const LocDb& aLocDb) const = 0;
-
-    inline const std::string name() const { return mName; }
+    inline const std::string name() const override { return mName; }
     inline std::string& name() { return mName; }
     inline void name(const char* str, size_t length) { mName.assign(str, length); }
-    inline const std::string lineage() const { return mLineage; }
+    inline const std::string lineage() const override { return mLineage; }
     inline std::string& lineage() { return mLineage; }
     inline void lineage(const char* str, size_t length) { mLineage.assign(str, length); }
-    inline const std::string passage() const { return mPassage; }
+    inline const std::string passage() const override { return mPassage; }
     inline std::string& passage() { return mPassage; }
     inline void passage(const char* str, size_t length) { mPassage.assign(str, length); }
-    inline bool has_passage() const { return !mPassage.empty(); }
-    inline std::string passage_without_date() const { return passage::without_date(mPassage); }
-    inline const std::string reassortant() const { return mReassortant; }
+    inline bool has_passage() const override { return !mPassage.empty(); }
+    inline std::string passage_without_date() const override { return passage::without_date(mPassage); }
+    inline const std::string reassortant() const override { return mReassortant; }
     inline std::string& reassortant() { return mReassortant; }
     inline void reassortant(const char* str, size_t length) { mReassortant.assign(str, length); }
-    inline bool is_egg() const { return passage::is_egg(mPassage) || is_reassortant(); } // reassortant is always egg (2016-10-21)
-    inline bool is_reassortant() const { return !mReassortant.empty(); }
-    inline bool distinct() const { return mAnnotations.distinct(); }
+    inline bool is_egg() const override { return passage::is_egg(mPassage) || is_reassortant(); } // reassortant is always egg (2016-10-21)
+    inline bool is_reassortant() const override { return !mReassortant.empty(); }
+    inline bool distinct() const override { return mAnnotations.distinct(); }
     inline const Annotations& annotations() const { return mAnnotations; }
     inline Annotations& annotations() { return mAnnotations; }
     inline bool has_semantic(char c) const { return mSemanticAttributes.find(c) != std::string::npos; }
     inline const std::string semantic() const { return mSemanticAttributes; }
     inline void semantic(const char* str, size_t length) { mSemanticAttributes.assign(str, length); }
-    std::string passage_type() const { return is_egg() ? "egg" : "cell"; }
+      // inline std::string passage_type() const { return is_egg() ? "egg" : "cell"; }
     std::string name_abbreviated(const LocDb& aLocDb) const;
     std::string location_abbreviated(const LocDb& aLocDb) const;
 
-    virtual AntigenSerumMatch match(const AntigenSerum& aNother) const;
-
-//     virtual std::string variant_id() const = 0;
-
-//       // returned cdc abbreviation starts with #
-//     inline std::string location() const { return virus_name::location(mName); }
-//     inline std::string year() const { return virus_name::year(mName); }
-
-//     inline bool operator == (const AntigenSerum& aNother) const { return name() == aNother.name() && variant_id() == aNother.variant_id(); }
-//     inline bool operator < (const AntigenSerum& aNother) const { return name() == aNother.name() ? variant_id() < aNother.variant_id() : name() < aNother.name(); }
-
- protected:
-    virtual AntigenSerumMatch match_passage(const AntigenSerum& aNother) const;
-
- private:
-//       // Chart& mChart;
-    std::string mName; // "N" "[VIRUS_TYPE/][HOST/]LOCATION/ISOLATION/YEAR" or "CDC_ABBR NAME" or "NAME"
-    std::string mLineage; // "L"
-    std::string mPassage; // "P"
-    std::string mReassortant; // "R"
-    Annotations mAnnotations; // "a"
-    std::string mSemanticAttributes;       // string of single letter semantic boolean attributes: R - reference, V - current vaccine, v - previous vaccine, S - vaccine surrogate
-
-}; // class AntigenSerum
-
-// // ----------------------------------------------------------------------
-
-class Serum;
-
-class Antigen : public AntigenSerum
-{
- public:
-    inline Antigen() = default;
-    virtual inline std::string full_name() const { return string::join({name(), reassortant(), annotations().join(), passage()}); }
-    virtual inline std::string full_name_without_passage() const { return string::join({name(), reassortant(), annotations().join()}); }
-    virtual inline std::string full_name_for_seqdb_matching() const { return string::join({name(), reassortant(), passage(), annotations().join()}); } // annotations may part of the passage in seqdb (NIMR ISOLATE 1)
-    virtual inline std::string abbreviated_name(const LocDb& aLocDb) const { return string::join({name_abbreviated(aLocDb), reassortant(), annotations().join()}); }
-    virtual inline std::string abbreviated_name_with_passage_type(const LocDb& aLocDb) const { return string::join("-", {name_abbreviated(aLocDb), reassortant(), annotations().join(), passage_type()}); }
-    virtual inline std::string abbreviated_location_with_passage_type(const LocDb& aLocDb) const { return string::join("-", {location_abbreviated(aLocDb), passage_type()}); }
-
-    // inline void name(const char* str, size_t length) { AntigenSerum::name(str, length); }
+      // inline void name(const char* str, size_t length) { AntigenSerum::name(str, length); }
 
     inline const std::string date() const { return mDate; }
     inline void date(const char* str, size_t length) { mDate.assign(str, length); }
-    inline bool reference() const { return has_semantic('R'); }
+    inline bool reference() const override { return has_semantic('R'); }
     inline const std::vector<std::string>& lab_id() const { return mLabId; }
     inline std::vector<std::string>& lab_id() { return mLabId; }
     inline bool has_lab_id(std::string aLabId) const { return std::find(mLabId.begin(), mLabId.end(), aLabId) != mLabId.end(); }
     inline const std::vector<std::string>& clades() const { return mClades; }
     inline std::vector<std::string>& clades() { return mClades; }
 
-    using AntigenSerum::match;
     virtual AntigenSerumMatch match(const Antigen& aAntigen) const;
     virtual AntigenSerumMatch match(const Serum& aSerum) const;
+    inline AntigenSerumMatch match(const AntigenSerumBase& aNother) const override { return match(static_cast<const Antigen&>(aNother)); }
+    AntigenSerumMatch match_passage(const AntigenSerumBase& aNother) const override;
 
  private:
+    std::string mName; // "N" "[VIRUS_TYPE/][HOST/]LOCATION/ISOLATION/YEAR" or "CDC_ABBR NAME" or "NAME"
+    std::string mLineage; // "L"
+    std::string mPassage; // "P"
+    std::string mReassortant; // "R"
+    Annotations mAnnotations; // "a"
+    std::string mSemanticAttributes;       // string of single letter semantic boolean attributes: R - reference, V - current vaccine, v - previous vaccine, S - vaccine surrogate
     std::string mDate; // "D"
     std::vector<std::string> mLabId; // "l"
     std::vector<std::string> mClades; // "c"
@@ -151,13 +173,39 @@ class Antigen : public AntigenSerum
 
 // ----------------------------------------------------------------------
 
-class Serum : public AntigenSerum
+class Serum : public SerumBase
 {
  public:
     inline Serum() = default;
-    virtual inline std::string full_name() const { return string::join({name(), reassortant(), serum_id(), annotations().join()}); } // serum_id comes before annotations, see hidb chart.cc Serum::variant_id
-    virtual inline std::string full_name_without_passage() const { return full_name(); }
-    virtual inline std::string abbreviated_name(const LocDb& aLocDb) const { return string::join({name_abbreviated(aLocDb), reassortant(), annotations().join()}); }
+    inline std::string full_name() const override { return string::join({name(), reassortant(), serum_id(), annotations().join()}); } // serum_id comes before annotations, see hidb chart.cc Serum::variant_id
+    inline std::string full_name_without_passage() const override { return full_name(); }
+    inline std::string abbreviated_name(const LocDb& aLocDb) const override { return string::join({name_abbreviated(aLocDb), reassortant(), annotations().join()}); }
+
+    inline const std::string name() const override { return mName; }
+    inline std::string& name() { return mName; }
+    inline void name(const char* str, size_t length) { mName.assign(str, length); }
+    inline const std::string lineage() const override { return mLineage; }
+    inline std::string& lineage() { return mLineage; }
+    inline void lineage(const char* str, size_t length) { mLineage.assign(str, length); }
+    inline const std::string passage() const override { return mPassage; }
+    inline std::string& passage() { return mPassage; }
+    inline void passage(const char* str, size_t length) { mPassage.assign(str, length); }
+    inline bool has_passage() const override { return !mPassage.empty(); }
+    inline std::string passage_without_date() const override { return passage::without_date(mPassage); }
+    inline const std::string reassortant() const override { return mReassortant; }
+    inline std::string& reassortant() { return mReassortant; }
+    inline void reassortant(const char* str, size_t length) { mReassortant.assign(str, length); }
+    inline bool is_egg() const override { return passage::is_egg(mPassage) || is_reassortant(); } // reassortant is always egg (2016-10-21)
+    inline bool is_reassortant() const override { return !mReassortant.empty(); }
+    inline bool distinct() const override { return mAnnotations.distinct(); }
+    inline const Annotations& annotations() const { return mAnnotations; }
+    inline Annotations& annotations() { return mAnnotations; }
+    inline bool has_semantic(char c) const { return mSemanticAttributes.find(c) != std::string::npos; }
+    inline const std::string semantic() const { return mSemanticAttributes; }
+    inline void semantic(const char* str, size_t length) { mSemanticAttributes.assign(str, length); }
+      // inline std::string passage_type() const { return is_egg() ? "egg" : "cell"; }
+    std::string name_abbreviated(const LocDb& aLocDb) const;
+    std::string location_abbreviated(const LocDb& aLocDb) const;
 
     inline const std::string serum_id() const { return mSerumId; }
     inline std::string& serum_id() { return mSerumId; }
@@ -178,14 +226,18 @@ class Serum : public AntigenSerum
     inline const std::vector<size_t>& homologous() const { return mHomologous; }
     inline std::vector<size_t>& homologous() { return mHomologous; }
 
-    using AntigenSerum::match;
     virtual AntigenSerumMatch match(const Serum& aSerum) const;
     virtual AntigenSerumMatch match(const Antigen& aAntigen) const;
-
- protected:
-    virtual AntigenSerumMatch match_passage(const AntigenSerum& aNother) const;
+    inline AntigenSerumMatch match(const AntigenSerumBase& aNother) const override { return match(static_cast<const Serum&>(aNother)); }
+    AntigenSerumMatch match_passage(const AntigenSerumBase& aNother) const override;
 
  private:
+    std::string mName; // "N" "[VIRUS_TYPE/][HOST/]LOCATION/ISOLATION/YEAR" or "CDC_ABBR NAME" or "NAME"
+    std::string mLineage; // "L"
+    std::string mPassage; // "P"
+    std::string mReassortant; // "R"
+    Annotations mAnnotations; // "a"
+    std::string mSemanticAttributes;       // string of single letter semantic boolean attributes: R - reference, V - current vaccine, v - previous vaccine, S - vaccine surrogate
     std::string mSerumId; // "I"
     std::vector<size_t> mHomologous; // "h"
     std::string mSerumSpecies; // "s"
@@ -284,7 +336,7 @@ class Projection : public ProjectionBase
     inline Projection() : mStress(-1), mDodgyTiterIsRegular(false), mStressDiffToStop(1e-10) {}
 
     inline void comment(const char* str, size_t length) { mComment.assign(str, length); }
-    inline std::string comment() const { return mComment; }
+    inline std::string comment() const override { return mComment; }
 
     inline LayoutBase& layout() override { return mLayout; }
     inline const LayoutBase& layout() const override { return mLayout; }
@@ -315,8 +367,8 @@ class Projection : public ProjectionBase
     inline void dodgy_titer_is_regular(bool aDodgyTiterIsRegular) { mDodgyTiterIsRegular = aDodgyTiterIsRegular; }
     inline bool dodgy_titer_is_regular() const { return mDodgyTiterIsRegular; }
 
-    inline void stress_diff_to_stop(double aStressDiffToStop) { mStressDiffToStop = aStressDiffToStop; }
-    inline double stress_diff_to_stop() const { return mStressDiffToStop; }
+    inline void stress_diff_to_stop(double aStressDiffToStop) override { mStressDiffToStop = aStressDiffToStop; }
+    inline double stress_diff_to_stop() const override { return mStressDiffToStop; }
 
     inline std::vector<size_t>& unmovable() { return mUnmovable; }
     inline const std::vector<size_t>& unmovable() const { return mUnmovable; }
@@ -545,13 +597,13 @@ class Chart : public ChartBase
 
     inline const Antigens& antigens() const { return mAntigens; }
     inline Antigens& antigens() { return mAntigens; }
-    inline const Antigen& antigen(size_t ag_no) const { return mAntigens[ag_no]; }
-    inline Antigen& antigen(size_t ag_no) { return mAntigens[ag_no]; }
+    inline const AntigenBase& antigen(size_t ag_no) const override { return mAntigens[ag_no]; }
+    // inline Antigen& antigen(size_t ag_no) { return mAntigens[ag_no]; }
 
     inline const Sera& sera() const { return mSera; }
     inline Sera& sera() { return mSera; }
-    inline const Serum& serum(size_t sr_no) const { return mSera[sr_no]; }
-    inline Serum& serum(size_t sr_no) { return mSera[sr_no]; }
+    inline const SerumBase& serum(size_t sr_no) const override { return mSera[sr_no]; }
+    // inline Serum& serum(size_t sr_no) { return mSera[sr_no]; }
 
     inline const ChartTiters& titers() const { return mTiters; }
     inline ChartTiters& titers() { return mTiters; }
@@ -620,12 +672,12 @@ class Chart : public ChartBase
     inline const ChartPlotSpec& plot_spec() const { return mPlotSpec; }
     inline ChartPlotSpec& plot_spec() { return mPlotSpec; }
 
-    inline IndexGenerator antigen_indices() const { return {number_of_antigens(), [](size_t) { return true; } }; }
-    inline IndexGenerator reference_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].reference(); } }; }
-    inline IndexGenerator test_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return !mAntigens[index].reference(); } }; }
-    inline IndexGenerator egg_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].is_egg(); } }; }
-    inline IndexGenerator reassortant_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].is_reassortant(); } }; }
-    inline IndexGenerator serum_indices() const { return {number_of_antigens(), number_of_points(), [](size_t) { return true; } }; }
+    // inline IndexGenerator antigen_indices() const { return {number_of_antigens(), [](size_t) { return true; } }; }
+    // inline IndexGenerator reference_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].reference(); } }; }
+    // inline IndexGenerator test_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return !mAntigens[index].reference(); } }; }
+    // inline IndexGenerator egg_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].is_egg(); } }; }
+    // inline IndexGenerator reassortant_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].is_reassortant(); } }; }
+    // inline IndexGenerator serum_indices() const { return {number_of_antigens(), number_of_points(), [](size_t) { return true; } }; }
 
     inline IndexGenerator antigens_not_found_in(const Chart& aNother) const
         {

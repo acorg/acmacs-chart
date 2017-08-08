@@ -16,70 +16,32 @@
 
 // ----------------------------------------------------------------------
 
-AntigenSerum::~AntigenSerum()
-{
-}
-
-// ----------------------------------------------------------------------
-
-std::string AntigenSerum::name_abbreviated(const LocDb& aLocDb) const
+static inline std::string name_abbreviated(std::string aName, const LocDb& aLocDb)
 {
     try {
         std::string virus_type, host, location, isolation, year, passage;
-        virus_name::split(name(), virus_type, host, location, isolation, year, passage);
+        virus_name::split(aName, virus_type, host, location, isolation, year, passage);
         return string::join("/", {aLocDb.abbreviation(location), isolation, year.substr(2)});
     }
     catch (virus_name::Unrecognized&) {
-        return name();
+        return aName;
     }
 
-} // AntigenSerum::name_abbreviated
+} // name_abbreviated
 
 // ----------------------------------------------------------------------
 
-std::string AntigenSerum::location_abbreviated(const LocDb& aLocDb) const
-{
-      // std::cerr << "DEBUG: location_abbreviated: \"" << name() << "\" -> \"" << virus_name::location(name()) << "\" -> \"" << aLocDb.abbreviation(virus_name::location(name())) << '"' << std::endl;
-    return aLocDb.abbreviation(virus_name::location(name()));
-
-} // AntigenSerum::location_abbreviated
-
-// ----------------------------------------------------------------------
-
-AntigenSerumMatch AntigenSerum::match(const AntigenSerum& aNother) const
-{
-      // fields not used for matching
-      // lineage, semantic-attributes, annotations
-
-    AntigenSerumMatch match;
-    if (!distinct() && !aNother.distinct() && name() == aNother.name()) {
-        if (reassortant() == aNother.reassortant()) {
-            match.add(match_passage(aNother));
-        }
-        else {
-            match.add(AntigenSerumMatch::ReassortantMismatch);
-        }
-    }
-    else {
-        match.add(AntigenSerumMatch::NameMismatch);
-    }
-    return match;
-
-} // AntigenSerum::match
-
-// ----------------------------------------------------------------------
-
-AntigenSerumMatch AntigenSerum::match_passage(const AntigenSerum& aNother) const
+static AntigenSerumMatch antigen_serum_match_passage(const AntigenSerumBase& left, const AntigenSerumBase& right)
 {
     AntigenSerumMatch match;
-    if (has_passage() && aNother.has_passage()) {
-        if (passage() != aNother.passage()) {
+    if (left.has_passage() && right.has_passage()) {
+        if (left.passage() != right.passage()) {
             match.add(AntigenSerumMatch::PassageMismatch);
-            if (passage_without_date() != aNother.passage_without_date()) {
+            if (left.passage_without_date() != right.passage_without_date()) {
                 match.add(AntigenSerumMatch::PassageWithoutDateMismatch);
                   // std::cerr << "  ?egg " << is_egg() << "  " << full_name() << std::endl;
                   // std::cerr << "  ?egg " << aNother.is_egg() << "  " << aNother.full_name() << std::endl;
-                if (is_egg() != aNother.is_egg()) {
+                if (left.is_egg() != right.is_egg()) {
                     match.add(AntigenSerumMatch::EggCellMismatch);
                 }
             }
@@ -90,7 +52,60 @@ AntigenSerumMatch AntigenSerum::match_passage(const AntigenSerum& aNother) const
     }
     return match;
 
-} // AntigenSerum::match_passage
+} // antigen_serum_match_passage
+
+// ----------------------------------------------------------------------
+
+static AntigenSerumMatch antigen_serum_match(const AntigenSerumBase& left, const AntigenSerumBase& right)
+{
+      // fields not used for matching
+      // lineage, semantic-attributes, annotations
+
+    AntigenSerumMatch match;
+    if (!left.distinct() && !right.distinct() && left.name() == right.name()) {
+        if (left.reassortant() == right.reassortant()) {
+            match.add(left.match_passage(right));
+        }
+        else {
+            match.add(AntigenSerumMatch::ReassortantMismatch);
+        }
+    }
+    else {
+        match.add(AntigenSerumMatch::NameMismatch);
+    }
+    return match;
+
+} // antigen_serum_match
+
+
+// ----------------------------------------------------------------------
+
+std::string Antigen::name_abbreviated(const LocDb& aLocDb) const
+{
+    return ::name_abbreviated(name(), aLocDb);
+
+} // Antigen::name_abbreviated
+
+std::string Serum::name_abbreviated(const LocDb& aLocDb) const
+{
+    return ::name_abbreviated(name(), aLocDb);
+
+} // Serum::name_abbreviated
+
+// ----------------------------------------------------------------------
+
+std::string Antigen::location_abbreviated(const LocDb& aLocDb) const
+{
+      // std::cerr << "DEBUG: location_abbreviated: \"" << name() << "\" -> \"" << virus_name::location(name()) << "\" -> \"" << aLocDb.abbreviation(virus_name::location(name())) << '"' << std::endl;
+    return aLocDb.abbreviation(virus_name::location(name()));
+
+} // Antigen::location_abbreviated
+
+std::string Serum::location_abbreviated(const LocDb& aLocDb) const
+{
+    return aLocDb.abbreviation(virus_name::location(name()));
+
+} // Serum::location_abbreviated
 
 // ----------------------------------------------------------------------
 
@@ -99,7 +114,7 @@ AntigenSerumMatch Antigen::match(const Antigen& aNother) const
       // fields not used for matching
       // date, clades, lab_id
 
-    AntigenSerumMatch m = AntigenSerum::match(aNother);
+    AntigenSerumMatch m = antigen_serum_match(*this, aNother);
     if (annotations() != aNother.annotations()) {
         m.add(AntigenSerumMatch::AnnotationMismatch);
     }
@@ -117,12 +132,20 @@ AntigenSerumMatch Antigen::match(const Serum& aNother) const
 
 // ----------------------------------------------------------------------
 
+AntigenSerumMatch Antigen::match_passage(const AntigenSerumBase& aNother) const
+{
+    return antigen_serum_match_passage(*this, aNother);
+
+} // Antigen::match_passage
+
+// ----------------------------------------------------------------------
+
 AntigenSerumMatch Serum::match(const Serum& aNother) const
 {
       // fields not used for matching
       // homologous
 
-    AntigenSerumMatch m = AntigenSerum::match(aNother);
+    AntigenSerumMatch m = antigen_serum_match(*this, aNother);
     if (m < AntigenSerumMatch::Mismatch) {
         if (annotations() != aNother.annotations()) {
             m.add(AntigenSerumMatch::AnnotationMismatch);
@@ -147,7 +170,7 @@ AntigenSerumMatch Serum::match(const Serum& aNother) const
 
 AntigenSerumMatch Serum::match(const Antigen& aNother) const
 {
-    AntigenSerumMatch m = AntigenSerum::match(aNother);
+    AntigenSerumMatch m = antigen_serum_match(*this, aNother);
     if (m < AntigenSerumMatch::Mismatch) {
                   // ignore serum specific annotations (CONC*, BOOSTED*, *BLEED)
         Annotations self_filtered;
@@ -166,7 +189,7 @@ AntigenSerumMatch Serum::match(const Antigen& aNother) const
 
 // ----------------------------------------------------------------------
 
-AntigenSerumMatch Serum::match_passage(const AntigenSerum& aNother) const
+AntigenSerumMatch Serum::match_passage(const AntigenSerumBase& aNother) const
 {
     AntigenSerumMatch match;
     if (!has_passage() && aNother.has_passage()) {
@@ -175,7 +198,7 @@ AntigenSerumMatch Serum::match_passage(const AntigenSerum& aNother) const
         }
     }
     else {
-        match = AntigenSerum::match_passage(aNother);
+        match = antigen_serum_match_passage(*this, aNother);
     }
     return match;
 

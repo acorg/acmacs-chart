@@ -2,7 +2,70 @@
 
 #include <string>
 
+#include "acmacs-base/range.hh"
 #include "acmacs-chart/layout-base.hh"
+#include "acmacs-chart/antigen-serum-match.hh"
+
+class LocDb;
+
+// ----------------------------------------------------------------------
+
+class AntigenSerumBase
+{
+ public:
+    inline AntigenSerumBase() = default;
+    inline AntigenSerumBase(const AntigenSerumBase&) = default;
+    virtual ~AntigenSerumBase();
+
+    inline AntigenSerumBase& operator=(const AntigenSerumBase&) = default;
+
+    virtual std::string full_name() const = 0;
+    virtual std::string full_name_without_passage() const = 0;
+    virtual std::string abbreviated_name(const LocDb& aLocDb) const = 0;
+
+    virtual const std::string name() const = 0;
+    virtual const std::string lineage() const = 0;
+    virtual const std::string passage() const = 0;
+    virtual bool has_passage() const = 0;
+    virtual std::string passage_without_date() const = 0;
+    virtual const std::string reassortant() const = 0;
+    virtual bool is_egg() const = 0;
+    virtual bool is_reassortant() const = 0;
+    virtual bool distinct() const = 0;
+    // inline const Annotations& annotations() const { return mAnnotations; }
+    // inline bool has_semantic(char c) const { return mSemanticAttributes.find(c) != std::string::npos; }
+    // inline const std::string semantic() const { return mSemanticAttributes; }
+    inline std::string passage_type() const { return is_egg() ? "egg" : "cell"; }
+
+    virtual AntigenSerumMatch match(const AntigenSerumBase& aNother) const = 0;
+    virtual AntigenSerumMatch match_passage(const AntigenSerumBase& aNother) const = 0;
+
+//     virtual std::string variant_id() const = 0;
+
+//       // returned cdc abbreviation starts with #
+//     inline std::string location() const { return virus_name::location(mName); }
+//     inline std::string year() const { return virus_name::year(mName); }
+
+//     inline bool operator == (const AntigenSerum& aNother) const { return name() == aNother.name() && variant_id() == aNother.variant_id(); }
+//     inline bool operator < (const AntigenSerum& aNother) const { return name() == aNother.name() ? variant_id() < aNother.variant_id() : name() < aNother.name(); }
+
+}; // class AntigenSerumBase
+
+// ----------------------------------------------------------------------
+
+class AntigenBase : public AntigenSerumBase
+{
+ public:
+    virtual bool reference() const  = 0;
+
+}; // class AntigenBase
+
+// ----------------------------------------------------------------------
+
+class SerumBase : public AntigenSerumBase
+{
+ public:
+}; // class SerumBase
 
 // ----------------------------------------------------------------------
 
@@ -50,8 +113,7 @@ class ProjectionBase
     inline ProjectionBase(const ProjectionBase&) = default;
     virtual ~ProjectionBase();
 
-    // inline void comment(const char* str, size_t length) { mComment.assign(str, length); }
-    // inline std::string comment() const { return mComment; }
+    virtual std::string comment() const = 0;
 
     virtual LayoutBase& layout() = 0;
     virtual const LayoutBase& layout() const = 0;
@@ -59,7 +121,6 @@ class ProjectionBase
     virtual void stress(double aStress) = 0;
     virtual double stress() const = 0;
 
-    // inline void minimum_column_basis(const char* str, size_t length) { mMinimumColumnBasis.assign(str, length); }
     virtual const MinimumColumnBasisBase& minimum_column_basis() const = 0;
 
     virtual ColumnBasesBase& column_bases() = 0;
@@ -77,8 +138,8 @@ class ProjectionBase
     // inline void dodgy_titer_is_regular(bool aDodgyTiterIsRegular) { mDodgyTiterIsRegular = aDodgyTiterIsRegular; }
     // inline bool dodgy_titer_is_regular() const { return mDodgyTiterIsRegular; }
 
-    // inline void stress_diff_to_stop(double aStressDiffToStop) { mStressDiffToStop = aStressDiffToStop; }
-    // inline double stress_diff_to_stop() const { return mStressDiffToStop; }
+    virtual void stress_diff_to_stop(double aStressDiffToStop) = 0;
+    virtual double stress_diff_to_stop() const = 0;
 
     // inline std::vector<size_t>& unmovable() { return mUnmovable; }
     // inline const std::vector<size_t>& unmovable() const { return mUnmovable; }
@@ -116,12 +177,12 @@ class ChartBase
 
     // inline const Antigens& antigens() const { return mAntigens; }
     // inline Antigens& antigens() { return mAntigens; }
-    // inline const Antigen& antigen(size_t ag_no) const { return mAntigens[ag_no]; }
+    virtual const AntigenBase& antigen(size_t ag_no) const  = 0;
     // inline Antigen& antigen(size_t ag_no) { return mAntigens[ag_no]; }
 
     // inline const Sera& sera() const { return mSera; }
     // inline Sera& sera() { return mSera; }
-    // inline const Serum& serum(size_t sr_no) const { return mSera[sr_no]; }
+    virtual const SerumBase& serum(size_t sr_no) const = 0;
     // inline Serum& serum(size_t sr_no) { return mSera[sr_no]; }
 
     // inline const ChartTiters& titers() const { return mTiters; }
@@ -188,12 +249,12 @@ class ChartBase
     // inline const ChartPlotSpec& plot_spec() const { return mPlotSpec; }
     // inline ChartPlotSpec& plot_spec() { return mPlotSpec; }
 
-    // inline IndexGenerator antigen_indices() const { return {number_of_antigens(), [](size_t) { return true; } }; }
-    // inline IndexGenerator reference_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].reference(); } }; }
-    // inline IndexGenerator test_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return !mAntigens[index].reference(); } }; }
-    // inline IndexGenerator egg_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].is_egg(); } }; }
-    // inline IndexGenerator reassortant_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].is_reassortant(); } }; }
-    // inline IndexGenerator serum_indices() const { return {number_of_antigens(), number_of_points(), [](size_t) { return true; } }; }
+    inline IndexGenerator antigen_indices() const { return {number_of_antigens(), [](size_t) { return true; } }; }
+    inline IndexGenerator reference_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return antigen(index).reference(); } }; }
+    inline IndexGenerator test_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return !antigen(index).reference(); } }; }
+    inline IndexGenerator egg_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return antigen(index).is_egg(); } }; }
+    inline IndexGenerator reassortant_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return antigen(index).is_reassortant(); } }; }
+    inline IndexGenerator serum_indices() const { return {number_of_antigens(), number_of_points(), [](size_t) { return true; } }; }
 
     // inline IndexGenerator antigens_not_found_in(const Chart& aNother) const
     //     {

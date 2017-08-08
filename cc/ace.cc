@@ -49,26 +49,26 @@ class Ace
 #endif
 
 static jsi::data<Antigen> antigen_data = {
-    {"N", jsi::field<Antigen>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Antigen::name))},
+    {"N", jsi::field<Antigen, const char*>(static_cast<void (Antigen::*)(const char*, size_t)>(&Antigen::name))},
     {"D", jsi::field(&Antigen::date)},
-    {"L", jsi::field<Antigen>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Antigen::lineage))},
-    {"P", jsi::field<Antigen>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Antigen::passage))},
-    {"R", jsi::field<Antigen>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Antigen::reassortant))},
+    {"L", jsi::field<Antigen, const char*>(static_cast<void (Antigen::*)(const char*, size_t)>(&Antigen::lineage))},
+    {"P", jsi::field<Antigen, const char*>(static_cast<void (Antigen::*)(const char*, size_t)>(&Antigen::passage))},
+    {"R", jsi::field<Antigen, const char*>(static_cast<void (Antigen::*)(const char*, size_t)>(&Antigen::reassortant))},
     {"l", jsi::field(&Antigen::lab_id)},
-    {"S", jsi::field<Antigen>(&Antigen::semantic)},
-    {"a", jsi::field<std::string, Antigen>(&Antigen::annotations)},
+    {"S", jsi::field<Antigen, const char*>(&Antigen::semantic)},
+    {"a", jsi::field<std::string, Antigen, Antigen>(&Antigen::annotations)},
     {"c", jsi::field(&Antigen::clades)},
 };
 
 static jsi::data<Serum> serum_data = {
-    {"N", jsi::field<Serum>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Serum::name))},
-    {"L", jsi::field<Serum>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Serum::lineage))},
-    {"P", jsi::field<Serum>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Serum::passage))},
-    {"R", jsi::field<Serum>(static_cast<void (AntigenSerum::*)(const char*, size_t)>(&Serum::reassortant))},
+    {"N", jsi::field<Serum, const char*>(static_cast<void (Serum::*)(const char*, size_t)>(&Serum::name))},
+    {"L", jsi::field<Serum, const char*>(static_cast<void (Serum::*)(const char*, size_t)>(&Serum::lineage))},
+    {"P", jsi::field<Serum, const char*>(static_cast<void (Serum::*)(const char*, size_t)>(&Serum::passage))},
+    {"R", jsi::field<Serum, const char*>(static_cast<void (Serum::*)(const char*, size_t)>(&Serum::reassortant))},
     {"I", jsi::field(static_cast<void (Serum::*)(const char*, size_t)>(&Serum::serum_id))},
-    {"S", jsi::field<Serum>(&Serum::semantic)},
+    {"S", jsi::field<Serum, const char*>(&Serum::semantic)},
     {"h", jsi::field(&Serum::homologous)},
-    {"a", jsi::field<std::string, Serum>(&Serum::annotations)},
+    {"a", jsi::field<std::string, Serum, Serum>(&Serum::annotations)},
     {"s", jsi::field(static_cast<void (Serum::*)(const char*, size_t)>(&Serum::serum_species))},
 };
 
