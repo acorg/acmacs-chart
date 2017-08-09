@@ -1,6 +1,6 @@
 #pragma once
 
-#include "acmacs-base/config.hh"
+#include "acmacs-base/throw.hh"
 #include "acmacs-base/transformation.hh"
 #include "acmacs-chart/bounding-ball.hh"
 

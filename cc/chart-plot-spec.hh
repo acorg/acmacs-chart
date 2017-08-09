@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include "acmacs-base/throw.hh"
+
 // ----------------------------------------------------------------------
 
 class LabelStyle
