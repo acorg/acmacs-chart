@@ -2,7 +2,7 @@
 
 #include "acmacs-base/log.hh"
 #include "acmacs-base/stream.hh"
-#include "vector.hh"
+#include "acmacs-chart/vector.hh"
 
 // ----------------------------------------------------------------------
 
