@@ -11,10 +11,10 @@
 class AntigenSerumMatch
 {
  public:
-    inline AntigenSerumMatch() : mLevel(Perfect) {}
-
     enum Level : size_t { Perfect=0, SerumSpeciesMismatch=0x1, PassageMismatch=0x2, PassageWithoutDateMismatch=0x4, EggCellUnknown=0x8, EggCellMismatch=0x10,
                           Mismatch=0x20, AnnotationMismatch=0x40, ReassortantMismatch=0x80, SerumIdMismatch=0x100, NameMismatch=0x200 };
+
+    inline AntigenSerumMatch(Level aLevel = Perfect) : mLevel(aLevel) {}
 
     inline bool operator < (AntigenSerumMatch m) const { return mLevel < m.mLevel; }
     inline bool operator < (Level l) const { return mLevel < l; }

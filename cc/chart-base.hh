@@ -56,7 +56,7 @@ class AntigenSerumBase
 class AntigenBase : public AntigenSerumBase
 {
  public:
-    virtual bool reference() const  = 0;
+    virtual bool reference() const = 0;
 
 }; // class AntigenBase
 
