@@ -32,13 +32,12 @@ PY_LDLIBS = $(LDLIBS) $(shell $(PYTHON_CONFIG) --ldflags | sed -E 's/-Wl,-stack_
 
 PKG_INCLUDES = $(shell pkg-config --cflags liblzma) $(shell $(PYTHON_CONFIG) --includes)
 
-
 # ----------------------------------------------------------------------
 
 BUILD = build
 DIST = $(abspath dist)
 
-all: check-acmacsd-root $(ACMACS_CHART_LIB) $(BACKEND)
+all: check-acmacsd-root install-headers $(ACMACS_CHART_LIB) $(BACKEND)
 
 install: check-acmacsd-root install-headers $(ACMACS_CHART_LIB) $(BACKEND)
 	ln -sf $(ACMACS_CHART_LIB) $(ACMACSD_ROOT)/lib
@@ -49,13 +48,12 @@ install: check-acmacsd-root install-headers $(ACMACS_CHART_LIB) $(BACKEND)
 
 install-headers: check-acmacsd-root
 	if [ ! -d $(ACMACSD_ROOT)/include/acmacs-chart ]; then mkdir $(ACMACSD_ROOT)/include/acmacs-chart; fi
-	ln -sf $(abspath cc)/*.hh $(ACMACSD_ROOT)/include/acmacs-chart
+	for h in $(abspath cc)/*.hh; do if [ ! $(ACMACSD_ROOT)/include/acmacs-chart/$$(basename $$h) ]; then ln -sf $$h $(ACMACSD_ROOT)/include/acmacs-chart; fi; done
 
 test: install
 	test/test
 
-rtags:
-	make -nkB | /usr/local/bin/rc --compile - || true
+include $(ACMACSD_ROOT)/share/Makefile.rtags
 
 # ----------------------------------------------------------------------
 
