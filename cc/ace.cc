@@ -444,7 +444,7 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
 
 void export_chart(std::string aFilename, const Chart& aChart)
 {
-    jsw::export_to_json(aChart, aFilename, 1, jsw::ForceCompression::Yes);
+    jsw::export_to_json(aChart, aFilename, 1, acmacs_base::ForceCompression::Yes);
 
 } // export_chart
 
