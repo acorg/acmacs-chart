@@ -74,15 +74,12 @@ class SerumBase : public AntigenSerumBase
 class MinimumColumnBasisBase
 {
  public:
-    inline MinimumColumnBasisBase() : mCached{static_cast<size_t>(-1)} {}
-    inline MinimumColumnBasisBase(const MinimumColumnBasisBase&) : mCached{static_cast<size_t>(-1)} {}
+    inline MinimumColumnBasisBase() = default;
+    inline MinimumColumnBasisBase(const MinimumColumnBasisBase&) = default;
     virtual ~MinimumColumnBasisBase();
     virtual operator size_t() const = 0;
     virtual operator std::string() const = 0;
     inline std::string str() const { return static_cast<std::string>(*this); }
-
- protected:
-    mutable size_t mCached;
 
 }; // class MinimumColumnBasisBase
 

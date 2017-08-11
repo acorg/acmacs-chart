@@ -291,8 +291,8 @@ class Sera : public std::vector<Serum>
 class MinimumColumnBasis : public MinimumColumnBasisBase
 {
  public:
-    using MinimumColumnBasisBase::MinimumColumnBasisBase;
-    inline MinimumColumnBasis(const MinimumColumnBasis& aSrc) : MinimumColumnBasisBase{aSrc}, mValue{aSrc.mValue} {}
+    inline MinimumColumnBasis() : mValue{"none"}, mCached{static_cast<size_t>(-1)} {}
+    inline MinimumColumnBasis(const MinimumColumnBasis& aSrc) : MinimumColumnBasisBase{aSrc}, mValue{aSrc.mValue}, mCached{static_cast<size_t>(-1)} {}
     inline operator size_t() const override { if (mCached == static_cast<decltype(mCached)>(-1)) mCached = mValue == "none" || mValue == "auto" ? 0 : std::stoul(mValue); return mCached; }
     inline operator std::string() const override { return mValue; }
     inline void assign(const char* str, size_t length) { mValue.assign(str, length); mCached = static_cast<decltype(mCached)>(-1); }
@@ -301,6 +301,7 @@ class MinimumColumnBasis : public MinimumColumnBasisBase
 
  private:
     std::string mValue;
+    mutable size_t mCached;
 
 }; // class MinimumColumnBasis
 
