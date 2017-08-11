@@ -117,18 +117,18 @@ class ProjectionBase
 
     virtual std::string comment() const = 0;
 
-    virtual LayoutBase& layout() = 0;
+      // virtual LayoutBase& layout() = 0;
     virtual const LayoutBase& layout() const = 0;
 
-    virtual void stress(double aStress) = 0;
+      // virtual void stress(double aStress) = 0;
     virtual double stress() const = 0;
 
     virtual const MinimumColumnBasisBase& minimum_column_basis() const = 0;
 
-    virtual ColumnBasesBase& column_bases() = 0;
+      // virtual ColumnBasesBase& column_bases() = 0;
     virtual const ColumnBasesBase& column_bases() const = 0;
 
-    virtual Transformation& transformation()  = 0;
+      // virtual Transformation& transformation()  = 0;
     virtual const Transformation& transformation() const = 0;
 
     // inline std::vector<double>& gradient_multipliers() { return mGradientMultipliers; }
@@ -138,9 +138,9 @@ class ProjectionBase
     // inline const std::vector<double>& titer_multipliers() const { return mTiterMultipliers; }
 
     // inline void dodgy_titer_is_regular(bool aDodgyTiterIsRegular) { mDodgyTiterIsRegular = aDodgyTiterIsRegular; }
-    // inline bool dodgy_titer_is_regular() const { return mDodgyTiterIsRegular; }
+    virtual bool dodgy_titer_is_regular() const = 0 ;
 
-    virtual void stress_diff_to_stop(double aStressDiffToStop) = 0;
+    // virtual void stress_diff_to_stop(double aStressDiffToStop) = 0;
     virtual double stress_diff_to_stop() const = 0;
 
     // inline std::vector<size_t>& unmovable() { return mUnmovable; }
@@ -266,7 +266,7 @@ class ChartBase
 
     // inline std::vector<Projection>& projections() { return mProjections; }
     // inline const std::vector<Projection>& projections() const { return mProjections; }
-    virtual ProjectionBase& projection(size_t aProjectionNo) = 0;
+    // virtual ProjectionBase& projection(size_t aProjectionNo) = 0;
     virtual const ProjectionBase& projection(size_t aProjectionNo) const = 0;
     virtual size_t number_of_projections() const = 0;
 

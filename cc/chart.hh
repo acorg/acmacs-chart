@@ -338,24 +338,24 @@ class Projection : public ProjectionBase
     inline void comment(const char* str, size_t length) { mComment.assign(str, length); }
     inline std::string comment() const override { return mComment; }
 
-    inline LayoutBase& layout() override { return mLayout; }
+    inline LayoutBase& layout() { return mLayout; }
     inline const LayoutBase& layout() const override { return mLayout; }
     inline std::vector<std::vector<double>>& layout_for_json() { return reinterpret_cast<std::vector<std::vector<double>>&>(mLayout.data()); }
     inline const std::vector<Coordinates>& layout_for_json() const { return mLayout.data(); }
 
-    inline void stress(double aStress) override { mStress = aStress; }
+    inline void stress(double aStress) { mStress = aStress; }
     inline double stress() const override { return mStress; }
 
     inline void minimum_column_basis(const char* str, size_t length) { mMinimumColumnBasis.assign(str, length); }
     inline const MinimumColumnBasisBase& minimum_column_basis() const override { return mMinimumColumnBasis; }
     inline std::string minimum_column_basis_for_json() const { return mMinimumColumnBasis.data(); }
 
-    inline ColumnBasesBase& column_bases() override { return mColumnBases; }
+    inline ColumnBasesBase& column_bases() { return mColumnBases; }
     inline const ColumnBasesBase& column_bases() const override { return mColumnBases; }
     inline std::vector<double>& column_bases_for_json() { return mColumnBases.data(); }
     inline const std::vector<double>& column_bases_for_json() const { return mColumnBases.data(); }
 
-    inline Transformation& transformation() override { return mTransformation; }
+    inline Transformation& transformation() { return mTransformation; }
     inline const Transformation& transformation() const override { return mTransformation; }
 
     inline std::vector<double>& gradient_multipliers() { return mGradientMultipliers; }
@@ -365,9 +365,9 @@ class Projection : public ProjectionBase
     inline const std::vector<double>& titer_multipliers() const { return mTiterMultipliers; }
 
     inline void dodgy_titer_is_regular(bool aDodgyTiterIsRegular) { mDodgyTiterIsRegular = aDodgyTiterIsRegular; }
-    inline bool dodgy_titer_is_regular() const { return mDodgyTiterIsRegular; }
+    inline bool dodgy_titer_is_regular() const override { return mDodgyTiterIsRegular; }
 
-    inline void stress_diff_to_stop(double aStressDiffToStop) override { mStressDiffToStop = aStressDiffToStop; }
+    inline void stress_diff_to_stop(double aStressDiffToStop) { mStressDiffToStop = aStressDiffToStop; }
     inline double stress_diff_to_stop() const override { return mStressDiffToStop; }
 
     inline std::vector<size_t>& unmovable() { return mUnmovable; }
@@ -671,7 +671,7 @@ class Chart : public ChartBase
 
     inline std::vector<Projection>& projections() { return mProjections; }
     inline const std::vector<Projection>& projections() const { return mProjections; }
-    inline ProjectionBase& projection(size_t aProjectionNo) override { return mProjections[aProjectionNo]; }
+    inline ProjectionBase& projection(size_t aProjectionNo) { return mProjections[aProjectionNo]; }
     inline const ProjectionBase& projection(size_t aProjectionNo) const override { return mProjections[aProjectionNo]; }
     inline size_t number_of_projections() const override { return mProjections.size(); }
 
