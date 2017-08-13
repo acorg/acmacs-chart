@@ -14,6 +14,7 @@ BACKEND = $(DIST)/acmacs_chart_backend$(PYTHON_MODULE_SUFFIX)
 # ----------------------------------------------------------------------
 
 include $(ACMACSD_ROOT)/share/Makefile.g++
+include $(ACMACSD_ROOT)/share/Makefile.dist-build.vars
 
 PYTHON_VERSION = $(shell python3 -c 'import sys; print("{0.major}.{0.minor}".format(sys.version_info))')
 PYTHON_CONFIG = python$(PYTHON_VERSION)-config
@@ -33,9 +34,6 @@ PY_LDLIBS = $(LDLIBS) $(shell $(PYTHON_CONFIG) --ldflags | sed -E 's/-Wl,-stack_
 PKG_INCLUDES = $(shell pkg-config --cflags liblzma) $(shell $(PYTHON_CONFIG) --includes)
 
 # ----------------------------------------------------------------------
-
-BUILD = build
-DIST = $(abspath dist)
 
 all: check-acmacsd-root install-headers $(ACMACS_CHART_LIB) $(BACKEND)
 
@@ -67,12 +65,6 @@ $(BACKEND): $(patsubst %.cc,$(BUILD)/%.o,$(PY_SOURCES)) | $(DIST)
 $(ACMACS_CHART_LIB): $(patsubst %.cc,$(BUILD)/%.o,$(SOURCES)) | $(DIST) $(LOCATION_DB_LIB)
 	$(CXX) -shared $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-clean:
-	rm -rf $(DIST) $(BUILD)/*.o $(BUILD)/*.d
-
-distclean: clean
-	rm -rf $(BUILD)
-
 # ----------------------------------------------------------------------
 
 $(BUILD)/%.o: cc/%.cc | $(BUILD) install-headers
@@ -86,11 +78,7 @@ ifndef ACMACSD_ROOT
 	$(error ACMACSD_ROOT is not set)
 endif
 
-$(DIST):
-	mkdir -p $(DIST)
-
-$(BUILD):
-	mkdir -p $(BUILD)
+include $(ACMACSD_ROOT)/share/Makefile.dist-build.rules
 
 .PHONY: check-acmacsd-root
 
