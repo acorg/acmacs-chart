@@ -5,8 +5,15 @@
 
 #include "acmacs-base/throw.hh"
 #include "acmacs-base/size-scale.hh"
-#include "acmacs-base/color.hh"
 #include "acmacs-chart/layout.hh"
+
+#ifdef ACMACS_TARGET_OS
+#include "acmacs-base/color.hh"
+#endif
+
+#ifdef ACMACS_TARGET_BROWSER
+#include "client/color.hh"
+#endif
 
 // ----------------------------------------------------------------------
 
@@ -85,8 +92,8 @@ class PointStyle
     inline Pixels size() const { return mSize; }
     inline std::string fill() const { return mFill.to_string(); }
     inline std::string outline() const { return mOutline.to_string(); }
-    inline std::string fill_hex() const { return mFill.to_hex_string(); }
-    inline std::string outline_hex() const { return mOutline.to_hex_string(); }
+    inline std::string fill_hex() const { return mFill.to_string(); }
+    inline std::string outline_hex() const { return mOutline.to_string(); }
     inline Pixels outline_width() const { return mOutlineWidth; }
     inline Aspect aspect() const { return mAspect; }
     inline Rotation rotation() const { return mRotation; }
