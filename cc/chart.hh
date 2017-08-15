@@ -6,8 +6,16 @@
 
 #include "acmacs-base/throw.hh"
 #include "acmacs-base/virus-name.hh"
-#include "acmacs-base/string.hh"
 #include "acmacs-base/passage.hh"
+
+#ifdef ACMACS_TARGET_OS
+#include "acmacs-base/string.hh"
+#endif
+
+#ifdef ACMACS_TARGET_BROWSER
+#include "client/string-client.hh"
+#endif
+
 
 #include "acmacs-chart/layout.hh"
 #include "acmacs-chart/chart-plot-spec.hh"
@@ -311,7 +319,7 @@ class ColumnBases : public ColumnBasesBase
 {
  public:
     using ColumnBasesBase::ColumnBasesBase;
-    inline void operator = (const ColumnBasesBase& aSrc) override { mColumnBases = dynamic_cast<const ColumnBases&>(aSrc).mColumnBases; }
+    inline void operator = (const ColumnBasesBase& aSrc) override { mColumnBases = DYNAMIC_CAST(const ColumnBases&, (aSrc)).mColumnBases; }
 
     inline double operator[](size_t aIndex) const override { return mColumnBases[aIndex]; }
     inline double at(size_t aIndex) const override { return mColumnBases.at(aIndex); }
