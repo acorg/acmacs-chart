@@ -3,6 +3,7 @@
 #include <string>
 
 #include "acmacs-base/range.hh"
+#include "acmacs-base/string-target.hh"
 #include "acmacs-chart/layout-base.hh"
 #include "acmacs-chart/antigen-serum-match.hh"
 

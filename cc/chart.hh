@@ -8,15 +8,6 @@
 #include "acmacs-base/virus-name.hh"
 #include "acmacs-base/passage.hh"
 
-#ifdef ACMACS_TARGET_OS
-#include "acmacs-base/string.hh"
-#endif
-
-#ifdef ACMACS_TARGET_BROWSER
-#include "client/string-client.hh"
-#endif
-
-
 #include "acmacs-chart/layout.hh"
 #include "acmacs-chart/chart-plot-spec.hh"
 #include "acmacs-chart/chart-base.hh"
