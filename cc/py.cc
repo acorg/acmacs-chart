@@ -127,6 +127,18 @@ PYBIND11_MODULE(acmacs_chart_backend, m)
     py::class_<Transformation>(m, "Transformation")
             ;
 
+    py::class_<LayoutBase>(m, "LayoutBase")
+            .def("number_of_points", &LayoutBase::number_of_points)
+            .def("number_of_dimensions", &LayoutBase::number_of_dimensions)
+            .def("__getitem__", [](const LayoutBase& aLayout, size_t aIndex) -> std::vector<double> { return aLayout[aIndex]; }, py::arg("index"))
+            ;
+
+    py::class_<Projection>(m, "Projection")
+            .def("stress", py::overload_cast<>(&Projection::stress, py::const_))
+            .def("minimum_column_basis", &Projection::minimum_column_basis_for_json)
+            .def("layout", py::overload_cast<>(&Projection::layout, py::const_), py::return_value_policy::reference)
+            ;
+
     py::class_<Titer>(m, "Titer")
             .def("__str__", [](const Titer& aTiter) -> std::string { return aTiter; })
             ;
@@ -154,6 +166,7 @@ PYBIND11_MODULE(acmacs_chart_backend, m)
             .def("serum_circle_radius", &Chart::serum_circle_radius, py::arg("antigen_no"), py::arg("serum_no"), py::arg("projection_no") = 0, py::arg("verbose") = false)
             .def("serum_coverage", [](const Chart& aChart, size_t aAntigenNo, size_t aSerumNo) -> std::vector<std::vector<size_t>> { std::vector<size_t> within, outside; aChart.serum_coverage(aAntigenNo, aSerumNo, within, outside); return {within, outside}; } , py::arg("antigen_no"), py::arg("serum_no"))
             .def("antigens_not_found_in", [](const Chart& aChart, const Chart& aNother) -> std::vector<size_t> { auto gen = aChart.antigens_not_found_in(aNother); return {gen.begin(), gen.end()}; }, py::arg("another_chart"))
+            .def("projection", py::overload_cast<size_t>(&Chart::projection, py::const_), py::arg("projection_no") = 0, py::return_value_policy::reference)
         ;
 
     m.def("import_chart", &import_chart, py::arg("data"), py::doc("Imports chart from a buffer or file in the ace format."));
