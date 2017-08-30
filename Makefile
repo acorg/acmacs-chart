@@ -60,15 +60,17 @@ include $(AD_SHARE)/Makefile.rtags
 # ----------------------------------------------------------------------
 
 $(BACKEND): $(patsubst %.cc,$(BUILD)/%.o,$(PY_SOURCES)) | $(DIST)
-	$(CXX) -shared $(LDFLAGS) -o $@ $^ $(PY_LDLIBS)
+	@echo "SHARED     " $@ # '<--' $^
+	@$(CXX) -shared $(LDFLAGS) -o $@ $^ $(PY_LDLIBS)
 
 $(ACMACS_CHART_LIB): $(patsubst %.cc,$(BUILD)/%.o,$(SOURCES)) | $(DIST) $(LOCATION_DB_LIB)
-	$(CXX) -shared $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	@echo "SHARED     " $@ # '<--' $^
+	@$(CXX) -shared $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 # ----------------------------------------------------------------------
 
 $(BUILD)/%.o: cc/%.cc | $(BUILD) install-headers
-	@echo $<
+	@echo $(CXX_NAME) $<
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 # ----------------------------------------------------------------------
