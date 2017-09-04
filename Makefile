@@ -23,9 +23,6 @@ PYTHON_MODULE_SUFFIX = $(shell $(PYTHON_CONFIG) --extension-suffix)
 
 ACMACS_CHART_LIB = $(DIST)/libacmacschart.so
 
-# -fvisibility=hidden and -flto make resulting lib smaller (pybind11) but linking is much slower
-OPTIMIZATION = -O3 #-fvisibility=hidden -flto
-PROFILE = # -pg
 CXXFLAGS = -g -MMD $(OPTIMIZATION) $(PROFILE) -fPIC -std=$(STD) $(WEVERYTHING) $(WARNINGS) -Icc -I$(AD_INCLUDE) $(PKG_INCLUDES)
 LDFLAGS = $(OPTIMIZATION) $(PROFILE)
 LDLIBS = -L$(AD_LIB) -lacmacsbase -llocationdb -lboost_filesystem -lboost_system $$(pkg-config --libs liblzma)
