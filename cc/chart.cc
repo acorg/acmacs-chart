@@ -655,7 +655,7 @@ double Chart::serum_circle_radius(size_t aAntigenNo, size_t aSerumNo, size_t aPr
             else
                 return false;
         };
-        std::vector<size_t> antigens_by_distances(Range<size_t>::begin(number_of_antigens()), Range<size_t>::end());
+        std::vector<size_t> antigens_by_distances(incrementer<size_t>::begin(0), incrementer<size_t>::end(number_of_antigens()));
         std::sort(antigens_by_distances.begin(), antigens_by_distances.end(), antigens_by_distances_sorting);
           //if (aVerbose) std::cerr << "DEBUG: antigens_by_distances " << antigens_by_distances << std::endl;
 
