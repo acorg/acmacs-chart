@@ -279,7 +279,7 @@ Chart* import_chart(std::string buffer)
     if (buffer == "-")
         buffer = acmacs_base::read_stdin();
     else if (buffer[0] != '{')
-        buffer = acmacs_base::read_file(buffer);
+        buffer = acmacs_base::read_file(buffer, true);
     Chart* chart = nullptr;
     if (buffer[0] == '{') {
         chart = new Chart{};
