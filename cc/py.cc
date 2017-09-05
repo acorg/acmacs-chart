@@ -169,6 +169,23 @@ PYBIND11_MODULE(acmacs_chart_backend, m)
             .def("projection", py::overload_cast<size_t>(&Chart::projection, py::const_), py::arg("projection_no") = 0, py::return_value_policy::reference)
         ;
 
+#ifdef __clang__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wexit-time-destructors"
+    static py::exception<AceChartReadError> ace_chart_read_error(m, "AceChartReadError");
+#pragma GCC diagnostic pop
+#endif
+    py::register_exception_translator([](std::exception_ptr p) {
+        try {
+            if (p)
+                std::rethrow_exception(p);
+        }
+        catch (const AceChartReadError& e) {
+            std::cerr << "AceChartReadError: " << e.what() << '\n';
+            ace_chart_read_error(e.what());
+        }
+    });
+
     m.def("import_chart", &import_chart, py::arg("data"), py::doc("Imports chart from a buffer or file in the ace format."));
     m.def("import_chart", [](py::bytes data) { return import_chart(data); }, py::arg("data"), py::doc("Imports chart from a buffer or file in the ace format."));
     m.def("export_chart", &export_chart, py::arg("filename"), py::arg("chart"), py::doc("Exports chart into a file in the ace format."));

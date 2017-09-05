@@ -278,8 +278,16 @@ Chart* import_chart(std::string buffer)
 {
     if (buffer == "-")
         buffer = acmacs_base::read_stdin();
-    else if (buffer[0] != '{')
-        buffer = acmacs_base::read_file(buffer, true);
+    else if (acmacs_base::xz_compressed(buffer))
+        buffer = acmacs_base::xz_decompress(buffer);
+    else if (buffer[0] != '{') {
+        try {
+            buffer = acmacs_base::read_file(buffer, true);
+        }
+        catch (std::exception& err) {
+            throw AceChartReadError{"cannot import chart from \"" + buffer + "\": " + err.what()};
+        }
+    }
     Chart* chart = nullptr;
     if (buffer[0] == '{') {
         chart = new Chart{};
@@ -291,11 +299,11 @@ Chart* import_chart(std::string buffer)
             throw;
         }
         catch (std::exception& err) {
-            throw AceChartReadError(err.what());
+            throw AceChartReadError{err.what()};
         }
     }
     else
-        throw AceChartReadError("cannot import chart: unrecognized source format");
+        throw AceChartReadError{"cannot import chart: unrecognized source format"};
     return chart;
 
 } // import_chart
