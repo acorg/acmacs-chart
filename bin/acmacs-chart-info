@@ -2,7 +2,7 @@
 # -*- Python -*-
 
 import sys, os, traceback, pprint
-if sys.version_info.major != 3: raise RuntimeError("Run script with python3")
+if sys.version_info.major < 3 or (sys.version_info.major == 3 and sys.version_info.minor < 6): raise RuntimeError("Run script with python3.6+")
 from pathlib import Path
 sys.path[:0] = [str(Path(os.environ["ACMACSD_ROOT"]).resolve().joinpath("py"))]
 import logging; module_logger = logging.getLogger(__name__)
