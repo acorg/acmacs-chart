@@ -169,12 +169,12 @@ PYBIND11_MODULE(acmacs_chart_backend, m)
             .def("projection", py::overload_cast<size_t>(&Chart::projection, py::const_), py::arg("projection_no") = 0, py::return_value_policy::reference)
         ;
 
-#ifdef __clang__
 #pragma GCC diagnostic push
+#ifdef __clang__
 #pragma GCC diagnostic ignored "-Wexit-time-destructors"
+#endif
     static py::exception<AceChartReadError> ace_chart_read_error(m, "AceChartReadError");
 #pragma GCC diagnostic pop
-#endif
     py::register_exception_translator([](std::exception_ptr p) {
         try {
             if (p)
