@@ -201,6 +201,11 @@ class ChartPlotSpec
 
     inline bool empty() const { return mDrawingOrder.empty() && mStyleForPoint.empty() && mStyles.empty() && mShownOnAll.empty(); }
 
+    inline const ChartPlotSpecStyle& style_for(size_t aPointNo) const
+        {
+            return styles().at(style_for_point().at(aPointNo));
+        }
+
  private:
     std::vector<size_t> mDrawingOrder;       // "d"
     std::vector<size_t> mStyleForPoint;      // "p"

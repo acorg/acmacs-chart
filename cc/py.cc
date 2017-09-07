@@ -148,6 +148,21 @@ PYBIND11_MODULE(acmacs_chart_backend, m)
             .def("max_for_serum", &ChartTiters::max_for_serum, py::arg("sr_no"))
             ;
 
+    py::class_<ChartPlotSpecStyle>(m, "ChartPlotSpecStyle")
+            .def("shown", py::overload_cast<>(&ChartPlotSpecStyle::shown, py::const_))
+            .def("fill_color", py::overload_cast<>(&ChartPlotSpecStyle::fill_color, py::const_))
+            .def("outline_color", py::overload_cast<>(&ChartPlotSpecStyle::outline_color, py::const_))
+            .def("outline_width", py::overload_cast<>(&ChartPlotSpecStyle::outline_width, py::const_))
+            .def("shape", py::overload_cast<>(&ChartPlotSpecStyle::shape_as_string, py::const_))
+            .def("size", py::overload_cast<>(&ChartPlotSpecStyle::size, py::const_))
+            .def("rotation", py::overload_cast<>(&ChartPlotSpecStyle::rotation, py::const_))
+            .def("aspect", py::overload_cast<>(&ChartPlotSpecStyle::aspect, py::const_))
+            ;
+
+    py::class_<ChartPlotSpec>(m, "ChartPlotSpec")
+            .def("style_for", &ChartPlotSpec::style_for, py::arg("point_no") = 0, py::return_value_policy::reference)
+            ;
+
     py::class_<Chart>(m, "Chart")
             .def("number_of_antigens", &Chart::number_of_antigens)
             .def("number_of_sera", &Chart::number_of_sera)
@@ -167,6 +182,7 @@ PYBIND11_MODULE(acmacs_chart_backend, m)
             .def("serum_coverage", [](const Chart& aChart, size_t aAntigenNo, size_t aSerumNo) -> std::vector<std::vector<size_t>> { std::vector<size_t> within, outside; aChart.serum_coverage(aAntigenNo, aSerumNo, within, outside); return {within, outside}; } , py::arg("antigen_no"), py::arg("serum_no"))
             .def("antigens_not_found_in", [](const Chart& aChart, const Chart& aNother) -> std::vector<size_t> { auto gen = aChart.antigens_not_found_in(aNother); return {gen.begin(), gen.end()}; }, py::arg("another_chart"))
             .def("projection", py::overload_cast<size_t>(&Chart::projection, py::const_), py::arg("projection_no") = 0, py::return_value_policy::reference)
+            .def("plot_spec", py::overload_cast<>(&Chart::plot_spec, py::const_), py::return_value_policy::reference)
         ;
 
 #pragma GCC diagnostic push
