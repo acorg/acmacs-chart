@@ -34,8 +34,7 @@ void LayoutBase::transform(const Transformation& aTransformation)
     for (size_t point_no = 0; point_no < number_of_points(); ++point_no) {
         const auto& row = operator[](point_no);
         if (!row.empty()) {     // empty row is for disconnected points
-            const double x1 = row[0] * aTransformation[0] + row[1] * aTransformation[2];
-            const double x2 = row[0] * aTransformation[1] + row[1] * aTransformation[3];
+            const auto [x1, x2] = aTransformation.transform(row[0], row[1]);
             set(point_no, {x1, x2});
         }
     }

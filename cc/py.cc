@@ -125,6 +125,7 @@ PYBIND11_MODULE(acmacs_chart_backend, m)
             ;
 
     py::class_<Transformation>(m, "Transformation")
+            .def("transform", [](const Transformation& aTransformation, double x, double y) -> std::vector<double> { const auto [x1, y1] = aTransformation.transform(x, y); return {x1, y1}; }, py::arg("x"), py::arg("y"))
             ;
 
     py::class_<LayoutBase>(m, "LayoutBase")
@@ -137,6 +138,7 @@ PYBIND11_MODULE(acmacs_chart_backend, m)
             .def("stress", py::overload_cast<>(&Projection::stress, py::const_))
             .def("minimum_column_basis", &Projection::minimum_column_basis_for_json)
             .def("layout", py::overload_cast<>(&Projection::layout, py::const_), py::return_value_policy::reference)
+            .def("transformation", py::overload_cast<>(&Projection::transformation, py::const_), py::return_value_policy::reference)
             ;
 
     py::class_<Titer>(m, "Titer")
