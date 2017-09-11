@@ -235,7 +235,7 @@ size_t Sera::find_by_name_for_exact_matching(std::string aFullName) const
 
 // ----------------------------------------------------------------------
 
-template <typename AgSr> static void find_by_name_matching_ag_sr(const std::vector<AgSr>& aAgSr, std::string aName, std::vector<size_t>& aIndices, string_match::score_t aScoreThreshold, bool /*aVerbose*/)
+template <typename AgSr> static void find_by_name_matching_ag_sr(const std::vector<AgSr>& aAgSr, std::string aName, std::vector<size_t>& aIndices, string_match::score_t aScoreThreshold, bool aVerbose)
 {
     using Score = AntigenSerumMatchScore<AgSr>;
 
@@ -251,9 +251,12 @@ template <typename AgSr> static void find_by_name_matching_ag_sr(const std::vect
     for (const auto& is: index_score) {
         if (is.second < index_score.front().second)
             break;
-        aIndices.push_back(is.first);
-        // if (aVerbose)
-        //     std::cerr << "DEBUG: find_by_name_matching index:" << is.first << " score:" << is.second << std::endl;
+          // if name contains CELL, EGG, WILDTYPE - match only corresponding passage/reassortant
+        if (! ((aName.find("CELL") != std::string::npos && aAgSr[is.first].is_egg()) || (aName.find("EGG") != std::string::npos && !aAgSr[is.first].is_egg()) || (aName.find("WILDTYPE") != std::string::npos && aAgSr[is.first].is_reassortant()))) {
+            aIndices.push_back(is.first);
+            if (aVerbose)
+                std::cerr << "DEBUG: find_by_name_matching \"" << aName << "\" --> " << is.first << " \"" << aAgSr[is.first].full_name() << "\" egg:" << aAgSr[is.first].is_egg() << " score:" << is.second << std::endl;
+        }
     }
 }
 
