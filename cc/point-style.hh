@@ -85,8 +85,8 @@ class PointStyle
     inline Pixels size() const { return mSize; }
     inline std::string fill() const { return mFill.to_string(); }
     inline std::string outline() const { return mOutline.to_string(); }
-    inline std::string fill_hex() const { return mFill.to_string(); }
-    inline std::string outline_hex() const { return mOutline.to_string(); }
+    inline std::string fill_hex() const { return mFill.to_hex_string(); }
+    inline std::string outline_hex() const { return mOutline.to_hex_string(); }
     inline Pixels outline_width() const { return mOutlineWidth; }
     inline Aspect aspect() const { return mAspect; }
     inline Rotation rotation() const { return mRotation; }
