@@ -38,9 +38,6 @@ install: check-acmacsd-root install-headers $(ACMACS_CHART_LIB) $(BACKEND)
 	ln -sf $(abspath py)/* $(AD_PY)
 	ln -sf $(abspath bin)/acmacs-chart-* $(AD_BIN)
 
-install-headers: check-acmacsd-root
-	$(call install_headers,acmacs-chart)
-
 test: install
 	test/test
 
