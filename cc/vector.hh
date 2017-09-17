@@ -17,14 +17,14 @@ class Vector : public std::vector<double>
       // Multiplies all vector elements by aAlpha
     inline Vector& multiply_by(double aAlpha)
         {
-            std::transform(this->begin(), this->end(), this->begin(), std::bind2nd(std::multiplies<double>(), aAlpha));
+            std::transform(this->begin(), this->end(), this->begin(), std::bind(std::multiplies<double>(), std::placeholders::_1, aAlpha));
             return *this;
         }
 
       // Add aValue to each vector element
     inline Vector& add(double aValue)
         {
-            std::transform(this->begin(), this->end(), this->begin(), std::bind2nd(std::plus<double>(), aValue));
+            std::transform(this->begin(), this->end(), this->begin(), std::bind(std::plus<double>(), std::placeholders::_1, aValue));
             return *this;
         }
 
