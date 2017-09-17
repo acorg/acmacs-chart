@@ -13,9 +13,8 @@ BACKEND = $(DIST)/acmacs_chart_backend$(PYTHON_MODULE_SUFFIX)
 
 # ----------------------------------------------------------------------
 
-TARGET_ROOT=$(shell if [ -f /Volumes/rdisk/ramdisk-id ]; then echo /Volumes/rdisk/AD; else echo $(ACMACSD_ROOT); fi)
-include $(TARGET_ROOT)/share/Makefile.g++
-include $(TARGET_ROOT)/share/Makefile.dist-build.vars
+include $(ACMACSD_ROOT)/share/makefiles/Makefile.g++
+include $(ACMACSD_ROOT)/share/makefiles/Makefile.dist-build.vars
 
 PYTHON_VERSION = $(shell python3 -c 'import sys; print("{0.major}.{0.minor}".format(sys.version_info))')
 PYTHON_CONFIG = python$(PYTHON_VERSION)-config
@@ -48,11 +47,11 @@ install-headers: check-acmacsd-root
 test: install
 	test/test
 
-include $(AD_SHARE)/Makefile.rtags
-
 # ----------------------------------------------------------------------
 
 -include $(BUILD)/*.d
+include $(ACMACSD_ROOT)/share/makefiles/Makefile.dist-build.rules
+include $(ACMACSD_ROOT)/share/makefiles/Makefile.rtags
 
 # ----------------------------------------------------------------------
 
@@ -63,16 +62,6 @@ $(BACKEND): $(patsubst %.cc,$(BUILD)/%.o,$(PY_SOURCES)) | $(DIST)
 $(ACMACS_CHART_LIB): $(patsubst %.cc,$(BUILD)/%.o,$(SOURCES)) | $(DIST) $(LOCATION_DB_LIB)
 	@echo "SHARED     " $@ # '<--' $^
 	@$(CXX) -shared $(LDFLAGS) -o $@ $^ $(LDLIBS)
-
-# ----------------------------------------------------------------------
-
-$(BUILD)/%.o: cc/%.cc | $(BUILD) install-headers
-	@echo $(CXX_NAME) $<
-	@$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-# ----------------------------------------------------------------------
-
-include $(AD_SHARE)/Makefile.dist-build.rules
 
 # ======================================================================
 ### Local Variables:
