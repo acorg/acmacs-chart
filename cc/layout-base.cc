@@ -34,8 +34,8 @@ void LayoutBase::transform(const Transformation& aTransformation)
     for (size_t point_no = 0; point_no < number_of_points(); ++point_no) {
         const auto& row = operator[](point_no);
         if (!row.empty()) {     // empty row is for disconnected points
-            const auto [x1, x2] = aTransformation.transform(row[0], row[1]);
-            set(point_no, {x1, x2});
+            const auto x = aTransformation.transform(row[0], row[1]); // no C++17 destructurization in cheerp yet
+            set(point_no, {x.first, x.second});
         }
     }
 
