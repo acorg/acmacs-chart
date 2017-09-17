@@ -1,6 +1,5 @@
 # -*- Makefile -*-
-# Eugene Skepner 2016
-
+# Eugene Skepner 2017
 # ----------------------------------------------------------------------
 
 MAKEFLAGS = -w
@@ -34,15 +33,13 @@ PKG_INCLUDES = $(shell pkg-config --cflags liblzma) $(shell $(PYTHON_CONFIG) --i
 all: check-acmacsd-root install-headers $(ACMACS_CHART_LIB) $(BACKEND)
 
 install: check-acmacsd-root install-headers $(ACMACS_CHART_LIB) $(BACKEND)
-	ln -sf $(ACMACS_CHART_LIB) $(AD_LIB)
-	if [ $$(uname) = "Darwin" ]; then /usr/bin/install_name_tool -id $(AD_LIB)/$(notdir $(ACMACS_CHART_LIB)) $(AD_LIB)/$(notdir $(ACMACS_CHART_LIB)); fi
+	$(call install_lib,$(ACMACS_CHART_LIB))
 	ln -sf $(BACKEND) $(AD_PY)
 	ln -sf $(abspath py)/* $(AD_PY)
 	ln -sf $(abspath bin)/acmacs-chart-* $(AD_BIN)
 
 install-headers: check-acmacsd-root
-	if [ ! -d $(AD_INCLUDE)/acmacs-chart ]; then mkdir $(AD_INCLUDE)/acmacs-chart; fi
-	for h in $(abspath cc)/*.hh; do if [ ! -f $(AD_INCLUDE)/acmacs-chart/$$(basename $$h) ]; then ln -sf $$h $(AD_INCLUDE)/acmacs-chart; fi; done
+	$(call install_headers,acmacs-chart)
 
 test: install
 	test/test
