@@ -457,6 +457,15 @@ void export_chart(std::string aFilename, const Chart& aChart)
 } // export_chart
 
 // ----------------------------------------------------------------------
+
+// void export_chart(std::string aFilename, const Chart& aChart, const std::vector<PointStyle>& aPointStyles);
+// {
+//     ChartPlotSpec& plot_spec = const_cast<Chart&>(aChart).plot_spec();
+//     jsw::export_to_json(aChart, aFilename, 1, acmacs_base::ForceCompression::Yes);
+
+// } // export_chart
+
+// ----------------------------------------------------------------------
 /// Local Variables:
 /// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
 /// End:

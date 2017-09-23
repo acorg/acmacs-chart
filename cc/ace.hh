@@ -21,6 +21,7 @@ class AceChartReadError : public std::runtime_error { public: using std::runtime
 
 Chart* import_chart(std::string data);
 void export_chart(std::string aFilename, const Chart& aChart);
+// void export_chart(std::string aFilename, const Chart& aChart, const std::vector<PointStyle>& aPointStyles);
 
 // ----------------------------------------------------------------------
 
