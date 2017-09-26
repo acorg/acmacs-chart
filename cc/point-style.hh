@@ -108,6 +108,13 @@ class PointStyle
 }; // class PointStyle
 
 // ----------------------------------------------------------------------
+
+inline PointStyle PointStyleEmpty()
+{
+    return {PointStyle::Empty};
+}
+
+// ----------------------------------------------------------------------
 /// Local Variables:
 /// eval: (if (fboundp 'eu-rename-buffer) (eu-rename-buffer))
 /// End:
