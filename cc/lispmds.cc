@@ -108,8 +108,7 @@ std::string reference_antigens(const Chart& aChart)
 {
     std::string output;
     const auto& antigens = aChart.antigens();
-    std::vector<size_t> reference_antigens;
-    antigens.reference_indices(reference_antigens);
+    auto reference_antigens = antigens.reference_indices();
     if (!reference_antigens.empty()) {
         output += "    :REFERENCE-ANTIGENS '(\n";
         for (size_t index: reference_antigens)

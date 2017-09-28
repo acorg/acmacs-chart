@@ -206,7 +206,7 @@ AntigenSerumMatch Serum::match_passage(const AntigenSerumBase& aNother) const
 
 // ----------------------------------------------------------------------
 
-void Antigens::find_by_name(std::string aName, std::vector<size_t>& aAntigenIndices) const
+void Antigens::find_by_name(std::string aName, Antigens::Indices& aAntigenIndices) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {
         if (ag->name().find(aName) != std::string::npos)
@@ -260,7 +260,7 @@ template <typename AgSr> static void find_by_name_matching_ag_sr(const std::vect
     }
 }
 
-void Antigens::find_by_name_matching(std::string aName, std::vector<size_t>& aAntigenIndices, string_match::score_t aScoreThreshold, bool aVerbose) const
+void Antigens::find_by_name_matching(std::string aName, Antigens::Indices& aAntigenIndices, string_match::score_t aScoreThreshold, bool aVerbose) const
 {
     find_by_name_matching_ag_sr(*this, aName, aAntigenIndices, aScoreThreshold, aVerbose);
 
@@ -276,7 +276,7 @@ void Sera::find_by_name_matching(std::string aName, std::vector<size_t>& aSeraIn
 
 // ----------------------------------------------------------------------
 
-void Antigens::find_by_lab_id(std::string aLabId, std::vector<size_t>& aAntigenIndices) const
+void Antigens::find_by_lab_id(std::string aLabId, Antigens::Indices& aAntigenIndices) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {
         if (ag->has_lab_id(aLabId))
@@ -327,7 +327,7 @@ void Antigens::countries(CountryData& aCountries, const LocDb& aLocDb, bool aExc
 
 // ----------------------------------------------------------------------
 
-void Antigens::country(std::string aCountry, std::vector<size_t>& aAntigenIndices, const LocDb& aLocDb) const
+void Antigens::country(std::string aCountry, Antigens::Indices& aAntigenIndices, const LocDb& aLocDb) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {
         try {
@@ -343,73 +343,6 @@ void Antigens::country(std::string aCountry, std::vector<size_t>& aAntigenIndice
     }
 
 } // Antigens::country
-
-// ----------------------------------------------------------------------
-
-void Antigens::reference_indices(std::vector<size_t>& aAntigenIndices) const
-{
-    for (auto a = begin(); a != end(); ++a) {
-        if (a->reference())
-            aAntigenIndices.push_back(static_cast<size_t>(a - begin()));
-    }
-
-} // Antigens::reference_indices
-
-// ----------------------------------------------------------------------
-
-void Antigens::test_indices(std::vector<size_t>& aAntigenIndices) const
-{
-    for (auto a = begin(); a != end(); ++a) {
-        if (!a->reference())
-            aAntigenIndices.push_back(static_cast<size_t>(a - begin()));
-    }
-
-} // Antigens::test_indices
-
-// ----------------------------------------------------------------------
-
-void Antigens::date_range_indices(std::string first_date, std::string after_last_date, std::vector<size_t>& aAntigenIndices) const
-{
-    for (auto a = begin(); a != end(); ++a) {
-        const std::string date = a->date();
-        if (!date.empty() && (first_date.empty() || date >= first_date) && (after_last_date.empty() || date < after_last_date))
-            aAntigenIndices.push_back(static_cast<size_t>(a - begin()));
-    }
-
-} // Antigens::date_range_indices
-
-// ----------------------------------------------------------------------
-
-void Antigens::egg_indices(std::vector<size_t>& aAntigenIndices) const
-{
-    for (auto a = begin(); a != end(); ++a) {
-        if (a->is_egg())
-            aAntigenIndices.push_back(static_cast<size_t>(a - begin()));
-    }
-
-} // Antigens::egg_indices
-
-// ----------------------------------------------------------------------
-
-void Antigens::cell_indices(std::vector<size_t>& aAntigenIndices) const
-{
-    for (auto a = begin(); a != end(); ++a) {
-        if (!a->is_egg())
-            aAntigenIndices.push_back(static_cast<size_t>(a - begin()));
-    }
-
-} // Antigens::cell_indices
-
-// ----------------------------------------------------------------------
-
-void Antigens::reassortant_indices(std::vector<size_t>& aAntigenIndices) const
-{
-    for (auto a = begin(); a != end(); ++a) {
-        if (a->is_reassortant())
-            aAntigenIndices.push_back(static_cast<size_t>(a - begin()));
-    }
-
-} // Antigens::reassortant_indices
 
 // ----------------------------------------------------------------------
 

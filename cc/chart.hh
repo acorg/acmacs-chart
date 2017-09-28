@@ -5,6 +5,7 @@
 #include <map>
 
 #include "acmacs-base/throw.hh"
+#include "acmacs-base/range.hh"
 #include "acmacs-base/virus-name.hh"
 #include "acmacs-base/passage.hh"
 
@@ -145,6 +146,8 @@ class Antigen : public AntigenBase
 
     inline const std::string date() const { return mDate; }
     inline void date(const char* str, size_t length) { mDate.assign(str, length); }
+    inline bool within_date_range(std::string first_date, std::string after_last_date) const { return !date().empty() && (first_date.empty() || date() >= first_date) && (after_last_date.empty() || date() < after_last_date); }
+
     inline bool reference() const override { return has_semantic('R'); }
     inline const std::vector<std::string>& lab_id() const { return mLabId; }
     inline std::vector<std::string>& lab_id() { return mLabId; }
@@ -250,25 +253,41 @@ class Serum : public SerumBase
 class Antigens : public std::vector<Antigen>
 {
  public:
-    using ContinentData = std::map<std::string, std::vector<size_t>>; // continent name to the list of antigen indices
-    using CountryData = std::map<std::string, std::vector<size_t>>; // country name to the list of antigen indices
-    using CladeData = std::map<std::string, std::vector<size_t>>; // clade name to the list of antigen indices
+    using Indices = std::vector<size_t>;
+    using ContinentData = std::map<std::string, Indices>; // continent name to the list of antigen indices
+    using CountryData = std::map<std::string, Indices>; // country name to the list of antigen indices
+    using CladeData = std::map<std::string, Indices>; // clade name to the list of antigen indices
 
     inline Antigens() {}
 
-    void find_by_name(std::string aName, std::vector<size_t>& aAntigenIndices) const;
-    void find_by_name_matching(std::string aName, std::vector<size_t>& aAntigenIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
+    void find_by_name(std::string aName, Indices& aAntigenIndices) const;
+    void find_by_name_matching(std::string aName, Indices& aAntigenIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
     size_t find_by_name_for_exact_matching(std::string aFullName) const; // returns size_t(-1) if not found
-    void find_by_lab_id(std::string aLabId, std::vector<size_t>& aAntigenIndices) const;
+    void find_by_lab_id(std::string aLabId, Indices& aAntigenIndices) const;
     void continents(ContinentData& aContinentData, const LocDb& aLocDb, bool aExcludeReference = true) const;
     void countries(CountryData& aCountries, const LocDb& aLocDb, bool aExcludeReference = true) const;
-    void country(std::string aCountry, std::vector<size_t>& aAntigenIndices, const LocDb& aLocDb) const;
-    void reference_indices(std::vector<size_t>& aAntigenIndices) const;
-    void test_indices(std::vector<size_t>& aAntigenIndices) const;
-    void date_range_indices(std::string first_date, std::string after_last_date, std::vector<size_t>& aAntigenIndices) const;
-    void egg_indices(std::vector<size_t>& aAntigenIndices) const;
-    void cell_indices(std::vector<size_t>& aAntigenIndices) const;
-    void reassortant_indices(std::vector<size_t>& aAntigenIndices) const;
+    void country(std::string aCountry, Indices& aAntigenIndices, const LocDb& aLocDb) const;
+
+    inline Indices all_indices() const { return filled_with_indexes<Indices::value_type>(size()); }
+    inline void filter_reference(Indices& aIndices) const { remove(aIndices, [](const auto& entry) -> bool { return !entry.reference(); }); }
+    inline void filter_test(Indices& aIndices) const { remove(aIndices, [](const auto& entry) -> bool { return entry.reference(); }); }
+    inline void filter_egg(Indices& aIndices) const { remove(aIndices, [](const auto& entry) -> bool { return !entry.is_egg(); }); }
+    inline void filter_cell(Indices& aIndices) const { remove(aIndices, [](const auto& entry) -> bool { return !entry.is_cell(); }); }
+    inline void filter_reassortant(Indices& aIndices) const { remove(aIndices, [](const auto& entry) -> bool { return !entry.is_reassortant(); }); }
+    inline void filter_date_range(Indices& aIndices, std::string first_date, std::string after_last_date) const { remove(aIndices, [=](const auto& entry) -> bool { return !entry.within_date_range(first_date, after_last_date); }); }
+
+    inline Indices reference_indices() const { auto indices = all_indices(); filter_reference(indices); return indices; }
+    inline Indices test_indices() const { auto indices = all_indices(); filter_test(indices); return indices; }
+    inline Indices egg_indices() const { auto indices = all_indices(); filter_egg(indices); return indices; }
+    inline Indices cell_indices() const { auto indices = all_indices(); filter_cell(indices); return indices; }
+    inline Indices reassortant_indices() const { auto indices = all_indices(); filter_reassortant(indices); return indices; }
+    inline Indices date_range_indices(std::string first_date, std::string after_last_date) const { auto indices = all_indices(); filter_date_range(indices, first_date, after_last_date); return indices; }
+
+ private:
+    inline void remove(Indices& aIndices, std::function<bool (const Antigen&)> aFilter) const
+        {
+            aIndices.erase(std::remove_if(aIndices.begin(), aIndices.end(), [&aFilter, this](auto index) -> bool { return aFilter((*this)[index]); }), aIndices.end());
+        }
 
 }; // class Antigens
 
@@ -277,11 +296,14 @@ class Antigens : public std::vector<Antigen>
 class Sera : public std::vector<Serum>
 {
  public:
+    using Indices = std::vector<size_t>;
     inline Sera() {}
 
       // returns -1 if not found
     size_t find_by_name_for_exact_matching(std::string aFullName) const;
-    void find_by_name_matching(std::string aName, std::vector<size_t>& aSeraIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
+    void find_by_name_matching(std::string aName, Indices& aSeraIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
+
+    inline Indices all_indices() const { return filled_with_indexes<Indices::value_type>(size()); }
 
 }; // class Sera
 

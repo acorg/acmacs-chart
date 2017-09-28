@@ -32,6 +32,7 @@ class AntigenSerumBase
     virtual const std::string reassortant() const = 0;
     virtual bool is_egg() const = 0;
     virtual bool is_reassortant() const = 0;
+    inline bool is_cell() const { return !is_egg(); }
     virtual bool distinct() const = 0;
     // inline const Annotations& annotations() const { return mAnnotations; }
     // inline bool has_semantic(char c) const { return mSemanticAttributes.find(c) != std::string::npos; }
