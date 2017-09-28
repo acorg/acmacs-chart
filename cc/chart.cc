@@ -327,22 +327,43 @@ void Antigens::countries(CountryData& aCountries, const LocDb& aLocDb, bool aExc
 
 // ----------------------------------------------------------------------
 
-void Antigens::country(std::string aCountry, Antigens::Indices& aAntigenIndices, const LocDb& aLocDb) const
+void Antigens::filter_country(Indices& aIndices, std::string aCountry, const LocDb& aLocDb) const
 {
-    for (auto ag = begin(); ag != end(); ++ag) {
+    auto not_in_country = [&](const auto& entry) -> bool {
         try {
-            const std::string location = virus_name::location(ag->name());
+            const std::string location = virus_name::location(entry.name());
             const std::string country = aLocDb.country(location);
-            if (country == aCountry)
-                aAntigenIndices.push_back(static_cast<size_t>(ag - begin()));
+            return country != aCountry;
         }
         catch (virus_name::Unrecognized&) {
         }
         catch (LocationNotFound&) {
         }
-    }
+        return true;
+    };
+    remove(aIndices, not_in_country);
 
-} // Antigens::country
+} // Antigens::filter_country
+
+// ----------------------------------------------------------------------
+
+void Antigens::filter_continent(Indices& aIndices, std::string aContinent, const LocDb& aLocDb) const
+{
+    auto not_in_continent = [&](const auto& entry) -> bool {
+        try {
+            const std::string location = virus_name::location(entry.name());
+            const std::string continent = aLocDb.continent(location);
+            return continent != aContinent;
+        }
+        catch (virus_name::Unrecognized&) {
+        }
+        catch (LocationNotFound&) {
+        }
+        return true;
+    };
+    remove(aIndices, not_in_continent);
+
+} // Antigens::filter_continent
 
 // ----------------------------------------------------------------------
 

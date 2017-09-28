@@ -266,7 +266,6 @@ class Antigens : public std::vector<Antigen>
     void find_by_lab_id(std::string aLabId, Indices& aAntigenIndices) const;
     void continents(ContinentData& aContinentData, const LocDb& aLocDb, bool aExcludeReference = true) const;
     void countries(CountryData& aCountries, const LocDb& aLocDb, bool aExcludeReference = true) const;
-    void country(std::string aCountry, Indices& aAntigenIndices, const LocDb& aLocDb) const;
 
     inline Indices all_indices() const { return filled_with_indexes<Indices::value_type>(size()); }
     inline void filter_reference(Indices& aIndices) const { remove(aIndices, [](const auto& entry) -> bool { return !entry.reference(); }); }
@@ -275,6 +274,8 @@ class Antigens : public std::vector<Antigen>
     inline void filter_cell(Indices& aIndices) const { remove(aIndices, [](const auto& entry) -> bool { return !entry.is_cell(); }); }
     inline void filter_reassortant(Indices& aIndices) const { remove(aIndices, [](const auto& entry) -> bool { return !entry.is_reassortant(); }); }
     inline void filter_date_range(Indices& aIndices, std::string first_date, std::string after_last_date) const { remove(aIndices, [=](const auto& entry) -> bool { return !entry.within_date_range(first_date, after_last_date); }); }
+    void filter_country(Indices& aIndices, std::string aCountry, const LocDb& aLocDb) const;
+    void filter_continent(Indices& aIndices, std::string aContinent, const LocDb& aLocDb) const;
 
     inline Indices reference_indices() const { auto indices = all_indices(); filter_reference(indices); return indices; }
     inline Indices test_indices() const { auto indices = all_indices(); filter_test(indices); return indices; }
@@ -282,6 +283,8 @@ class Antigens : public std::vector<Antigen>
     inline Indices cell_indices() const { auto indices = all_indices(); filter_cell(indices); return indices; }
     inline Indices reassortant_indices() const { auto indices = all_indices(); filter_reassortant(indices); return indices; }
     inline Indices date_range_indices(std::string first_date, std::string after_last_date) const { auto indices = all_indices(); filter_date_range(indices, first_date, after_last_date); return indices; }
+    inline Indices country(std::string aCountry, const LocDb& aLocDb) const  { auto indices = all_indices(); filter_country(indices, aCountry, aLocDb); return indices; }
+    inline Indices continent(std::string aContinent, const LocDb& aLocDb) const  { auto indices = all_indices(); filter_country(indices, aContinent, aLocDb); return indices; }
 
  private:
     inline void remove(Indices& aIndices, std::function<bool (const Antigen&)> aFilter) const
