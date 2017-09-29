@@ -32,12 +32,12 @@ class AntigenSerumBase
     virtual const std::string reassortant() const = 0;
     virtual bool is_egg() const = 0;
     virtual bool is_reassortant() const = 0;
-    inline bool is_cell() const { return !is_egg(); }
+    inline bool is_cell() const { return !is_egg() && !is_reassortant(); }
     virtual bool distinct() const = 0;
     // inline const Annotations& annotations() const { return mAnnotations; }
     // inline bool has_semantic(char c) const { return mSemanticAttributes.find(c) != std::string::npos; }
     // inline const std::string semantic() const { return mSemanticAttributes; }
-    inline std::string passage_type() const { return is_egg() ? "egg" : "cell"; }
+    inline std::string passage_type() const { return (is_egg() || is_reassortant()) ? "egg" : "cell"; }
 
     virtual AntigenSerumMatch match(const AntigenSerumBase& aNother) const = 0;
     virtual AntigenSerumMatch match_passage(const AntigenSerumBase& aNother) const = 0;

@@ -131,7 +131,7 @@ class Antigen : public AntigenBase
     inline const std::string reassortant() const override { return mReassortant; }
     inline std::string& reassortant() { return mReassortant; }
     inline void reassortant(const char* str, size_t length) { mReassortant.assign(str, length); }
-    inline bool is_egg() const override { return passage::is_egg(mPassage) || is_reassortant(); } // reassortant is always egg (2016-10-21)
+    inline bool is_egg() const override { return passage::is_egg(mPassage) && !is_reassortant(); }
     inline bool is_reassortant() const override { return !mReassortant.empty(); }
     inline bool distinct() const override { return mAnnotations.distinct(); }
     inline const Annotations& annotations() const { return mAnnotations; }
