@@ -14,13 +14,14 @@ template <typename RW> jsw::writer<RW>& operator <<(jsw::writer<RW>&, const std:
 #include "acmacs-base/json-writer.hh"
 
 #include "acmacs-chart/chart.hh"
+#include "acmacs-base/timeit.hh"
 
 // ----------------------------------------------------------------------
 
 class AceChartReadError : public std::runtime_error { public: using std::runtime_error::runtime_error; };
 
-Chart* import_chart(std::string data);
-void export_chart(std::string aFilename, const Chart& aChart);
+Chart* import_chart(std::string data, report_time timer = report_time::No);
+void export_chart(std::string aFilename, const Chart& aChart, report_time timer = report_time::No);
 // void export_chart(std::string aFilename, const Chart& aChart, const std::vector<PointStyle>& aPointStyles);
 
 // ----------------------------------------------------------------------

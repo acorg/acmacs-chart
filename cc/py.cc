@@ -206,9 +206,9 @@ PYBIND11_MODULE(acmacs_chart_backend, m)
         }
     });
 
-    m.def("import_chart", &import_chart, py::arg("data"), py::doc("Imports chart from a buffer or file in the ace format."));
-    m.def("import_chart", [](py::bytes data) { return import_chart(data); }, py::arg("data"), py::doc("Imports chart from a buffer or file in the ace format."));
-    m.def("export_chart", py::overload_cast<std::string, const Chart&>(&export_chart), py::arg("filename"), py::arg("chart"), py::doc("Exports chart into a file in the ace format."));
+    m.def("import_chart", [](std::string data, bool timer) { return import_chart(data, timer ? report_time::Yes : report_time::No); }, py::arg("data"), py::arg("timer") = false, py::doc("Imports chart from a buffer or file in the ace format."));
+    m.def("import_chart", [](py::bytes data, bool timer) { return import_chart(data, timer ? report_time::Yes : report_time::No); }, py::arg("data"), py::arg("timer") = false, py::doc("Imports chart from a buffer or file in the ace format."));
+    m.def("export_chart", [](std::string filename, const Chart& chart, bool timer) { export_chart(filename, chart, timer ? report_time::Yes : report_time::No); }, py::arg("filename"), py::arg("chart"), py::arg("timer") = false, py::doc("Exports chart into a file in the ace format."));
       // m.def("export_chart", py::overload_cast<std::string, const Chart&, const std::vector<PointStyle>&>(&export_chart), py::arg("filename"), py::arg("chart"), py::arg("point_styles"), py::doc("Exports chart into a file in the ace format."));
     m.def("export_chart_lispmds", py::overload_cast<std::string, const Chart&>(&export_chart_lispmds), py::arg("filename"), py::arg("chart"), py::doc("Exports chart into a file in the lispmds save format."));
     m.def("export_chart_lispmds", py::overload_cast<std::string, const Chart&, const std::vector<PointStyle>&, const Transformation&>(&export_chart_lispmds), py::arg("filename"), py::arg("chart"), py::arg("point_styles"), py::arg("transformation"), py::doc("Exports chart into a file in the lispmds save format."));
