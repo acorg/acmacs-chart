@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <optional>
 
 #include "acmacs-base/throw.hh"
 #include "acmacs-base/range.hh"
@@ -262,11 +263,14 @@ namespace acmacs_chart_internal
         return result;
     }
 
-    template <typename AgSr> inline size_t find_by_full_name(const AgSr& aAgSr, std::string aFullName)
+    template <typename AgSr> inline std::optional<size_t> find_by_full_name(const AgSr& aAgSr, std::string aFullName)
     {
         auto name_match = [&](size_t index) -> bool { return aAgSr[index].full_name() == aFullName; };
         const auto found = std::find_if(incrementer<size_t>::begin(0), incrementer<size_t>::end(aAgSr.size()), name_match);
-        return *found == aAgSr.size() ? AntigenSerumNotFound : *found;
+        if (*found == aAgSr.size())
+            return {};
+        else
+            return *found;
     }
 }
 
@@ -286,7 +290,7 @@ class Antigens : public std::vector<Antigen>
 
     inline Indices find_by_name(std::string aName) const { return acmacs_chart_internal::find_by_name(*this, aName); }
       // returns AntigenSerumNotFound if not found
-    inline size_t find_by_full_name(std::string aFullName) const { return acmacs_chart_internal::find_by_full_name(*this, aFullName); }
+    inline std::optional<size_t> find_by_full_name(std::string aFullName) const { return acmacs_chart_internal::find_by_full_name(*this, aFullName); }
     void find_by_name_matching(std::string aName, Indices& aAntigenIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
     void find_by_lab_id(std::string aLabId, Indices& aAntigenIndices) const;
     void continents(ContinentData& aContinentData, const LocDb& aLocDb, bool aExcludeReference = true) const;
@@ -329,7 +333,7 @@ class Sera : public std::vector<Serum>
 
     inline Indices find_by_name(std::string aName) const { return acmacs_chart_internal::find_by_name(*this, aName); }
       // returns AntigenSerumNotFound if not found
-    inline size_t find_by_full_name(std::string aFullName) const { return acmacs_chart_internal::find_by_full_name(*this, aFullName); }
+    inline std::optional<size_t> find_by_full_name(std::string aFullName) const { return acmacs_chart_internal::find_by_full_name(*this, aFullName); }
     void find_by_name_matching(std::string aName, Indices& aSeraIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
 
     inline Indices all_indices() const { return filled_with_indexes<Indices::value_type>(size()); }
@@ -739,7 +743,7 @@ class Chart : public ChartBase
     inline IndexGenerator antigens_not_found_in(const Chart& aNother) const
         {
             auto filter = [this,&aNother](size_t aIndex) -> bool {
-                return aNother.antigens().find_by_full_name(this->antigens()[aIndex].full_name()) == AntigenSerumNotFound;
+                return !aNother.antigens().find_by_full_name(this->antigens()[aIndex].full_name());
             };
             return {number_of_antigens(), filter};
         }
