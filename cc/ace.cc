@@ -276,7 +276,7 @@ static jsi::data<Ace> ace_data = {
 
 Chart* import_chart(std::string buffer, report_time timer)
 {
-    Timeit ti("reading chart", std::cerr, timer);
+    Timeit ti("reading chart from " + buffer + ": ", std::cerr, timer);
     if (buffer == "-")
         buffer = acmacs_base::read_stdin();
     else if (acmacs_base::xz_compressed(buffer))
@@ -453,7 +453,7 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
 
 void export_chart(std::string aFilename, const Chart& aChart, report_time timer)
 {
-    Timeit ti("writing chart", std::cerr, timer);
+    Timeit ti("writing chart to " + aFilename + ": ", std::cerr, timer);
     jsw::export_to_json(aChart, aFilename, 1, acmacs_base::ForceCompression::Yes);
 
 } // export_chart
