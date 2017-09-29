@@ -248,6 +248,30 @@ class Serum : public SerumBase
 
 // ----------------------------------------------------------------------
 
+constexpr static const size_t AntigenSerumNotFound = static_cast<size_t>(-1);
+
+namespace acmacs_chart_internal
+{
+    using Indices = std::vector<size_t>;
+
+    template <typename AgSr> inline Indices find_by_name(const AgSr& aAgSr, std::string aName)
+    {
+        auto name_match = [&](size_t index) -> bool { return aAgSr[index].name().find(aName) != std::string::npos; };
+        Indices result(aAgSr.size());
+        result.erase(std::copy_if(incrementer<size_t>::begin(0), incrementer<size_t>::end(aAgSr.size()), result.begin(), name_match), result.end());
+        return result;
+    }
+
+    template <typename AgSr> inline size_t find_by_full_name(const AgSr& aAgSr, std::string aFullName)
+    {
+        auto name_match = [&](size_t index) -> bool { return aAgSr[index].full_name() == aFullName; };
+        const auto found = std::find_if(incrementer<size_t>::begin(0), incrementer<size_t>::end(aAgSr.size()), name_match);
+        return *found == aAgSr.size() ? AntigenSerumNotFound : *found;
+    }
+}
+
+// ----------------------------------------------------------------------
+
 // using AntigenRefs = std::vector<const Antigen*>;
 
 class Antigens : public std::vector<Antigen>
@@ -260,9 +284,10 @@ class Antigens : public std::vector<Antigen>
 
     inline Antigens() {}
 
-    Indices find_by_name(std::string aName) const;
+    inline Indices find_by_name(std::string aName) const { return acmacs_chart_internal::find_by_name(*this, aName); }
+      // returns AntigenSerumNotFound if not found
+    inline size_t find_by_full_name(std::string aFullName) const { return acmacs_chart_internal::find_by_full_name(*this, aFullName); }
     void find_by_name_matching(std::string aName, Indices& aAntigenIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
-    size_t find_by_name_for_exact_matching(std::string aFullName) const; // returns size_t(-1) if not found
     void find_by_lab_id(std::string aLabId, Indices& aAntigenIndices) const;
     void continents(ContinentData& aContinentData, const LocDb& aLocDb, bool aExcludeReference = true) const;
     void countries(CountryData& aCountries, const LocDb& aLocDb, bool aExcludeReference = true) const;
@@ -302,9 +327,9 @@ class Sera : public std::vector<Serum>
     using Indices = std::vector<size_t>;
     inline Sera() {}
 
-    Indices find_by_name(std::string aName) const;
-      // returns -1 if not found
-    size_t find_by_name_for_exact_matching(std::string aFullName) const;
+    inline Indices find_by_name(std::string aName) const { return acmacs_chart_internal::find_by_name(*this, aName); }
+      // returns AntigenSerumNotFound if not found
+    inline size_t find_by_full_name(std::string aFullName) const { return acmacs_chart_internal::find_by_full_name(*this, aFullName); }
     void find_by_name_matching(std::string aName, Indices& aSeraIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
 
     inline Indices all_indices() const { return filled_with_indexes<Indices::value_type>(size()); }
@@ -714,8 +739,7 @@ class Chart : public ChartBase
     inline IndexGenerator antigens_not_found_in(const Chart& aNother) const
         {
             auto filter = [this,&aNother](size_t aIndex) -> bool {
-                const size_t found = aNother.antigens().find_by_name_for_exact_matching(this->antigens()[aIndex].full_name());
-                return found == static_cast<size_t>(-1);
+                return aNother.antigens().find_by_full_name(this->antigens()[aIndex].full_name()) == AntigenSerumNotFound;
             };
             return {number_of_antigens(), filter};
         }

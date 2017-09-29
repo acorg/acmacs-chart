@@ -206,45 +206,6 @@ AntigenSerumMatch Serum::match_passage(const AntigenSerumBase& aNother) const
 
 // ----------------------------------------------------------------------
 
-Antigens::Indices Antigens::find_by_name(std::string aName) const
-{
-    Indices indices;
-    for (auto ag = begin(); ag != end(); ++ag) {
-        if (ag->name().find(aName) != std::string::npos)
-            indices.push_back(static_cast<size_t>(ag - begin()));
-    }
-    return indices;
-
-} // Antigens::find_by_name
-
-// ----------------------------------------------------------------------
-
-size_t Antigens::find_by_name_for_exact_matching(std::string aFullName) const
-{
-    auto found = std::find_if(begin(), end(), [&aFullName](const auto& e) -> bool { return e.full_name() == aFullName; });
-    return found == end() ? static_cast<size_t>(-1) : static_cast<size_t>(found - begin());
-
-} // Antigens::find_by_name_for_exact_matching
-
-// ----------------------------------------------------------------------
-
-Sera::Indices Sera::find_by_name(std::string aName) const
-{
-    throw std::runtime_error{"Sera::find_by_name: not implemented"};
-
-} // Sera::find_by_name
-
-// ----------------------------------------------------------------------
-
-size_t Sera::find_by_name_for_exact_matching(std::string aFullName) const
-{
-    auto found = std::find_if(begin(), end(), [&aFullName](const auto& e) -> bool { return e.full_name() == aFullName; });
-    return found == end() ? static_cast<size_t>(-1) : static_cast<size_t>(found - begin());
-
-} // Sera::find_by_name_for_exact_matching
-
-// ----------------------------------------------------------------------
-
 template <typename AgSr> static void find_by_name_matching_ag_sr(const std::vector<AgSr>& aAgSr, std::string aName, std::vector<size_t>& aIndices, string_match::score_t aScoreThreshold, bool aVerbose)
 {
     using Score = AntigenSerumMatchScore<AgSr>;
