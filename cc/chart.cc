@@ -206,12 +206,14 @@ AntigenSerumMatch Serum::match_passage(const AntigenSerumBase& aNother) const
 
 // ----------------------------------------------------------------------
 
-void Antigens::find_by_name(std::string aName, Antigens::Indices& aAntigenIndices) const
+Antigens::Indices Antigens::find_by_name(std::string aName) const
 {
+    Indices indices;
     for (auto ag = begin(); ag != end(); ++ag) {
         if (ag->name().find(aName) != std::string::npos)
-            aAntigenIndices.push_back(static_cast<size_t>(ag - begin()));
+            indices.push_back(static_cast<size_t>(ag - begin()));
     }
+    return indices;
 
 } // Antigens::find_by_name
 
@@ -223,6 +225,14 @@ size_t Antigens::find_by_name_for_exact_matching(std::string aFullName) const
     return found == end() ? static_cast<size_t>(-1) : static_cast<size_t>(found - begin());
 
 } // Antigens::find_by_name_for_exact_matching
+
+// ----------------------------------------------------------------------
+
+Sera::Indices Sera::find_by_name(std::string aName) const
+{
+    throw std::runtime_error{"Sera::find_by_name: not implemented"};
+
+} // Sera::find_by_name
 
 // ----------------------------------------------------------------------
 

@@ -260,7 +260,7 @@ class Antigens : public std::vector<Antigen>
 
     inline Antigens() {}
 
-    void find_by_name(std::string aName, Indices& aAntigenIndices) const;
+    Indices find_by_name(std::string aName) const;
     void find_by_name_matching(std::string aName, Indices& aAntigenIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
     size_t find_by_name_for_exact_matching(std::string aFullName) const; // returns size_t(-1) if not found
     void find_by_lab_id(std::string aLabId, Indices& aAntigenIndices) const;
@@ -302,6 +302,7 @@ class Sera : public std::vector<Serum>
     using Indices = std::vector<size_t>;
     inline Sera() {}
 
+    Indices find_by_name(std::string aName) const;
       // returns -1 if not found
     size_t find_by_name_for_exact_matching(std::string aFullName) const;
     void find_by_name_matching(std::string aName, Indices& aSeraIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
