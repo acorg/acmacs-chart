@@ -289,7 +289,6 @@ class Antigens : public std::vector<Antigen>
     inline Antigens() {}
 
     inline Indices find_by_name(std::string aName) const { return acmacs_chart_internal::find_by_name(*this, aName); }
-      // returns AntigenSerumNotFound if not found
     inline std::optional<size_t> find_by_full_name(std::string aFullName) const { return acmacs_chart_internal::find_by_full_name(*this, aFullName); }
     void find_by_name_matching(std::string aName, Indices& aAntigenIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
     void find_by_lab_id(std::string aLabId, Indices& aAntigenIndices) const;
@@ -332,7 +331,6 @@ class Sera : public std::vector<Serum>
     inline Sera() {}
 
     inline Indices find_by_name(std::string aName) const { return acmacs_chart_internal::find_by_name(*this, aName); }
-      // returns AntigenSerumNotFound if not found
     inline std::optional<size_t> find_by_full_name(std::string aFullName) const { return acmacs_chart_internal::find_by_full_name(*this, aFullName); }
     void find_by_name_matching(std::string aName, Indices& aSeraIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
 
