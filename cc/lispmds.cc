@@ -242,8 +242,8 @@ std::string transformation(const Chart& aChart, const Transformation* aTransform
 )";
     if (!aChart.projections().empty()) {
         const auto& transformation = aTransformation ? *aTransformation : aChart.projection(0).transformation();
-        output += "        :CANVAS-BASIS-VECTOR-0 (" + double_to_string_lisp(transformation[0]) + " " + double_to_string_lisp(transformation[2]) + ")\n";
-        output += "        :CANVAS-BASIS-VECTOR-1 (" + double_to_string_lisp(transformation[1]) + " " + double_to_string_lisp(transformation[3]) + ")\n";
+        output += "        :CANVAS-BASIS-VECTOR-0 (" + double_to_string_lisp(transformation.a) + " " + double_to_string_lisp(transformation.c) + ")\n";
+        output += "        :CANVAS-BASIS-VECTOR-1 (" + double_to_string_lisp(transformation.b) + " " + double_to_string_lisp(transformation.d) + ")\n";
     }
     else {
         output += "        :CANVAS-BASIS-VECTOR-0 (1.0 0.0)\n";

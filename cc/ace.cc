@@ -87,6 +87,58 @@ static jsi::data<ChartInfo> chart_info_data = {
 
 // ----------------------------------------------------------------------
 
+class TransformationStorer : public jsi::StorerBase
+{
+ public:
+    using Base = jsi::StorerBase;
+
+    inline TransformationStorer(Transformation& aTarget, size_t aElement = 0) : mTarget(aTarget), mElement(aElement) {}
+
+    inline virtual Base* StartArray()
+        {
+            if (mElement)
+                return jsi::storers::_i::failure(typeid(*this).name() + std::string(": unexpected StartArray event"));
+            return nullptr;
+        }
+
+    inline virtual Base* EndArray()
+        {
+            if (mElement != 4)
+                return jsi::storers::_i::failure(typeid(*this).name() + std::string(": unexpected EndArray event"));
+            return jsi::storers::_i::pop();
+        }
+
+    inline virtual Base* Double(double d)
+        {
+            switch (mElement) {
+              case 0:
+                  mTarget.a = d;
+                  break;
+              case 1:
+                  mTarget.b = d;
+                  break;
+              case 2:
+                  mTarget.c = d;
+                  break;
+              case 3:
+                  mTarget.d = d;
+                  break;
+              default:
+                  return jsi::storers::_i::failure(typeid(*this).name() + std::string(": unexpected number event"));
+            }
+            ++mElement;
+            return nullptr;
+        }
+
+    inline virtual Base* Int(int i) { return Double(i); }
+    inline virtual Base* Uint(unsigned u) { return Double(u); }
+
+ private:
+    Transformation& mTarget;
+    size_t mElement;
+
+}; // class TiterDictStorer
+
 static jsi::data<Projection> projection_data = {
     {"C", jsi::field(&Projection::column_bases_for_json)},
     {"D", jsi::field(&Projection::disconnected)},
@@ -97,7 +149,8 @@ static jsi::data<Projection> projection_data = {
     {"l", jsi::field(&Projection::layout_for_json)},
     {"m", jsi::field(&Projection::minimum_column_basis)},
     {"s", jsi::field(&Projection::stress)},
-    {"t", jsi::field<double, Projection, Projection, Transformation>(&Projection::transformation)},
+      //{"t", jsi::field<double, Projection, Projection, Transformation>(&Projection::transformation)},
+    {"t", jsi::field<TransformationStorer, Projection, Transformation>(&Projection::transformation)},
     {"U", jsi::field(&Projection::unmovable)},
     {"u", jsi::field(&Projection::unmovable_in_last_dimension)},
     {"d", jsi::field(&Projection::dodgy_titer_is_regular)},
@@ -358,6 +411,11 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
                   << jsw::end_object;
 }
 
+template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const Transformation& aTransformation)
+{
+    return writer << jsw::start_array << aTransformation.a << aTransformation.b << aTransformation.c << aTransformation.d << jsw::end_array;
+}
+
 template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const Projection& aProjection)
 {
     return writer << jsw::start_object
@@ -372,7 +430,7 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
                   << jsw::key("l") << aProjection.layout_for_json()
                   << jsw::key("m") << aProjection.minimum_column_basis_for_json()
                   << jsw::key("s") << aProjection.stress()
-                  << jsw::if_not_empty("t", aProjection.transformation())
+                  << jsw::key("t") << aProjection.transformation()
                   << jsw::if_not_empty("u", aProjection.unmovable_in_last_dimension())
                   << jsw::end_object;
 }
