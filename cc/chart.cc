@@ -9,12 +9,6 @@
 
 // ----------------------------------------------------------------------
 
-// Chart::~Chart()
-// {
-// }
-
-// ----------------------------------------------------------------------
-
 static inline std::string name_abbreviated(std::string aName, const LocDb& aLocDb)
 {
     try {
@@ -205,44 +199,72 @@ AntigenSerumMatch Serum::match_passage(const AntigenSerumBase& aNother) const
 
 // ----------------------------------------------------------------------
 
-// template <typename AgSr> static void find_by_name_matching_ag_sr(const std::vector<AgSr>& aAgSr, std::string aName, std::vector<size_t>& aIndices, string_match::score_t aScoreThreshold, bool aVerbose)
-// {
-//     using Score = AntigenSerumMatchScore<AgSr>;
+template <typename AgSr> void AntigensSera<AgSr>::find_by_name_matching(std::string aName, Indices& aIndices, string_match::score_t aScoreThreshold, bool aVerbose) const
+{
+    using Score = AntigenSerumMatchScore<AgSr>;
 
-//     std::vector<std::pair<size_t, string_match::score_t>> index_score;
-//     string_match::score_t score_threshold = aScoreThreshold;
-//     for (auto ag = aAgSr.begin(); ag != aAgSr.end(); ++ag) {
-//         Score score{aName, *ag, score_threshold};
-//         score_threshold = std::max(score.name_score(), score_threshold);
-//         if (score.full_name_score())
-//             index_score.emplace_back(static_cast<size_t>(ag - aAgSr.begin()), score.full_name_score());
-//     }
-//     std::sort(index_score.begin(), index_score.end(), [](const auto& a, const auto& b) -> bool { return a.second > b.second; });
-//     for (const auto& is: index_score) {
-//         if (is.second < index_score.front().second)
-//             break;
-//           // if name contains CELL, EGG, WILDTYPE - match only corresponding passage/reassortant
-//         if (! ((aName.find("CELL") != std::string::npos && aAgSr[is.first].is_egg()) || (aName.find("EGG") != std::string::npos && !aAgSr[is.first].is_egg()) || (aName.find("WILDTYPE") != std::string::npos && aAgSr[is.first].is_reassortant()))) {
-//             aIndices.push_back(is.first);
-//             if (aVerbose)
-//                 std::cerr << "DEBUG: find_by_name_matching \"" << aName << "\" --> " << is.first << " \"" << aAgSr[is.first].full_name() << "\" egg:" << aAgSr[is.first].is_egg() << " score:" << is.second << std::endl;
-//         }
-//     }
-// }
+    std::vector<std::pair<size_t, string_match::score_t>> index_score;
+    string_match::score_t score_threshold = aScoreThreshold;
+    for (auto ag = begin(); ag != end(); ++ag) {
+        Score score{aName, *ag, score_threshold};
+        score_threshold = std::max(score.name_score(), score_threshold);
+        if (score.full_name_score())
+            index_score.emplace_back(static_cast<size_t>(ag - begin()), score.full_name_score());
+    }
+    std::sort(index_score.begin(), index_score.end(), [](const auto& a, const auto& b) -> bool { return a.second > b.second; });
+    for (const auto& is: index_score) {
+        if (is.second < index_score.front().second)
+            break;
+          // if name contains CELL, EGG, WILDTYPE - match only corresponding passage/reassortant
+        if (! ((aName.find("CELL") != std::string::npos && at(is.first).is_egg()) || (aName.find("EGG") != std::string::npos && !at(is.first).is_egg()) || (aName.find("WILDTYPE") != std::string::npos && at(is.first).is_reassortant()))) {
+            aIndices.push_back(is.first);
+            if (aVerbose)
+                std::cerr << "DEBUG: find_by_name_matching \"" << aName << "\" --> " << is.first << " \"" << at(is.first).full_name() << "\" egg:" << at(is.first).is_egg() << " score:" << is.second << std::endl;
+        }
+    }
 
-// void Antigens::find_by_name_matching(std::string aName, Antigens::Indices& aAntigenIndices, string_match::score_t aScoreThreshold, bool aVerbose) const
-// {
-//     find_by_name_matching_ag_sr(*this, aName, aAntigenIndices, aScoreThreshold, aVerbose);
+} // AntigensSera<AgSr>::find_by_name_matching
 
-// } // Antigens::find_by_name_matching
+// ----------------------------------------------------------------------
 
-// // ----------------------------------------------------------------------
+template <typename AgSr> void AntigensSera<AgSr>::filter_country(Indices& aIndices, std::string aCountry, const LocDb& aLocDb) const
+{
+    auto not_in_country = [&](const auto& entry) -> bool {
+        try {
+            return aLocDb.country(virus_name::location(entry.name())) != aCountry;
+        }
+        catch (virus_name::Unrecognized&) {
+        }
+        catch (LocationNotFound&) {
+        }
+        return true;
+    };
+    remove(aIndices, not_in_country);
 
-// void Sera::find_by_name_matching(std::string aName, std::vector<size_t>& aSeraIndices, string_match::score_t aScoreThreshold, bool aVerbose) const
-// {
-//     find_by_name_matching_ag_sr(*this, aName, aSeraIndices, aScoreThreshold, aVerbose);
+} // AntigensSera<AgSr>::filter_country
 
-// } // Sera::find_by_name_matching
+// ----------------------------------------------------------------------
+
+template <typename AgSr> void AntigensSera<AgSr>::filter_continent(Indices& aIndices, std::string aContinent, const LocDb& aLocDb) const
+{
+    auto not_in_continent = [&](const auto& entry) -> bool {
+        try {
+            return aLocDb.continent(virus_name::location(entry.name())) != aContinent;
+        }
+        catch (virus_name::Unrecognized&) {
+        }
+        catch (LocationNotFound&) {
+        }
+        return true;
+    };
+    remove(aIndices, not_in_continent);
+
+} // AntigensSera<AgSr>::filter_continent
+
+// ----------------------------------------------------------------------
+
+template class AntigensSera<Antigen>;
+template class AntigensSera<Serum>;
 
 // ----------------------------------------------------------------------
 
@@ -294,46 +316,6 @@ void Antigens::countries(CountryData& aCountries, const LocDb& aLocDb, bool aExc
     }
 
 } // Antigens::countries
-
-// ----------------------------------------------------------------------
-
-// void Antigens::filter_country(Indices& aIndices, std::string aCountry, const LocDb& aLocDb) const
-// {
-//     auto not_in_country = [&](const auto& entry) -> bool {
-//         try {
-//             const std::string location = virus_name::location(entry.name());
-//             const std::string country = aLocDb.country(location);
-//             return country != aCountry;
-//         }
-//         catch (virus_name::Unrecognized&) {
-//         }
-//         catch (LocationNotFound&) {
-//         }
-//         return true;
-//     };
-//     remove(aIndices, not_in_country);
-
-// } // Antigens::filter_country
-
-// // ----------------------------------------------------------------------
-
-// void Antigens::filter_continent(Indices& aIndices, std::string aContinent, const LocDb& aLocDb) const
-// {
-//     auto not_in_continent = [&](const auto& entry) -> bool {
-//         try {
-//             const std::string location = virus_name::location(entry.name());
-//             const std::string continent = aLocDb.continent(location);
-//             return continent != aContinent;
-//         }
-//         catch (virus_name::Unrecognized&) {
-//         }
-//         catch (LocationNotFound&) {
-//         }
-//         return true;
-//     };
-//     remove(aIndices, not_in_continent);
-
-// } // Antigens::filter_continent
 
 // ----------------------------------------------------------------------
 

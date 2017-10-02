@@ -281,8 +281,6 @@ template <typename AgSr> class AntigensSera : public std::vector<AgSr>
 {
  public:
     using Indices = std::vector<size_t>;
-    using ContinentData = std::map<std::string, Indices>; // continent name to the list of antigen/serum indices
-    using CountryData = std::map<std::string, Indices>; // country name to the list of antigen/serum indices
     using std::vector<AgSr>::at;
     using std::vector<AgSr>::begin;
     using std::vector<AgSr>::end;
@@ -291,63 +289,11 @@ template <typename AgSr> class AntigensSera : public std::vector<AgSr>
 
     inline Indices find_by_name(std::string aName) const { return acmacs_chart_internal::find_by_name(*this, aName); }
     inline std::optional<size_t> find_by_full_name(std::string aFullName) const { return acmacs_chart_internal::find_by_full_name(*this, aFullName); }
-
-    void find_by_name_matching(std::string aName, Indices& aIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const
-        {
-            using Score = AntigenSerumMatchScore<AgSr>;
-
-            std::vector<std::pair<size_t, string_match::score_t>> index_score;
-            string_match::score_t score_threshold = aScoreThreshold;
-            for (auto ag = begin(); ag != end(); ++ag) {
-                Score score{aName, *ag, score_threshold};
-                score_threshold = std::max(score.name_score(), score_threshold);
-                if (score.full_name_score())
-                    index_score.emplace_back(static_cast<size_t>(ag - begin()), score.full_name_score());
-            }
-            std::sort(index_score.begin(), index_score.end(), [](const auto& a, const auto& b) -> bool { return a.second > b.second; });
-            for (const auto& is: index_score) {
-                if (is.second < index_score.front().second)
-                    break;
-                  // if name contains CELL, EGG, WILDTYPE - match only corresponding passage/reassortant
-                if (! ((aName.find("CELL") != std::string::npos && at(is.first).is_egg()) || (aName.find("EGG") != std::string::npos && !at(is.first).is_egg()) || (aName.find("WILDTYPE") != std::string::npos && at(is.first).is_reassortant()))) {
-                    aIndices.push_back(is.first);
-                    if (aVerbose)
-                        std::cerr << "DEBUG: find_by_name_matching \"" << aName << "\" --> " << is.first << " \"" << at(is.first).full_name() << "\" egg:" << at(is.first).is_egg() << " score:" << is.second << std::endl;
-                }
-            }
-        }
+    void find_by_name_matching(std::string aName, Indices& aIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
 
     inline Indices all_indices() const { return filled_with_indexes<Indices::value_type>(this->size()); }
-
-    inline void filter_country(Indices& aIndices, std::string aCountry, const LocDb& aLocDb) const
-        {
-            auto not_in_country = [&](const auto& entry) -> bool {
-                try {
-                    return aLocDb.country(virus_name::location(entry.name())) != aCountry;
-                }
-                catch (virus_name::Unrecognized&) {
-                }
-                catch (LocationNotFound&) {
-                }
-                return true;
-            };
-            remove(aIndices, not_in_country);
-        }
-
-    inline void filter_continent(Indices& aIndices, std::string aContinent, const LocDb& aLocDb) const
-        {
-            auto not_in_continent = [&](const auto& entry) -> bool {
-                try {
-                    return aLocDb.continent(virus_name::location(entry.name())) != aContinent;
-                }
-                catch (virus_name::Unrecognized&) {
-                }
-                catch (LocationNotFound&) {
-                }
-                return true;
-            };
-            remove(aIndices, not_in_continent);
-        }
+    void filter_country(Indices& aIndices, std::string aCountry, const LocDb& aLocDb) const;
+    void filter_continent(Indices& aIndices, std::string aContinent, const LocDb& aLocDb) const;
 
     inline Indices country(std::string aCountry, const LocDb& aLocDb) const  { auto indices = all_indices(); filter_country(indices, aCountry, aLocDb); return indices; }
     inline Indices continent(std::string aContinent, const LocDb& aLocDb) const  { auto indices = all_indices(); filter_country(indices, aContinent, aLocDb); return indices; }
@@ -360,6 +306,9 @@ template <typename AgSr> class AntigensSera : public std::vector<AgSr>
 
 }; // class AntigensSera<AgSr>
 
+extern template class AntigensSera<Antigen>;
+extern template class AntigensSera<Serum>;
+
 // ----------------------------------------------------------------------
 
 // using AntigenRefs = std::vector<const Antigen*>;
@@ -368,22 +317,19 @@ class Antigens : public AntigensSera<Antigen>
 {
  public:
     using CladeData = std::map<std::string, Indices>; // clade name to the list of antigen indices
+    using ContinentData = std::map<std::string, Indices>; // continent name to the list of antigen/serum indices
+    using CountryData = std::map<std::string, Indices>; // country name to the list of antigen/serum indices
 
-    // inline std::optional<size_t> find_by_full_name(std::string aFullName) const { return acmacs_chart_internal::find_by_full_name(*this, aFullName); }
-    // void find_by_name_matching(std::string aName, Indices& aAntigenIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
     void find_by_lab_id(std::string aLabId, Indices& aAntigenIndices) const;
     void continents(ContinentData& aContinentData, const LocDb& aLocDb, bool aExcludeReference = true) const;
     void countries(CountryData& aCountries, const LocDb& aLocDb, bool aExcludeReference = true) const;
 
-    // inline Indices all_indices() const { return filled_with_indexes<Indices::value_type>(size()); }
     inline void filter_reference(Indices& aIndices) const { remove(aIndices, [](const auto& entry) -> bool { return !entry.reference(); }); }
     inline void filter_test(Indices& aIndices) const { remove(aIndices, [](const auto& entry) -> bool { return entry.reference(); }); }
     inline void filter_egg(Indices& aIndices) const { remove(aIndices, [](const auto& entry) -> bool { return !entry.is_egg(); }); }
     inline void filter_cell(Indices& aIndices) const { remove(aIndices, [](const auto& entry) -> bool { return !entry.is_cell(); }); }
     inline void filter_reassortant(Indices& aIndices) const { remove(aIndices, [](const auto& entry) -> bool { return !entry.is_reassortant(); }); }
     inline void filter_date_range(Indices& aIndices, std::string first_date, std::string after_last_date) const { remove(aIndices, [=](const auto& entry) -> bool { return !entry.within_date_range(first_date, after_last_date); }); }
-    // void filter_country(Indices& aIndices, std::string aCountry, const LocDb& aLocDb) const;
-    // void filter_continent(Indices& aIndices, std::string aContinent, const LocDb& aLocDb) const;
 
     inline Indices reference_indices() const { auto indices = all_indices(); filter_reference(indices); return indices; }
     inline Indices test_indices() const { auto indices = all_indices(); filter_test(indices); return indices; }
@@ -391,12 +337,6 @@ class Antigens : public AntigensSera<Antigen>
     inline Indices cell_indices() const { auto indices = all_indices(); filter_cell(indices); return indices; }
     inline Indices reassortant_indices() const { auto indices = all_indices(); filter_reassortant(indices); return indices; }
     inline Indices date_range_indices(std::string first_date, std::string after_last_date) const { auto indices = all_indices(); filter_date_range(indices, first_date, after_last_date); return indices; }
-
- // private:
- //    inline void remove(Indices& aIndices, std::function<bool (const Antigen&)> aFilter) const
- //        {
- //            aIndices.erase(std::remove_if(aIndices.begin(), aIndices.end(), [&aFilter, this](auto index) -> bool { return aFilter((*this)[index]); }), aIndices.end());
- //        }
 
 }; // class Antigens
 
@@ -406,12 +346,6 @@ class Sera : public AntigensSera<Serum>
 {
  public:
     inline void filter_serum_id(Indices& aIndices, std::string aSerumId) const { remove(aIndices, [&aSerumId](const auto& entry) -> bool { return entry.serum_id() != aSerumId; }); }
-
-    // inline Indices find_by_name(std::string aName) const { return acmacs_chart_internal::find_by_name(*this, aName); }
-    // inline std::optional<size_t> find_by_full_name(std::string aFullName) const { return acmacs_chart_internal::find_by_full_name(*this, aFullName); }
-    // void find_by_name_matching(std::string aName, Indices& aSeraIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
-
-    // inline Indices all_indices() const { return filled_with_indexes<Indices::value_type>(size()); }
 
 }; // class Sera
 
