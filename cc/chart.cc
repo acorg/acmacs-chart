@@ -9,12 +9,12 @@
 
 // ----------------------------------------------------------------------
 
-static inline std::string name_abbreviated(std::string aName, const LocDb& aLocDb)
+static inline std::string name_abbreviated(std::string aName)
 {
     try {
         std::string virus_type, host, location, isolation, year, passage;
         virus_name::split(aName, virus_type, host, location, isolation, year, passage);
-        return string::join("/", {aLocDb.abbreviation(location), isolation, year.substr(2)});
+        return string::join("/", {get_locdb().abbreviation(location), isolation, year.substr(2)});
     }
     catch (virus_name::Unrecognized&) {
         return aName;
@@ -73,30 +73,29 @@ static AntigenSerumMatch antigen_serum_match(const AntigenSerumBase& left, const
 
 // ----------------------------------------------------------------------
 
-std::string Antigen::name_abbreviated(const LocDb& aLocDb) const
+std::string Antigen::name_abbreviated() const
 {
-    return ::name_abbreviated(name(), aLocDb);
+    return ::name_abbreviated(name());
 
 } // Antigen::name_abbreviated
 
-std::string Serum::name_abbreviated(const LocDb& aLocDb) const
+std::string Serum::name_abbreviated() const
 {
-    return ::name_abbreviated(name(), aLocDb);
+    return ::name_abbreviated(name());
 
 } // Serum::name_abbreviated
 
 // ----------------------------------------------------------------------
 
-std::string Antigen::location_abbreviated(const LocDb& aLocDb) const
+std::string Antigen::location_abbreviated() const
 {
-      // std::cerr << "DEBUG: location_abbreviated: \"" << name() << "\" -> \"" << virus_name::location(name()) << "\" -> \"" << aLocDb.abbreviation(virus_name::location(name())) << '"' << std::endl;
-    return aLocDb.abbreviation(virus_name::location(name()));
+    return get_locdb().abbreviation(virus_name::location(name()));
 
 } // Antigen::location_abbreviated
 
-std::string Serum::location_abbreviated(const LocDb& aLocDb) const
+std::string Serum::location_abbreviated() const
 {
-    return aLocDb.abbreviation(virus_name::location(name()));
+    return get_locdb().abbreviation(virus_name::location(name()));
 
 } // Serum::location_abbreviated
 
@@ -227,11 +226,11 @@ template <typename AgSr> void AntigensSera<AgSr>::find_by_name_matching(std::str
 
 // ----------------------------------------------------------------------
 
-template <typename AgSr> void AntigensSera<AgSr>::filter_country(Indices& aIndices, std::string aCountry, const LocDb& aLocDb) const
+template <typename AgSr> void AntigensSera<AgSr>::filter_country(Indices& aIndices, std::string aCountry) const
 {
     auto not_in_country = [&](const auto& entry) -> bool {
         try {
-            return aLocDb.country(virus_name::location(entry.name())) != aCountry;
+            return get_locdb().country(virus_name::location(entry.name())) != aCountry;
         }
         catch (virus_name::Unrecognized&) {
         }
@@ -245,11 +244,11 @@ template <typename AgSr> void AntigensSera<AgSr>::filter_country(Indices& aIndic
 
 // ----------------------------------------------------------------------
 
-template <typename AgSr> void AntigensSera<AgSr>::filter_continent(Indices& aIndices, std::string aContinent, const LocDb& aLocDb) const
+template <typename AgSr> void AntigensSera<AgSr>::filter_continent(Indices& aIndices, std::string aContinent) const
 {
     auto not_in_continent = [&](const auto& entry) -> bool {
         try {
-            return aLocDb.continent(virus_name::location(entry.name())) != aContinent;
+            return get_locdb().continent(virus_name::location(entry.name())) != aContinent;
         }
         catch (virus_name::Unrecognized&) {
         }
@@ -279,13 +278,13 @@ void Antigens::find_by_lab_id(std::string aLabId, Antigens::Indices& aAntigenInd
 
 // ----------------------------------------------------------------------
 
-void Antigens::continents(ContinentData& aContinentData, const LocDb& aLocDb, bool aExcludeReference) const
+void Antigens::continents(ContinentData& aContinentData, bool aExcludeReference) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {
         if (!aExcludeReference || !ag->reference()) {
             try {
                 const std::string location = virus_name::location(ag->name());
-                const std::string continent = aLocDb.continent(location);
+                const std::string continent = get_locdb().continent(location);
                 aContinentData[continent].push_back(static_cast<size_t>(ag - begin()));
             }
             catch (virus_name::Unrecognized&) {
@@ -299,13 +298,13 @@ void Antigens::continents(ContinentData& aContinentData, const LocDb& aLocDb, bo
 
 // ----------------------------------------------------------------------
 
-void Antigens::countries(CountryData& aCountries, const LocDb& aLocDb, bool aExcludeReference) const
+void Antigens::countries(CountryData& aCountries, bool aExcludeReference) const
 {
     for (auto ag = begin(); ag != end(); ++ag) {
         if (!aExcludeReference || !ag->reference()) {
             try {
                 const std::string location = virus_name::location(ag->name());
-                const std::string country = aLocDb.country(location);
+                const std::string country = get_locdb().country(location);
                 aCountries[country].push_back(static_cast<size_t>(ag - begin()));
             }
             catch (virus_name::Unrecognized&) {

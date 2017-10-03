@@ -22,7 +22,7 @@ class AntigenSerumBase
 
     virtual std::string full_name() const = 0;
     virtual std::string full_name_without_passage() const = 0;
-    virtual std::string abbreviated_name(const LocDb& aLocDb) const = 0;
+    virtual std::string abbreviated_name() const = 0;
 
     virtual const std::string name() const = 0;
     virtual const std::string lineage() const = 0;
