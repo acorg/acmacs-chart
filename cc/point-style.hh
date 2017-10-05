@@ -62,14 +62,16 @@ class PointStyle
             return *this;
         }
 
-    void draw(Surface& aSurface, const Coordinates& aCoord);
-
     inline PointStyle& show(Shown aShown = Shown::Shown) { mShown = aShown; return *this; }
     inline PointStyle& hide() { mShown = Shown::Hidden; return *this; }
     inline PointStyle& shape(Shape aShape) { mShape = aShape; return *this; }
     inline PointStyle& shape(std::string aShape) { if (aShape == "circle") shape(Shape::Circle); else if (aShape == "box") shape(Shape::Box); else if (aShape == "triangle") shape(Shape::Triangle); else THROW(std::runtime_error("Unrecognized point style shape: " + aShape), *this); return *this; }
     inline PointStyle& fill(Color c) { mFill = c; return *this; }
+    inline PointStyle& fill(std::string aColor) { mFill = aColor; return *this; }
+    inline PointStyle& fill(const char* aColor) { mFill = aColor; return *this; }
     inline PointStyle& outline(Color c) { mOutline = c; return *this; }
+    inline PointStyle& outline(std::string aColor) { mOutline = aColor; return *this; }
+    inline PointStyle& outline(const char* aColor) { mOutline = aColor; return *this; }
     inline PointStyle& size(Pixels aSize) { mSize = aSize; return *this; }
     inline PointStyle& outline_width(Pixels aOutlineWidth) { mOutlineWidth = aOutlineWidth; return *this; }
     inline PointStyle& aspect(Aspect aAspect) { mAspect = aAspect; return *this; }
