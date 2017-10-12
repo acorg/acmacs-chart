@@ -23,7 +23,7 @@ ACMACS_CHART_LIB = $(DIST)/libacmacschart.so
 
 CXXFLAGS = -g -MMD $(OPTIMIZATION) $(PROFILE) -fPIC -std=$(STD) $(WEVERYTHING) $(WARNINGS) -Icc -I$(AD_INCLUDE) $(PKG_INCLUDES)
 LDFLAGS = $(OPTIMIZATION) $(PROFILE)
-LDLIBS = -L$(AD_LIB) -lacmacsbase -llocationdb $$(pkg-config --libs liblzma)
+LDLIBS = -L$(AD_LIB) -lacmacsbase -llocationdb $$(pkg-config --libs liblzma) $(CXX_LIB)
 PY_LDLIBS = $(LDLIBS) $(shell $(PYTHON_CONFIG) --ldflags | sed -E 's/-Wl,-stack_size,[0-9]+//')
 
 PKG_INCLUDES = $(shell pkg-config --cflags liblzma) $(shell $(PYTHON_CONFIG) --includes)

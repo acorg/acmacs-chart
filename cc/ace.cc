@@ -329,7 +329,7 @@ static jsi::data<Ace> ace_data = {
 
 Chart* import_chart(std::string buffer, report_time timer)
 {
-    Timeit ti("reading chart from " + buffer + ": ", std::cerr, timer);
+    Timeit ti("DEBUG: reading chart from " + buffer + ": ", std::cerr, timer);
     if (buffer == "-")
         buffer = acmacs_base::read_stdin();
     else if (acmacs_base::xz_compressed(buffer))
