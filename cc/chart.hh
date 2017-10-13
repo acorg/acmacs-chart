@@ -52,11 +52,11 @@ class Antigen : public AntigenBase
 {
  public:
     inline Antigen() = default;
-    virtual inline std::string full_name() const override { return string::join({name(), reassortant(), annotations().join(), passage()}); }
-    virtual inline std::string full_name_without_passage() const override { return string::join({name(), reassortant(), annotations().join()}); }
+    inline std::string full_name() const override { return string::join({name(), reassortant(), annotations().join(), passage()}); }
+    inline std::string full_name_without_passage() const override { return string::join({name(), reassortant(), annotations().join()}); }
     virtual inline std::string full_name_for_seqdb_matching() const { return string::join({name(), reassortant(), passage(), annotations().join()}); } // annotations may part of the passage in seqdb (NIMR ISOLATE 1)
-    virtual inline std::string abbreviated_name() const override { return string::join({name_abbreviated(), reassortant(), annotations().join()}); }
-    virtual inline std::string abbreviated_name_with_passage_type() const { return string::join("-", {name_abbreviated(), reassortant(), annotations().join(), passage_type()}); }
+    inline std::string abbreviated_name() const override { return string::join({name_abbreviated(), reassortant(), annotations().join()}); }
+    inline std::string abbreviated_name_with_passage_type() const override { return string::join("-", {name_abbreviated(), reassortant(), annotations().join(), passage_type()}); }
     virtual inline std::string abbreviated_location_with_passage_type() const { return string::join("-", {location_abbreviated(), passage_type()}); }
 
     inline const std::string name() const override { return mName; }
@@ -125,6 +125,7 @@ class Serum : public SerumBase
     inline std::string full_name() const override { return string::join({name(), reassortant(), serum_id(), annotations().join()}); } // serum_id comes before annotations, see hidb chart.cc Serum::variant_id
     inline std::string full_name_without_passage() const override { return full_name(); }
     inline std::string abbreviated_name() const override { return string::join({name_abbreviated(), reassortant(), annotations().join()}); }
+    inline std::string abbreviated_name_with_passage_type() const override { return abbreviated_name(); }
 
     inline const std::string name() const override { return mName; }
     inline std::string& name() { return mName; }
