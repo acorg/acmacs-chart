@@ -364,7 +364,7 @@ const std::string ChartInfo::make_name() const
 const std::string Chart::make_name(size_t aProjectionNo) const
 {
     const auto& info = chart_info();
-    std::string n = info.name();
+    std::string n = info.make_name();
     if (aProjectionNo != static_cast<size_t>(-1) && aProjectionNo < projections().size()) {
         n += " >=" + projection(aProjectionNo).minimum_column_basis().str();
         n += " " + std::to_string(projection(aProjectionNo).stress());
