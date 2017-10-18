@@ -5,6 +5,8 @@
 #include "acmacs-base/json-importer.hh"
 namespace jsi = json_importer;
 
+#include "point-style.hh"
+
 // ----------------------------------------------------------------------
 // ~/ac/acmacs/docs/ace-format.json
 // ----------------------------------------------------------------------
@@ -518,12 +520,16 @@ void export_chart(std::string aFilename, const Chart& aChart, report_time timer)
 
 // ----------------------------------------------------------------------
 
-// void export_chart(std::string aFilename, const Chart& aChart, const std::vector<PointStyle>& aPointStyles);
-// {
-//     ChartPlotSpec& plot_spec = const_cast<Chart&>(aChart).plot_spec();
-//     jsw::export_to_json(aChart, aFilename, 1, acmacs_base::ForceCompression::Yes);
+void export_chart(std::string aFilename, Chart& aChart, const std::vector<PointStyle>& aPointStyles, const Transformation& aTransformation, report_time timer)
+{
+    Timeit ti("writing chart to " + aFilename + ": ", std::cerr, timer);
+    if (aChart.number_of_projections()) {
+        dynamic_cast<Projection&>(aChart.projection(0)).transformation() = aTransformation;
+    }
+    ChartPlotSpec& plot_spec = aChart.plot_spec();
+    jsw::export_to_json(aChart, aFilename, 1, acmacs_base::ForceCompression::Yes);
 
-// } // export_chart
+} // export_chart
 
 // ----------------------------------------------------------------------
 /// Local Variables:
