@@ -202,14 +202,14 @@ namespace acmacs_chart_internal
     {
         auto name_match = [&](size_t index) -> bool { return aAgSr[index].name().find(aName) != std::string::npos; };
         Indices result(aAgSr.size());
-        result.erase(std::copy_if(incrementer<size_t>::begin(0), incrementer<size_t>::end(aAgSr.size()), result.begin(), name_match), result.end());
+        result.erase(std::copy_if(acmacs::incrementer<size_t>::begin(0), acmacs::incrementer<size_t>::end(aAgSr.size()), result.begin(), name_match), result.end());
         return result;
     }
 
     template <typename AgSr> inline std::optional<size_t> find_by_full_name(const AgSr& aAgSr, std::string aFullName)
     {
         auto name_match = [&](size_t index) -> bool { return aAgSr[index].full_name() == aFullName; };
-        const auto found = std::find_if(incrementer<size_t>::begin(0), incrementer<size_t>::end(aAgSr.size()), name_match);
+        const auto found = std::find_if(acmacs::incrementer<size_t>::begin(0), acmacs::incrementer<size_t>::end(aAgSr.size()), name_match);
         if (*found == aAgSr.size())
             return {};
         else
@@ -233,7 +233,7 @@ template <typename AgSr> class AntigensSera : public std::vector<AgSr>
     inline std::optional<size_t> find_by_full_name(std::string aFullName) const { return acmacs_chart_internal::find_by_full_name(*this, aFullName); }
     void find_by_name_matching(std::string aName, Indices& aIndices, string_match::score_t aScoreThreshold = 0, bool aVerbose = false) const;
 
-    inline Indices all_indices() const { return filled_with_indexes<Indices::value_type>(this->size()); }
+    inline Indices all_indices() const { return acmacs::filled_with_indexes<Indices::value_type>(this->size()); }
     void filter_country(Indices& aIndices, std::string aCountry) const;
     void filter_continent(Indices& aIndices, std::string aContinent) const;
 
@@ -361,8 +361,9 @@ class Projection : public ProjectionBase
     inline std::vector<double>& column_bases_for_json() { return mColumnBases.data(); }
     inline const std::vector<double>& column_bases_for_json() const { return mColumnBases.data(); }
 
-    inline Transformation& transformation() { return mTransformation; }
+    inline Transformation& transformation() { return mTransformation; } // required by json_importer
     inline const Transformation& transformation() const override { return mTransformation; }
+    inline void transformation(const Transformation& aTransformation) override { mTransformation = aTransformation; }
 
     inline std::vector<double>& gradient_multipliers() { return mGradientMultipliers; }
     inline const std::vector<double>& gradient_multipliers() const { return mGradientMultipliers; }
@@ -598,7 +599,7 @@ class Chart : public ChartBase
 
     inline size_t number_of_antigens() const override { return mAntigens.size(); }
     inline size_t number_of_sera() const override { return mSera.size(); }
-      // inline size_t number_of_points() const override { return number_of_antigens() + number_of_sera(); }
+    inline size_t number_of_points() const { return number_of_antigens() + number_of_sera(); }
     std::string lineage() const;
     const std::string make_name(size_t aProjectionNo = static_cast<size_t>(-1)) const;
 
@@ -684,14 +685,14 @@ class Chart : public ChartBase
     inline const ChartPlotSpec& plot_spec() const { return mPlotSpec; }
     inline ChartPlotSpec& plot_spec() { return mPlotSpec; }
 
-    // inline IndexGenerator antigen_indices() const { return {number_of_antigens(), [](size_t) { return true; } }; }
-    // inline IndexGenerator reference_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].reference(); } }; }
-    // inline IndexGenerator test_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return !mAntigens[index].reference(); } }; }
-    // inline IndexGenerator egg_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].is_egg(); } }; }
-    // inline IndexGenerator reassortant_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].is_reassortant(); } }; }
-    // inline IndexGenerator serum_indices() const { return {number_of_antigens(), number_of_points(), [](size_t) { return true; } }; }
+    // inline acmacs::IndexGenerator antigen_indices() const { return {number_of_antigens(), [](size_t) { return true; } }; }
+    // inline acmacs::IndexGenerator reference_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].reference(); } }; }
+    // inline acmacs::IndexGenerator test_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return !mAntigens[index].reference(); } }; }
+    // inline acmacs::IndexGenerator egg_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].is_egg(); } }; }
+    // inline acmacs::IndexGenerator reassortant_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return mAntigens[index].is_reassortant(); } }; }
+    // inline acmacs::IndexGenerator serum_indices() const { return {number_of_antigens(), number_of_points(), [](size_t) { return true; } }; }
 
-    inline IndexGenerator antigens_not_found_in(const Chart& aNother) const
+    inline acmacs::IndexGenerator antigens_not_found_in(const Chart& aNother) const
         {
             auto filter = [this,&aNother](size_t aIndex) -> bool {
                 return !aNother.antigens().find_by_full_name(this->antigens()[aIndex].full_name());

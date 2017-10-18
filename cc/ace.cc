@@ -331,7 +331,7 @@ static jsi::data<Ace> ace_data = {
 
 Chart* import_chart(std::string buffer, report_time timer)
 {
-    Timeit ti("DEBUG: reading chart from " + buffer + ": ", std::cerr, timer);
+    Timeit ti("DEBUG: reading chart from " + buffer + ": ", timer);
     if (buffer == "-")
         buffer = acmacs_base::read_stdin();
     else if (acmacs_base::xz_compressed(buffer))
@@ -513,20 +513,7 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
 
 void export_chart(std::string aFilename, const Chart& aChart, report_time timer)
 {
-    Timeit ti("writing chart to " + aFilename + ": ", std::cerr, timer);
-    jsw::export_to_json(aChart, aFilename, 1, acmacs_base::ForceCompression::Yes);
-
-} // export_chart
-
-// ----------------------------------------------------------------------
-
-void export_chart(std::string aFilename, Chart& aChart, const std::vector<PointStyle>& aPointStyles, const Transformation& aTransformation, report_time timer)
-{
-    Timeit ti("writing chart to " + aFilename + ": ", std::cerr, timer);
-    if (aChart.number_of_projections()) {
-        dynamic_cast<Projection&>(aChart.projection(0)).transformation() = aTransformation;
-    }
-    ChartPlotSpec& plot_spec = aChart.plot_spec();
+    Timeit ti("writing chart to " + aFilename + ": ", timer);
     jsw::export_to_json(aChart, aFilename, 1, acmacs_base::ForceCompression::Yes);
 
 } // export_chart

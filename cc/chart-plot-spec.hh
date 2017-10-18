@@ -4,6 +4,9 @@
 #include <vector>
 
 #include "acmacs-base/throw.hh"
+#include "acmacs-base/float.hh"
+
+class Chart;
 
 // ----------------------------------------------------------------------
 
@@ -14,6 +17,13 @@ class LabelStyle
     enum class Weight {Normal, Bold};
 
     inline LabelStyle() : mShown(true), mSlant(Slant::Normal), mWeight(Weight::Normal), mSize(1), mColor("black"), mRotation(0), mInterline(0.2) {}
+
+    inline bool operator==(const LabelStyle& aNother) const
+        {
+            return mShown == aNother.mShown && mPosition == aNother.mPosition && mText == aNother.mText && mFace == aNother.mFace
+                    && mSlant == aNother.mSlant && mWeight == aNother.mWeight && float_equal(mSize, aNother.mSize) && mColor == aNother.mColor
+                    && float_equal(mRotation, aNother.mRotation) && float_equal(mInterline, aNother.mInterline);
+        }
 
     inline void shown(bool aShown) { mShown = aShown; }
     inline bool shown() const { return mShown; }
@@ -110,21 +120,34 @@ class ChartPlotSpecStyle
  public:
     enum Shape {Circle, Box, Triangle};
 
-    inline ChartPlotSpecStyle() : mShown(true), mFillColor("transparent"), mOutlineColor("black"), mOutlineWidth(1), mShape(Circle), mSize(1), mRotation(0), mAspect(1) {}
+    inline ChartPlotSpecStyle() : mShown(true), mFillColor("green"), mOutlineColor("black"), mOutlineWidth(1), mShape(Circle), mSize(1), mRotation(0), mAspect(1) {}
+    inline ChartPlotSpecStyle(std::string aFillColor, std::string aOulineColor, Shape aShape, double aSize)
+        : mShown(true), mFillColor(aFillColor), mOutlineColor(aOulineColor), mOutlineWidth(1), mShape(aShape), mSize(aSize), mRotation(0), mAspect(1) {}
+
+    inline bool operator == (const ChartPlotSpecStyle& aNother) const
+        {
+            return mShown == aNother.mShown && mFillColor == aNother.mFillColor && mOutlineColor == aNother.mOutlineColor && float_equal(mOutlineWidth, aNother.mOutlineWidth)
+                    && mShape == aNother.mShape && float_equal(mSize, aNother.mSize) && float_equal(mRotation, aNother.mRotation)
+                    && float_equal(mAspect, aNother.mAspect) && mLabel == aNother.mLabel;
+        }
 
     inline void shown(bool aShown) { mShown = aShown; }
     inline bool shown() const { return mShown; }
 
     inline void fill_color(const char* str, size_t length) { mFillColor.assign(str, length); }
+    inline void fill(std::string aColor) { mFillColor = aColor; }
     inline std::string fill_color() const { return mFillColor; }
 
     inline void outline_color(const char* str, size_t length) { mOutlineColor.assign(str, length); }
+    inline void outline(std::string aColor) { mOutlineColor = aColor; }
     inline std::string outline_color() const { return mOutlineColor; }
 
     inline void outline_width(double aOutlineWidth) { mOutlineWidth = aOutlineWidth; }
     inline double outline_width() const { return mOutlineWidth; }
 
     inline void shape(const char* str, size_t length) { mShape = shape_from_string(str, length); }
+      //inline void shape(std::string aShape) { mShape = shape_from_string(aShape.c_str(), aShape.size()); }
+    inline void set_shape(Shape aShape) { mShape = aShape; }
     inline Shape shape() const { return mShape; }
     inline std::string shape_as_string() const
         {
@@ -203,14 +226,24 @@ class ChartPlotSpec
 
     inline const ChartPlotSpecStyle& style_for(size_t aPointNo) const
         {
-            return styles().at(style_for_point().at(aPointNo));
+            try {
+                return styles().at(style_for_point().at(aPointNo));
+            }
+            catch (std::out_of_range&) {
+                throw std::runtime_error("Invalid ChartPlotSpec: no style for point " + std::to_string(aPointNo));
+            }
         }
+
+    void set(size_t aPointNo, const ChartPlotSpecStyle& aStyle);
+    void reset(const Chart& aChart);
 
  private:
     std::vector<size_t> mDrawingOrder;       // "d"
     std::vector<size_t> mStyleForPoint;      // "p"
     std::vector<ChartPlotSpecStyle> mStyles; // "P"
     std::vector<size_t> mShownOnAll;         // "s"
+
+    void clear();
 
 }; // class ChartPlotSpec
 

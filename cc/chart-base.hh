@@ -130,6 +130,7 @@ class ProjectionBase
 
       // virtual Transformation& transformation()  = 0;
     virtual const Transformation& transformation() const = 0;
+    virtual void transformation(const Transformation&) = 0;
 
     // inline std::vector<double>& gradient_multipliers() { return mGradientMultipliers; }
     // inline const std::vector<double>& gradient_multipliers() const { return mGradientMultipliers; }
@@ -273,14 +274,14 @@ class ChartBase
     // inline const ChartPlotSpec& plot_spec() const { return mPlotSpec; }
     // inline ChartPlotSpec& plot_spec() { return mPlotSpec; }
 
-    inline IndexGenerator antigen_indices() const { return {number_of_antigens(), [](size_t) { return true; } }; }
-    inline IndexGenerator reference_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return antigen(index).reference(); } }; }
-    inline IndexGenerator test_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return !antigen(index).reference(); } }; }
-    inline IndexGenerator egg_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return antigen(index).is_egg(); } }; }
-    inline IndexGenerator reassortant_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return antigen(index).is_reassortant(); } }; }
-    inline IndexGenerator serum_indices() const { return {number_of_antigens(), number_of_points(), [](size_t) { return true; } }; }
+    inline acmacs::IndexGenerator antigen_indices() const { return {number_of_antigens(), [](size_t) { return true; } }; }
+    inline acmacs::IndexGenerator reference_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return antigen(index).reference(); } }; }
+    inline acmacs::IndexGenerator test_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return !antigen(index).reference(); } }; }
+    inline acmacs::IndexGenerator egg_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return antigen(index).is_egg(); } }; }
+    inline acmacs::IndexGenerator reassortant_antigen_indices() const { return {number_of_antigens(), [this](size_t index) { return antigen(index).is_reassortant(); } }; }
+    inline acmacs::IndexGenerator serum_indices() const { return {number_of_antigens(), number_of_points(), [](size_t) { return true; } }; }
 
-    // inline IndexGenerator antigens_not_found_in(const Chart& aNother) const
+    // inline acmacs::IndexGenerator antigens_not_found_in(const Chart& aNother) const
     //     {
     //         auto filter = [this,&aNother](size_t aIndex) -> bool {
     //             const size_t found = aNother.antigens().find_by_name_for_exact_matching(this->antigens()[aIndex].full_name());

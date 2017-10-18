@@ -25,8 +25,6 @@ class AceChartReadError : public std::runtime_error { public: using std::runtime
 
 Chart* import_chart(std::string data, report_time timer = report_time::No);
 void export_chart(std::string aFilename, const Chart& aChart, report_time timer = report_time::No);
-// change first projection transformation and chart plot spec, then export it
-void export_chart(std::string aFilename, Chart& aChart, const std::vector<PointStyle>& aPointStyles, const Transformation& aTransformation, report_time timer = report_time::No);
 
 // ----------------------------------------------------------------------
 
