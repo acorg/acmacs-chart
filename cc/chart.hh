@@ -344,7 +344,7 @@ class Projection : public ProjectionBase
     inline void comment(const char* str, size_t length) { mComment.assign(str, length); }
     inline std::string comment() const override { return mComment; }
 
-    inline LayoutBase& layout() { return mLayout; }
+    inline LayoutBase& layout() override { return mLayout; }
     inline const LayoutBase& layout() const override { return mLayout; }
     inline std::vector<std::vector<double>>& layout_for_json() { return reinterpret_cast<std::vector<std::vector<double>>&>(mLayout.data()); }
     inline const std::vector<Coordinates>& layout_for_json() const { return mLayout.data(); }

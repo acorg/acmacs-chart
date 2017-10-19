@@ -117,7 +117,7 @@ class ProjectionBase
 
     virtual std::string comment() const = 0;
 
-      // virtual LayoutBase& layout() = 0;
+    virtual LayoutBase& layout() = 0;
     virtual const LayoutBase& layout() const = 0;
 
       // virtual void stress(double aStress) = 0;
