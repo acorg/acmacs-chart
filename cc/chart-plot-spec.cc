@@ -1,5 +1,5 @@
 #include "acmacs-base/range.hh"
-#include "acmacs-base/enumerate.hh"
+//#include "acmacs-base/enumerate.hh"
 #include "chart-plot-spec.hh"
 #include "chart.hh"
 

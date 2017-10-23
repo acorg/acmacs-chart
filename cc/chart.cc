@@ -4,8 +4,13 @@
 
 #include "acmacs-base/virus-name.hh"
 #include "acmacs-base/range.hh"
+#include "acmacs-base/enumerate.hh"
 
 #include "chart.hh"
+
+#ifdef __clang__
+#pragma GCC diagnostic ignored "-Wexit-time-destructors"
+#endif
 
 // ----------------------------------------------------------------------
 
@@ -155,11 +160,6 @@ AntigenSerumMatch Serum::match(const Serum& aNother) const
 
 // ----------------------------------------------------------------------
 
-#pragma GCC diagnostic push
-#ifdef __clang__
-#pragma GCC diagnostic ignored "-Wexit-time-destructors"
-#endif
-
 AntigenSerumMatch Serum::match(const Antigen& aNother) const
 {
     AntigenSerumMatch m = antigen_serum_match(*this, aNother);
@@ -176,8 +176,6 @@ AntigenSerumMatch Serum::match(const Antigen& aNother) const
     return m;
 
 } // Serum::match
-
-#pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------
 
@@ -244,21 +242,58 @@ template <typename AgSr> void AntigensSera<AgSr>::filter_country(Indices& aIndic
 
 // ----------------------------------------------------------------------
 
+template <typename AgSr> class ContinentToIndices : public std::map<std::string, std::vector<size_t>>
+{
+ public:
+    ContinentToIndices(const AntigensSera<AgSr>& aAgSr)
+        {
+            auto add = [this](size_t aIndex, std::string aContinent) {
+                const auto [iter, added] = this->emplace(aContinent, mapped_type{});
+                iter->second.push_back(aIndex);
+            };
+
+            const auto& locdb = get_locdb(report_time::Yes);
+            for (const auto [index, entry]: acmacs::enumerate(aAgSr)) {
+                try {
+                    add(index, locdb.continent(virus_name::location(entry.name())));
+                }
+                catch (std::exception&) {
+                    add(index, "UNKNOWN");
+                }
+            }
+        }
+
+}; // class ContinentToIndices<>
+
 template <typename AgSr> void AntigensSera<AgSr>::filter_continent(Indices& aIndices, std::string aContinent) const
 {
-    auto not_in_continent = [&](const auto& entry) -> bool {
-        try {
-            return get_locdb().continent(virus_name::location(entry.name())) != aContinent;
-        }
-        catch (virus_name::Unrecognized&) {
-        }
-        catch (LocationNotFound&) {
-        }
-        return true;
-    };
-    remove(aIndices, not_in_continent);
+    static const ContinentToIndices<AgSr> continent_to_indices(*this);
+    const auto continent_indices = continent_to_indices.find(aContinent);
+    if (continent_indices == continent_to_indices.end()) {
+        aIndices.clear();
+    }
+    else {
+        auto not_in_continent = [&](size_t aIndex) -> bool { return std::find(std::begin(continent_indices->second), std::end(continent_indices->second), aIndex) == std::end(continent_indices->second); };
+        aIndices.erase(std::remove_if(aIndices.begin(), aIndices.end(), not_in_continent), aIndices.end());
+    }
 
 } // AntigensSera<AgSr>::filter_continent
+
+// template <typename AgSr> void AntigensSera<AgSr>::filter_continent(Indices& aIndices, std::string aContinent) const
+// {
+//     auto not_in_continent = [&](const auto& entry) -> bool {
+//         try {
+//             return get_locdb(report_time::Yes).continent(virus_name::location(entry.name())) != aContinent;
+//         }
+//         catch (virus_name::Unrecognized&) {
+//         }
+//         catch (LocationNotFound&) {
+//         }
+//         return true;
+//     };
+//     remove(aIndices, not_in_continent);
+
+// } // AntigensSera<AgSr>::filter_continent
 
 // ----------------------------------------------------------------------
 

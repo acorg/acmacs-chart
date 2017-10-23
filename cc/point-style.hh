@@ -2,6 +2,7 @@
 
 #include <string>
 #include <limits>
+#include <iostream>
 
 #include "acmacs-base/throw.hh"
 #include "acmacs-base/color-target.hh"
@@ -114,6 +115,15 @@ class PointStyle
 inline PointStyle PointStyleEmpty()
 {
     return {PointStyle::Empty};
+}
+
+// ----------------------------------------------------------------------
+
+inline std::ostream& operator<<(std::ostream& out, const PointStyle& aStyle)
+{
+    out << "PointStyle(fill=\"" << aStyle.fill() << "\", outline=\"" << aStyle.outline() << "\", size=" << aStyle.size()
+        << ", aspect=" << aStyle.aspect() << ", rotation=" << aStyle.rotation() << ")";
+    return out;
 }
 
 // ----------------------------------------------------------------------
