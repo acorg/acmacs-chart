@@ -272,6 +272,8 @@ class Antigens : public AntigensSera<Antigen>
     inline void filter_cell(Indices& aIndices) const { remove(aIndices, [](const auto& entry) -> bool { return !entry.is_cell(); }); }
     inline void filter_reassortant(Indices& aIndices) const { remove(aIndices, [](const auto& entry) -> bool { return !entry.is_reassortant(); }); }
     inline void filter_date_range(Indices& aIndices, std::string first_date, std::string after_last_date) const { remove(aIndices, [=](const auto& entry) -> bool { return !entry.within_date_range(first_date, after_last_date); }); }
+    inline void filter_found_in(Indices& aIndices, const Antigens& aNother) const { remove(aIndices, [&](const auto& entry) -> bool { return !aNother.find_by_full_name(entry.full_name()); }); }
+    inline void filter_not_found_in(Indices& aIndices, const Antigens& aNother) const { remove(aIndices, [&](const auto& entry) -> bool { return aNother.find_by_full_name(entry.full_name()).has_value(); }); }
 
     inline Indices reference_indices() const { auto indices = all_indices(); filter_reference(indices); return indices; }
     inline Indices test_indices() const { auto indices = all_indices(); filter_test(indices); return indices; }
