@@ -248,8 +248,7 @@ template <typename AgSr> class ContinentToIndices : public std::map<std::string,
     ContinentToIndices(const AntigensSera<AgSr>& aAgSr)
         {
             auto add = [this](size_t aIndex, std::string aContinent) {
-                const auto [iter, added] = this->emplace(aContinent, mapped_type{});
-                iter->second.push_back(aIndex);
+                this->emplace(aContinent, mapped_type{}).first->second.push_back(aIndex);
             };
 
             const auto& locdb = get_locdb(report_time::Yes);
