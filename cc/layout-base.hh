@@ -30,7 +30,7 @@ class LayoutBase
             return c1.empty() || c2.empty() ? no_distance : c1.distance(c2);
         }
 
-    void transform(const Transformation& aTransformation);
+    void transform(const acmacs::Transformation& aTransformation);
 
     void min_max_points(std::vector<size_t>& aMin, std::vector<size_t>& aMax) const;
 

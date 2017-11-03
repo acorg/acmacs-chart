@@ -94,7 +94,7 @@ class TransformationStorer : public jsi::StorerBase
  public:
     using Base = jsi::StorerBase;
 
-    inline TransformationStorer(Transformation& aTarget, size_t aElement = 0) : mTarget(aTarget), mElement(aElement) {}
+    inline TransformationStorer(acmacs::Transformation& aTarget, size_t aElement = 0) : mTarget(aTarget), mElement(aElement) {}
 
     inline virtual Base* StartArray()
         {
@@ -136,7 +136,7 @@ class TransformationStorer : public jsi::StorerBase
     inline virtual Base* Uint(unsigned u) { return Double(u); }
 
  private:
-    Transformation& mTarget;
+    acmacs::Transformation& mTarget;
     size_t mElement;
 
 }; // class TiterDictStorer
@@ -151,8 +151,8 @@ static jsi::data<Projection> projection_data = {
     {"l", jsi::field(&Projection::layout_for_json)},
     {"m", jsi::field(&Projection::minimum_column_basis)},
     {"s", jsi::field(&Projection::stress)},
-      //{"t", jsi::field<double, Projection, Projection, Transformation>(&Projection::transformation)},
-    {"t", jsi::field<TransformationStorer, Projection, Transformation>(&Projection::transformation)},
+      //{"t", jsi::field<double, Projection, Projection, acmacs::Transformation>(&Projection::transformation)},
+    {"t", jsi::field<TransformationStorer, Projection, acmacs::Transformation>(&Projection::transformation)},
     {"U", jsi::field(&Projection::unmovable)},
     {"u", jsi::field(&Projection::unmovable_in_last_dimension)},
     {"d", jsi::field(&Projection::dodgy_titer_is_regular)},
@@ -413,7 +413,7 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
                   << jsw::end_object;
 }
 
-template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const Transformation& aTransformation)
+template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writer, const acmacs::Transformation& aTransformation)
 {
     return writer << jsw::start_array << aTransformation.a << aTransformation.b << aTransformation.c << aTransformation.d << jsw::end_array;
 }

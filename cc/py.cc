@@ -126,8 +126,8 @@ PYBIND11_MODULE(acmacs_chart_backend, m)
             .def("make_name", &ChartInfo::make_name)
             ;
 
-    py::class_<Transformation>(m, "Transformation")
-            .def("transform", [](const Transformation& aTransformation, double x, double y) -> std::vector<double> { const auto [x1, y1] = aTransformation.transform(x, y); return {x1, y1}; }, py::arg("x"), py::arg("y"))
+    py::class_<acmacs::Transformation>(m, "Transformation")
+            .def("transform", [](const acmacs::Transformation& aTransformation, double x, double y) -> std::vector<double> { const auto [x1, y1] = aTransformation.transform(x, y); return {x1, y1}; }, py::arg("x"), py::arg("y"))
             ;
 
     py::class_<LayoutBase>(m, "LayoutBase")
@@ -211,7 +211,7 @@ PYBIND11_MODULE(acmacs_chart_backend, m)
     m.def("export_chart", [](std::string filename, const Chart& chart, bool timer) { export_chart(filename, chart, timer ? report_time::Yes : report_time::No); }, py::arg("filename"), py::arg("chart"), py::arg("timer") = false, py::doc("Exports chart into a file in the ace format."));
       // m.def("export_chart", py::overload_cast<std::string, const Chart&, const std::vector<PointStyle>&>(&export_chart), py::arg("filename"), py::arg("chart"), py::arg("point_styles"), py::doc("Exports chart into a file in the ace format."));
     m.def("export_chart_lispmds", py::overload_cast<std::string, const Chart&>(&export_chart_lispmds), py::arg("filename"), py::arg("chart"), py::doc("Exports chart into a file in the lispmds save format."));
-    m.def("export_chart_lispmds", py::overload_cast<std::string, const Chart&, const std::vector<PointStyle>&, const Transformation&>(&export_chart_lispmds), py::arg("filename"), py::arg("chart"), py::arg("point_styles"), py::arg("transformation"), py::doc("Exports chart into a file in the lispmds save format."));
+    m.def("export_chart_lispmds", py::overload_cast<std::string, const Chart&, const std::vector<PointStyle>&, const acmacs::Transformation&>(&export_chart_lispmds), py::arg("filename"), py::arg("chart"), py::arg("point_styles"), py::arg("transformation"), py::doc("Exports chart into a file in the lispmds save format."));
 
       // ----------------------------------------------------------------------
       //

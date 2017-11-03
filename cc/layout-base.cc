@@ -28,7 +28,7 @@ BoundingBall* LayoutBase::minimum_bounding_ball() const
 
 // ----------------------------------------------------------------------
 
-void LayoutBase::transform(const Transformation& aTransformation)
+void LayoutBase::transform(const acmacs::Transformation& aTransformation)
 {
       // multiply matrices: this x aTransformation
     for (size_t point_no = 0; point_no < number_of_points(); ++point_no) {

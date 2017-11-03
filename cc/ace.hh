@@ -4,7 +4,7 @@
 #include <vector>
 
 class PointStyle;
-class Transformation;
+namespace acmacs { class Transformation; }
 
 namespace json_writer
 {

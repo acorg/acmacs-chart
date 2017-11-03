@@ -363,9 +363,9 @@ class Projection : public ProjectionBase
     inline std::vector<double>& column_bases_for_json() { return mColumnBases.data(); }
     inline const std::vector<double>& column_bases_for_json() const { return mColumnBases.data(); }
 
-    inline Transformation& transformation() { return mTransformation; } // required by json_importer
-    inline const Transformation& transformation() const override { return mTransformation; }
-    inline void transformation(const Transformation& aTransformation) override { mTransformation = aTransformation; }
+    inline acmacs::Transformation& transformation() { return mTransformation; } // required by json_importer
+    inline const acmacs::Transformation& transformation() const override { return mTransformation; }
+    inline void transformation(const acmacs::Transformation& aTransformation) override { mTransformation = aTransformation; }
 
     inline std::vector<double>& gradient_multipliers() { return mGradientMultipliers; }
     inline const std::vector<double>& gradient_multipliers() const { return mGradientMultipliers; }
@@ -404,7 +404,7 @@ class Projection : public ProjectionBase
     double mStress;                                 // "s"
     MinimumColumnBasis mMinimumColumnBasis;         // "m": "1280", "none" (default)
     ColumnBases mColumnBases;                       // "C"
-    Transformation mTransformation;                 // "t": [1.0, 0.0, 0.0, 1.0]
+    acmacs::Transformation mTransformation;                 // "t": [1.0, 0.0, 0.0, 1.0]
     std::vector<double> mGradientMultipliers;       // "g": [] double for each point
     std::vector<double> mTiterMultipliers;          // "f": [],  antigens_sera_titers_multipliers, double for each point
     bool mDodgyTiterIsRegular;                      // "d": false

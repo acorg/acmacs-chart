@@ -7,10 +7,10 @@
 
 class Chart;
 class PointStyle;
-class Transformation;
+namespace acmacs { class Transformation; }
 
 void export_chart_lispmds(std::string aFilename, const Chart& aChart);
-void export_chart_lispmds(std::string aFilename, const Chart& aChart, const std::vector<PointStyle>& aPointStyles, const Transformation& aTransformation);
+void export_chart_lispmds(std::string aFilename, const Chart& aChart, const std::vector<PointStyle>& aPointStyles, const acmacs::Transformation& aTransformation);
 
 // ----------------------------------------------------------------------
 /// Local Variables:

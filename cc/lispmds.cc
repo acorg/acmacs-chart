@@ -10,13 +10,13 @@
 
 // ----------------------------------------------------------------------
 
-static std::string make_lispmds(const Chart& aChart, const std::vector<PointStyle>& aPointStyles, const Transformation* aTransformation);
+static std::string make_lispmds(const Chart& aChart, const std::vector<PointStyle>& aPointStyles, const acmacs::Transformation* aTransformation);
 static std::string table(const Chart& aChart);
 static std::string reference_antigens(const Chart& aChart);
 static std::string projections(const Chart& aChart);
 static std::string layout(const Projection& aProjection, const Chart& aChart);
 static std::string plot_spec(const Chart& aChart, const std::vector<PointStyle>& aPointStyles);
-static std::string transformation(const Chart& aChart, const Transformation* aTransformation);
+static std::string transformation(const Chart& aChart, const acmacs::Transformation* aTransformation);
 static std::string acmacs_b1_data(const Chart& aChart);
 static std::string encode(std::string aSource);
 static std::string convert_titer(std::string aSource);
@@ -33,7 +33,7 @@ void export_chart_lispmds(std::string aFilename, const Chart& aChart)
 
 // ----------------------------------------------------------------------
 
-void export_chart_lispmds(std::string aFilename, const Chart& aChart, const std::vector<PointStyle>& aPointStyles, const Transformation& aTransformation)
+void export_chart_lispmds(std::string aFilename, const Chart& aChart, const std::vector<PointStyle>& aPointStyles, const acmacs::Transformation& aTransformation)
 {
     acmacs_base::write_file(aFilename, make_lispmds(aChart, aPointStyles, &aTransformation));
 
@@ -41,7 +41,7 @@ void export_chart_lispmds(std::string aFilename, const Chart& aChart, const std:
 
 // ----------------------------------------------------------------------
 
-std::string make_lispmds(const Chart& aChart, const std::vector<PointStyle>& aPointStyles, const Transformation* aTransformation)
+std::string make_lispmds(const Chart& aChart, const std::vector<PointStyle>& aPointStyles, const acmacs::Transformation* aTransformation)
 {
     std::string output = ";; MDS configuration file (version 0.5). -*- Lisp -*-\n;; Created by acmacsd/acmacs-chart at ";
     output += time_format("%Y-%m-%d %H:%M %Z\n");
@@ -232,7 +232,7 @@ std::string plot_spec(const Chart& aChart, const std::vector<PointStyle>& aPoint
 
 // ----------------------------------------------------------------------
 
-std::string transformation(const Chart& aChart, const Transformation* aTransformation)
+std::string transformation(const Chart& aChart, const acmacs::Transformation* aTransformation)
 {
     std::string output;
     output += R"(    :CANVAS-COORD-TRANSFORMATIONS '(

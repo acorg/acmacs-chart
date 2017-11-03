@@ -128,9 +128,9 @@ class ProjectionBase
       // virtual ColumnBasesBase& column_bases() = 0;
     virtual const ColumnBasesBase& column_bases() const = 0;
 
-      // virtual Transformation& transformation()  = 0;
-    virtual const Transformation& transformation() const = 0;
-    virtual void transformation(const Transformation&) = 0;
+      // virtual acmacs::Transformation& transformation()  = 0;
+    virtual const acmacs::Transformation& transformation() const = 0;
+    virtual void transformation(const acmacs::Transformation&) = 0;
 
     // inline std::vector<double>& gradient_multipliers() { return mGradientMultipliers; }
     // inline const std::vector<double>& gradient_multipliers() const { return mGradientMultipliers; }
