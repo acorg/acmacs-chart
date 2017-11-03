@@ -252,7 +252,7 @@ template <typename AgSr> class ContinentToIndices : public std::map<std::string,
             };
 
             const auto& locdb = get_locdb(report_time::Yes);
-            for (const auto [index, entry]: acmacs::enumerate(aAgSr)) {
+            for (auto [index, entry]: acmacs::enumerate(aAgSr)) {
                 try {
                     add(index, locdb.continent(virus_name::location(entry.name())));
                 }
