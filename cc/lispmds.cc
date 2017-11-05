@@ -363,7 +363,7 @@ std::string convert_titer(std::string aSource)
 
 std::string double_to_string_lisp(double aValue)
 {
-    std::string result = double_to_string(aValue);
+    std::string result = acmacs::to_string(aValue);
     auto e_pos = result.find('e');
     if (e_pos != std::string::npos)
         result[e_pos] = 'd';
