@@ -1,6 +1,6 @@
 #include "acmacs-base/read-file.hh"
 #include "acmacs-base/xz.hh"
-#include "acmacs-base/date.hh"
+#include "acmacs-base/time.hh"
 #include "acmacs-base/string.hh"
 #include "acmacs-base/float.hh"
 
@@ -44,7 +44,7 @@ void export_chart_lispmds(std::string aFilename, const Chart& aChart, const std:
 std::string make_lispmds(const Chart& aChart, const std::vector<PointStyle>& aPointStyles, const acmacs::Transformation* aTransformation)
 {
     std::string output = ";; MDS configuration file (version 0.5). -*- Lisp -*-\n;; Created by acmacsd/acmacs-chart at ";
-    output += time_format("%Y-%m-%d %H:%M %Z\n");
+    output += acmacs::time_format("%Y-%m-%d %H:%M %Z\n");
     output += ";; Table: " + aChart.make_name() + "\n";
     if (!aChart.projections().empty()) {
         output += ";; stresses";
