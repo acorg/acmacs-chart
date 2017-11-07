@@ -449,7 +449,12 @@ std::string Chart::lineage() const
         if (!antigen.lineage().empty())
             lineages.insert(antigen.lineage());
     }
-    return string::join("+", lineages);
+    std::string lineage = string::join("+", lineages);
+    if (lineage == "V")
+        lineage = "VICTORIA";
+    else if (lineage == "Y")
+        lineage = "YAMAGATA";
+    return lineage;
 
 } // Chart::lineage
 
