@@ -19,11 +19,13 @@ PYTHON_VERSION = $(shell python3 -c 'import sys; print("{0.major}.{0.minor}".for
 PYTHON_CONFIG = python$(PYTHON_VERSION)-config
 PYTHON_MODULE_SUFFIX = $(shell $(PYTHON_CONFIG) --extension-suffix)
 
-ACMACS_CHART_LIB = $(DIST)/libacmacschart.so
+ACMACS_CHART_LIB_MAJOR = 1
+ACMACS_CHART_LIB_MINOR = 0
+ACMACS_CHART_LIB = $(DIST)/$(call shared_lib_name,libacmacschart,$(ACMACS_CHART_LIB_MAJOR),$(ACMACS_CHART_LIB_MINOR))
 
-CXXFLAGS = -g -MMD $(OPTIMIZATION) $(PROFILE) -fPIC -std=$(STD) $(WEVERYTHING) $(WARNINGS) -Icc -I$(AD_INCLUDE) $(PKG_INCLUDES)
+CXXFLAGS = -g -MMD $(OPTIMIZATION) $(PROFILE) -fPIC -std=$(STD) $(WARNINGS) -Icc -I$(AD_INCLUDE) $(PKG_INCLUDES)
 LDFLAGS = $(OPTIMIZATION) $(PROFILE)
-LDLIBS = -L$(AD_LIB) -lacmacsbase -llocationdb $$(pkg-config --libs liblzma) $(CXX_LIB)
+LDLIBS = $(AD_LIB)/$(call shared_lib_name,libacmacsbase,1,0) -L$(AD_LIB) -llocationdb $$(pkg-config --libs liblzma) $(CXX_LIB)
 PY_LDLIBS = $(LDLIBS) $(shell $(PYTHON_CONFIG) --ldflags | sed -E 's/-Wl,-stack_size,[0-9]+//')
 
 PKG_INCLUDES = $(shell pkg-config --cflags liblzma) $(shell $(PYTHON_CONFIG) --includes)
@@ -50,12 +52,12 @@ include $(ACMACSD_ROOT)/share/makefiles/Makefile.rtags
 # ----------------------------------------------------------------------
 
 $(BACKEND): $(patsubst %.cc,$(BUILD)/%.o,$(PY_SOURCES)) | $(DIST)
-	@echo "SHARED     " $@ # '<--' $^
+	@printf "%-16s %s\n" "SHARED" $@
 	@$(CXX) -shared $(LDFLAGS) -o $@ $^ $(PY_LDLIBS)
 
 $(ACMACS_CHART_LIB): $(patsubst %.cc,$(BUILD)/%.o,$(SOURCES)) | $(DIST) $(LOCATION_DB_LIB)
-	@echo "SHARED     " $@ # '<--' $^
-	@$(CXX) -shared $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	@printf "%-16s %s\n" "SHARED" $@
+	@$(call make_shared,libacmacschart,$(ACMACS_CHART_LIB_MAJOR),$(ACMACS_CHART_LIB_MINOR)) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 # ======================================================================
 ### Local Variables:
