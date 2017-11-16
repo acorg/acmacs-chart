@@ -16,11 +16,11 @@ class Surface;
 #include "acmacs-base/global-constructors-push.hh"
 
 const Aspect AspectRegular{1.0};
-const Aspect AspectEgg{0.75};
+// const Aspect AspectEgg{0.75};
 const Aspect AspectNoChange{std::numeric_limits<double>::quiet_NaN()};
 
 const Rotation RotationRegular{0.0};
-const Rotation RotationReassortant{0.5};
+// const Rotation RotationReassortant{0.5};
 const Rotation RotationNoChange{std::numeric_limits<double>::quiet_NaN()};
 
 #include "acmacs-base/diagnostics-pop.hh"
