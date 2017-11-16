@@ -3,7 +3,7 @@
 #include <iostream>
 #include <limits>
 
-#include "acmacs-chart/layout-base.hh"
+#include "acmacs-chart-1/layout-base.hh"
 
 // ----------------------------------------------------------------------
 

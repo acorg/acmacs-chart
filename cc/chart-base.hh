@@ -4,8 +4,8 @@
 
 #include "acmacs-base/range.hh"
 #include "acmacs-base/string-target.hh"
-#include "acmacs-chart/layout-base.hh"
-#include "acmacs-chart/antigen-serum-match.hh"
+#include "acmacs-chart-1/layout-base.hh"
+#include "acmacs-chart-1/antigen-serum-match.hh"
 
 class LocDb;
 

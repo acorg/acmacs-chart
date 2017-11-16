@@ -16,7 +16,7 @@ template <typename RW> jsw::writer<RW>& operator <<(jsw::writer<RW>&, const std:
 
 #include "acmacs-base/json-writer.hh"
 
-#include "acmacs-chart/chart.hh"
+#include "acmacs-chart-1/chart.hh"
 #include "acmacs-base/timeit.hh"
 
 // ----------------------------------------------------------------------

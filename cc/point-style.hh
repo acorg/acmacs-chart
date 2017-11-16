@@ -7,7 +7,7 @@
 #include "acmacs-base/throw.hh"
 #include "acmacs-base/color-target.hh"
 #include "acmacs-base/size-scale.hh"
-#include "acmacs-chart/layout.hh"
+#include "acmacs-chart-1/layout.hh"
 
 // ----------------------------------------------------------------------
 

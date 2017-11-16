@@ -11,9 +11,9 @@
 #include "acmacs-base/passage.hh"
 #include "locationdb/locdb.hh"
 
-#include "acmacs-chart/layout.hh"
-#include "acmacs-chart/chart-plot-spec.hh"
-#include "acmacs-chart/chart-base.hh"
+#include "acmacs-chart-1/layout.hh"
+#include "acmacs-chart-1/chart-plot-spec.hh"
+#include "acmacs-chart-1/chart-base.hh"
 
 // ----------------------------------------------------------------------
 
