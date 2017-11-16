@@ -42,7 +42,7 @@ install: check-acmacsd-root install-headers $(ACMACS_CHART_LIB) $(ACMACS_CHART_P
 	$(call install_lib,$(ACMACS_CHART_LIB))
 	$(call install_py_lib,$(ACMACS_CHART_PY_LIB))
 	ln -sf $(abspath py)/* $(AD_PY)
-	ln -sf $(abspath bin)/acmacs-chart-* $(AD_BIN)
+	@#ln -sf $(abspath bin)/acmacs-chart-* $(AD_BIN)
 
 test: install
 	test/test
