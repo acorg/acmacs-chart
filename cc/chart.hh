@@ -69,11 +69,11 @@ class Antigen : public AntigenBase
     inline std::string& passage() { return mPassage; }
     inline void passage(const char* str, size_t length) { mPassage.assign(str, length); }
     inline bool has_passage() const override { return !mPassage.empty(); }
-    inline std::string passage_without_date() const override { return passage::without_date(mPassage); }
+    inline std::string passage_without_date() const override { return acmacs::passage::without_date(mPassage); }
     inline const std::string reassortant() const override { return mReassortant; }
     inline std::string& reassortant() { return mReassortant; }
     inline void reassortant(const char* str, size_t length) { mReassortant.assign(str, length); }
-    inline bool is_egg() const override { return passage::is_egg(mPassage) && !is_reassortant(); }
+    inline bool is_egg() const override { return acmacs::passage::is_egg(mPassage) && !is_reassortant(); }
     inline bool is_reassortant() const override { return !mReassortant.empty(); }
     inline bool distinct() const override { return mAnnotations.distinct(); }
     inline const Annotations& annotations() const { return mAnnotations; }
@@ -137,11 +137,11 @@ class Serum : public SerumBase
     inline std::string& passage() { return mPassage; }
     inline void passage(const char* str, size_t length) { mPassage.assign(str, length); }
     inline bool has_passage() const override { return !mPassage.empty(); }
-    inline std::string passage_without_date() const override { return passage::without_date(mPassage); }
+    inline std::string passage_without_date() const override { return acmacs::passage::without_date(mPassage); }
     inline const std::string reassortant() const override { return mReassortant; }
     inline std::string& reassortant() { return mReassortant; }
     inline void reassortant(const char* str, size_t length) { mReassortant.assign(str, length); }
-    inline bool is_egg() const override { return passage::is_egg(mPassage) || is_reassortant(); } // reassortant is always egg (2016-10-21)
+    inline bool is_egg() const override { return acmacs::passage::is_egg(mPassage) || is_reassortant(); } // reassortant is always egg (2016-10-21)
     inline bool is_reassortant() const override { return !mReassortant.empty(); }
     inline bool distinct() const override { return mAnnotations.distinct(); }
     inline const Annotations& annotations() const { return mAnnotations; }
