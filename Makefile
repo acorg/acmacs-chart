@@ -11,7 +11,8 @@ PY_SOURCES = py.cc $(SOURCES)
 
 ACMACS_CHART_LIB_MAJOR = 1
 ACMACS_CHART_LIB_MINOR = 0
-ACMACS_CHART_LIB = $(DIST)/$(call shared_lib_name,libacmacschart,$(ACMACS_CHART_LIB_MAJOR),$(ACMACS_CHART_LIB_MINOR))
+ACMACS_CHART_LIB_NAME = libacmacschart
+ACMACS_CHART_LIB = $(DIST)/$(call shared_lib_name,$(ACMACS_CHART_LIB_NAME),$(ACMACS_CHART_LIB_MAJOR),$(ACMACS_CHART_LIB_MINOR))
 
 ACMACS_CHART_PY_LIB_MAJOR = 1
 ACMACS_CHART_PY_LIB_MINOR = 0
@@ -54,13 +55,13 @@ include $(ACMACSD_ROOT)/share/makefiles/Makefile.rtags
 
 # ----------------------------------------------------------------------
 
+$(ACMACS_CHART_LIB): $(patsubst %.cc,$(BUILD)/%.o,$(SOURCES)) | $(DIST) $(LOCATION_DB_LIB)
+	@printf "%-16s %s\n" "SHARED" $@
+	@$(call make_shared,$(ACMACS_CHART_LIB_NAME),$(ACMACS_CHART_LIB_MAJOR),$(ACMACS_CHART_LIB_MINOR)) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
 $(ACMACS_CHART_PY_LIB): $(patsubst %.cc,$(BUILD)/%.o,$(PY_SOURCES)) | $(DIST)
 	@printf "%-16s %s\n" "SHARED" $@
 	@$(call make_shared,$(ACMACS_CHART_PY_LIB_NAME),$(ACMACS_CHART_PY_LIB_MAJOR),$(ACMACS_CHART_PY_LIB_MINOR)) $(LDFLAGS) -o $@ $^ $(LDLIBS) $(PYTHON_LDLIBS)
-
-$(ACMACS_CHART_LIB): $(patsubst %.cc,$(BUILD)/%.o,$(SOURCES)) | $(DIST) $(LOCATION_DB_LIB)
-	@printf "%-16s %s\n" "SHARED" $@
-	@$(call make_shared,libacmacschart,$(ACMACS_CHART_LIB_MAJOR),$(ACMACS_CHART_LIB_MINOR)) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 # ======================================================================
 ### Local Variables:
