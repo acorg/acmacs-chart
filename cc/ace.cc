@@ -333,12 +333,12 @@ Chart* import_chart(std::string buffer, report_time timer)
 {
     Timeit ti("DEBUG: reading chart from " + buffer + ": ", timer);
     if (buffer == "-")
-        buffer = acmacs_base::read_stdin();
-    else if (acmacs_base::xz_compressed(buffer))
-        buffer = acmacs_base::xz_decompress(buffer);
+        buffer = acmacs::file::read_stdin();
+    else if (acmacs::file::xz_compressed(buffer))
+        buffer = acmacs::file::xz_decompress(buffer);
     else if (buffer[0] != '{') {
         try {
-            buffer = acmacs_base::read_file(buffer, true);
+            buffer = acmacs::file::read(buffer, true);
         }
         catch (std::exception& err) {
             throw AceChartReadError{"cannot import chart from \"" + buffer + "\": " + err.what()};
@@ -514,7 +514,7 @@ template <typename RW> inline jsw::writer<RW>& operator <<(jsw::writer<RW>& writ
 void export_chart(std::string aFilename, const Chart& aChart, report_time timer)
 {
     Timeit ti("writing chart to " + aFilename + ": ", timer);
-    jsw::export_to_json(aChart, aFilename, 1, acmacs_base::ForceCompression::Yes);
+    jsw::export_to_json(aChart, aFilename, 1, acmacs::file::ForceCompression::Yes);
 
 } // export_chart
 

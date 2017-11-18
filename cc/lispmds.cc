@@ -27,7 +27,7 @@ static std::string double_to_string_lisp(double aValue);
 void export_chart_lispmds(std::string aFilename, const Chart& aChart)
 {
     std::vector<PointStyle> point_styles;
-    acmacs_base::write_file(aFilename, make_lispmds(aChart, point_styles, nullptr));
+    acmacs::file::write(aFilename, make_lispmds(aChart, point_styles, nullptr));
 
 } // export_chart_lispmds
 
@@ -35,7 +35,7 @@ void export_chart_lispmds(std::string aFilename, const Chart& aChart)
 
 void export_chart_lispmds(std::string aFilename, const Chart& aChart, const std::vector<PointStyle>& aPointStyles, const acmacs::Transformation& aTransformation)
 {
-    acmacs_base::write_file(aFilename, make_lispmds(aChart, aPointStyles, &aTransformation));
+    acmacs::file::write(aFilename, make_lispmds(aChart, aPointStyles, &aTransformation));
 
 } // export_chart_lispmds
 
