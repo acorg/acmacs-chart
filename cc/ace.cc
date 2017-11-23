@@ -338,7 +338,7 @@ Chart* import_chart(std::string buffer, report_time timer)
         buffer = acmacs::file::xz_decompress(buffer);
     else if (buffer[0] != '{') {
         try {
-            buffer = acmacs::file::read(buffer, true);
+            buffer = acmacs::file::read(buffer);
         }
         catch (std::exception& err) {
             throw AceChartReadError{"cannot import chart from \"" + buffer + "\": " + err.what()};
