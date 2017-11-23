@@ -334,11 +334,11 @@ Chart* import_chart(std::string buffer, report_time timer)
     Timeit ti("DEBUG: reading chart from " + buffer + ": ", timer);
     if (buffer == "-")
         buffer = acmacs::file::read_stdin();
-    else if (acmacs::file::xz_compressed(buffer))
+    else if (acmacs::file::xz_compressed(buffer.data()))
         buffer = acmacs::file::xz_decompress(buffer);
     else if (buffer[0] != '{') {
         try {
-            buffer = acmacs::file::read(buffer);
+            buffer = static_cast<std::string>(acmacs::file::read(buffer));
         }
         catch (std::exception& err) {
             throw AceChartReadError{"cannot import chart from \"" + buffer + "\": " + err.what()};
